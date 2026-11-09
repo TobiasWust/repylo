@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { addDays, today, weekStart } from "./dates";
 import { buildData, type Data, type Rows } from "./model";
 import { calculatePlates } from "./plates";
+import { monthlyReview } from "./review";
+import { rate } from "./standards";
 import { suggestProgression } from "./progression";
 import { detectPrs, e1rm, exerciseSessions, records, setsPerMuscle, weekStreak } from "./stats";
 import { computeSuggestions, recoveringMuscles } from "./suggestions";
@@ -23,7 +25,7 @@ const build = (workouts: WorkoutSpec[], extra: Partial<Rows> = {}): Data => {
     templates: [],
     customExercises: [],
     bodyWeights: [],
-    settings: [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20 }],
+    settings: [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 1, standards: "male" }],
     exerciseSettings: [],
     dismissals: [],
     ...extra,
@@ -76,6 +78,13 @@ describe("stats", () => {
     const thisMonday = weekStart(today());
     const days = new Set([addDays(thisMonday, -7), addDays(thisMonday, -14)]);
     expect(weekStreak(days)).toBe(2);
+  });
+
+  it("only counts weeks that reach the weekly goal", () => {
+    const monday = weekStart(today());
+    const days = new Set([addDays(monday, -7), addDays(monday, -6), addDays(monday, -14)]);
+    expect(weekStreak(days, 2)).toBe(1);
+    expect(weekStreak(days, 1)).toBe(2);
   });
 
   it("detects PRs only when there is history to beat", () => {
@@ -234,5 +243,33 @@ describe("plates", () => {
 
   it("reports what can't be loaded exactly", () => {
     expect(calculatePlates(21, 20, "kg").remainder).toBe(0.5);
+  });
+});
+
+describe("strength standards", () => {
+  it("places a lift on the level scale", () => {
+    const r = rate("bench_press", 1.2, "male")!;
+    expect(r.level).toBe("intermediate");
+    expect(r.nextRatio).toBe(1.5);
+    expect(r.progress).toBeCloseTo(0.4);
+    expect(rate("bench_press", 1.2, "female")!.level).toBe("advanced");
+    expect(rate("leg_press", 3, "male")).toBeNull();
+  });
+});
+
+describe("monthly review", () => {
+  it("summarises a month and finds the biggest gain", () => {
+    const thisMonth = today().slice(0, 7);
+    const data = build([
+      { daysAgo: 0, exercises: { squat: [[110, 5], [110, 5]] } },
+      { daysAgo: 40, exercises: { squat: [[100, 5]] } },
+    ]);
+    const review = monthlyReview(data, thisMonth);
+    expect(review.workouts).toBe(1);
+    expect(review.sets).toBe(2);
+    expect(review.volume).toBe(1100);
+    expect(review.favorite?.exerciseKey).toBe("squat");
+    expect(review.biggestGain?.percent).toBeCloseTo(10);
+    expect(review.records).toBe(1);
   });
 });

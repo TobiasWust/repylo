@@ -7,6 +7,8 @@ import { Icon, LineChart, Segmented } from "../ui/components";
 import { useApp } from "../ui/context";
 import { equipmentName, formatDate, goalName, goalShort, muscleName } from "../ui/text";
 import { parseDay } from "../domain/dates";
+import { Sticker } from "../ui/stickers";
+import { ExerciseLevelCard } from "../ui/StrengthLevel";
 
 type ChartMetric = "e1rm" | "top" | "volume" | "reps" | "duration" | "distance";
 
@@ -139,6 +141,8 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
             )}
           </div>
 
+          <ExerciseLevelCard exerciseKey={exerciseKey} />
+
           <section className="card">
             <div className="section-row">
               <h2 className="card-title">{t("Verlauf", "Progress")}</h2>
@@ -149,7 +153,9 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
 
           {progression && (
             <section className="card yellow-card">
-              <h2 className="card-title">💡 {t("Nächstes Mal", "Next time")}</h2>
+              <h2 className="card-title with-sticker">
+                <Sticker name="bulb" /> {t("Nächstes Mal", "Next time")}
+              </h2>
               <p>
                 {progression.sets
                   .map((s) => (isTimed ? formatDuration(s.duration ?? 0) : `${s.reps ?? "–"}${s.weight ? ` × ${weight(s.weight)}` : ""}`))
@@ -214,7 +220,11 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
                       .map((x) => (isTimed ? formatDuration(x.duration ?? 0) + (x.distance ? ` · ${formatNumber(x.distance / 1000, lang, 2)} km` : "") : `${x.reps ?? "–"}${x.weight ? ` × ${weight(x.weight)}` : ""}`))
                       .join(" · ")}
                   </small>
-                  {s.note && <small className="note-line">📝 {s.note}</small>}
+                  {s.note && (
+                    <small className="note-line">
+                      <Sticker name="note" size={16} /> {s.note}
+                    </small>
+                  )}
                 </span>
               </button>
             ))}

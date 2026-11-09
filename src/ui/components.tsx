@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Sticker, type StickerName } from "./stickers";
 
 const paths = {
   home: "M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -10,6 +11,8 @@ const paths = {
   check: "M5 12l5 5L20 7",
   trash: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
   back: "M15 5l-7 7 7 7",
+  forward: "M9 5l7 7-7 7",
+  pencil: "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4",
   close: "M6 6l12 12M18 6 6 18",
   up: "M6 15l6-6 6 6",
   down: "M6 9l6 6 6-6",
@@ -221,9 +224,9 @@ export const Segmented = <T extends string>({ value, options, onChange }: { valu
   </div>
 );
 
-export const Empty = ({ emoji, children }: { emoji: string; children: ReactNode }) => (
+export const Empty = ({ sticker, children }: { sticker: StickerName; children: ReactNode }) => (
   <div className="empty">
-    <span className="empty-emoji">{emoji}</span>
+    <Sticker name={sticker} size={64} />
     <div>{children}</div>
   </div>
 );

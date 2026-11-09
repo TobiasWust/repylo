@@ -6,9 +6,11 @@ import { computeSuggestions, dismissDays, type Suggestion } from "../domain/sugg
 import { hasValue, trainedDays, weekStreak } from "../domain/stats";
 import { BackfillSheet } from "../ui/BackfillSheet";
 import { Icon } from "../ui/components";
+import { Sticker, type StickerName } from "../ui/stickers";
+import { previousMonth } from "../domain/review";
 import { useApp, type App } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
-import { formatDate, muscleName } from "../ui/text";
+import { formatDate, monthName, muscleName } from "../ui/text";
 import { ensureTodayWorkout, initialSets, templateItems } from "../ui/workoutOps";
 
 const tileColors = ["var(--yellow)", "var(--pink)", "var(--mint)", "var(--lavender)", "var(--sky)"];
@@ -19,7 +21,7 @@ const cardColors: Record<Suggestion["kind"], string> = {
   imbalance: "var(--mint)",
   plateau: "var(--sky)",
 };
-const cardEmoji: Record<Suggestion["kind"], string> = { split: "🔁", neglected: "🎯", missing: "⏳", imbalance: "⚖️", plateau: "📈" };
+const cardSticker: Record<Suggestion["kind"], StickerName> = { split: "repeat", neglected: "target", missing: "hourglass", imbalance: "balance", plateau: "chartUp" };
 
 const suggestionText = (s: Suggestion, app: App): { title: string; text: string } => {
   const { t, lang, data, exerciseName } = app;
@@ -116,7 +118,7 @@ const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
       }}
     >
       <div className="suggestion-head">
-        <span className="suggestion-emoji">{cardEmoji[suggestion.kind]}</span>
+        <Sticker name={cardSticker[suggestion.kind]} size={30} />
         <h3>{title}</h3>
         <button className="icon-button small" onClick={dismiss} aria-label={t("Ausblenden", "Dismiss")}>
           <Icon name="close" size={18} />
@@ -138,6 +140,34 @@ const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
   );
 };
 
+/** Progress ring for the weekly goal (training days this week / goal). */
+const GoalRing = ({ done, goal }: { done: number; goal: number }) => {
+  const r = 30;
+  const circumference = 2 * Math.PI * r;
+  const share = Math.min(1, done / goal);
+  return (
+    <svg className="goal-ring" width={84} height={84} viewBox="0 0 84 84" aria-hidden>
+      <circle cx={42} cy={42} r={r} fill="#fff" stroke="var(--ink)" strokeWidth={3} />
+      <circle cx={42} cy={42} r={r} fill="none" stroke="#fff" strokeWidth={11} />
+      <circle
+        cx={42}
+        cy={42}
+        r={r}
+        fill="none"
+        stroke={share >= 1 ? "var(--bg)" : "var(--pink)"}
+        strokeWidth={11}
+        strokeDasharray={`${share * circumference} ${circumference}`}
+        transform="rotate(-90 42 42)"
+      />
+      <circle cx={42} cy={42} r={r + 5.5} fill="none" stroke="var(--ink)" strokeWidth={2.5} />
+      <circle cx={42} cy={42} r={r - 5.5} fill="var(--yellow)" stroke="var(--ink)" strokeWidth={2.5} />
+      <foreignObject x={22} y={22} width={40} height={40}>
+        <div className="goal-ring-center">{share >= 1 ? <Sticker name="medal" size={30} /> : <Sticker name="flame" size={28} />}</div>
+      </foreignObject>
+    </svg>
+  );
+};
+
 export const Home = () => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName, setTab } = app;
@@ -145,12 +175,20 @@ export const Home = () => {
   // Recompute when data changes; "now" is fixed per render on purpose.
   const suggestions = useMemo(() => computeSuggestions(data), [data]);
   const days = useMemo(() => trainedDays(data), [data]);
-  const streak = weekStreak(days);
+  const goal = data.settings.weeklyGoal;
+  const streak = weekStreak(days, goal);
   const thisWeek = weekStart(today());
   const weekWorkouts = data.workouts.filter((w) => w.date >= thisWeek && w.exercises.some((e) => e.sets.some(hasValue)));
   const weekSets = weekWorkouts.reduce((n, w) => n + w.exercises.reduce((m, e) => m + e.sets.filter(hasValue).length, 0), 0);
   const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 5);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
+  const daysThisWeek = weekDays.filter((d) => days.has(d)).length;
+  // First week of a month: offer last month's review (once, dismissable).
+  const lastMonth = previousMonth(today().slice(0, 7));
+  const showReview =
+    Number(today().slice(8)) <= 7 &&
+    data.workouts.some((w) => w.date.startsWith(lastMonth)) &&
+    (data.dismissedUntil.get(`review:${lastMonth}`) ?? 0) < Date.now();
 
   const [backfill, setBackfill] = useState(false);
   const startToday = () => open({ type: "workout", id: ensureTodayWorkout(data, actions).id });
@@ -170,15 +208,26 @@ export const Home = () => {
           <div className="logo">repylo</div>
           <div className="tagline">Every rep counts.</div>
         </div>
-        <div className="streak-badge" title={t("Wochen in Folge", "Weeks in a row")}>
-          🔥 {streak}
+        <div className="streak-badge" title={t("Wochen in Folge mit erreichtem Wochenziel", "Weeks in a row with your weekly goal reached")}>
+          <Sticker name="flame" size={26} /> {streak}
         </div>
       </header>
 
       <section className="card hero">
-        <div className="hero-label">{t("Diese Woche", "This week")}</div>
-        <div className="hero-value">
-          {weekWorkouts.length} <small>{t(weekWorkouts.length === 1 ? "Training" : "Trainings", weekWorkouts.length === 1 ? "workout" : "workouts")}</small>
+        <div className="hero-top">
+          <GoalRing done={daysThisWeek} goal={goal} />
+          <div>
+            <div className="hero-label">{t("Diese Woche", "This week")}</div>
+            <div className="hero-value">
+              {daysThisWeek}
+              <small> / {goal}</small>
+            </div>
+            <div className="hero-label">
+              {daysThisWeek >= goal
+                ? t("Wochenziel geschafft!", "Weekly goal reached!")
+                : t(`Noch ${goal - daysThisWeek} ${goal - daysThisWeek === 1 ? "Trainingstag" : "Trainingstage"}`, `${goal - daysThisWeek} more training ${goal - daysThisWeek === 1 ? "day" : "days"} to go`)}
+            </div>
+          </div>
         </div>
         <div className="week-dots">
           {weekDays.map((d) => (
@@ -203,10 +252,25 @@ export const Home = () => {
           <Icon name={todays ? "dumbbell" : "bolt"} />
           {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Heute trainiert", "I trained today")}
         </button>
+        <button className="button full soft" onClick={() => setBackfill(true)}>
+          <Sticker name="calendar" size={24} /> {t("Früheres Training nachtragen", "Log a past workout")}
+        </button>
       </section>
-      <button className="link center" onClick={() => setBackfill(true)}>
-        {t("Früheres Training nachtragen", "Log a past workout")}
-      </button>
+
+      {showReview && (
+        <section className="card review-teaser">
+          <div className="suggestion-head">
+            <Sticker name="party" size={34} />
+            <h3>{t(`Dein ${monthName(lastMonth, lang)}-Rückblick ist da`, `Your ${monthName(lastMonth, lang)} review is ready`)}</h3>
+            <button className="icon-button small" onClick={() => actions.dismiss(`review:${lastMonth}`, 40)} aria-label={t("Ausblenden", "Dismiss")}>
+              <Icon name="close" size={18} />
+            </button>
+          </div>
+          <button className="button dark full" onClick={() => open({ type: "review", month: lastMonth })}>
+            {t("Ansehen", "Show me")}
+          </button>
+        </section>
+      )}
 
       {data.templates.length > 0 && (
         <section>
@@ -246,12 +310,16 @@ export const Home = () => {
           )}
         </div>
         {recent.length === 0 ? (
-          <div className="card muted-card">{t("Noch keine Trainings. Leg los! 💪", "No workouts yet. Let’s go! 💪")}</div>
+          <div className="card muted-card with-sticker">
+            <Sticker name="muscle" size={34} /> {t("Noch keine Trainings. Leg los!", "No workouts yet. Let’s go!")}
+          </div>
         ) : (
           <div className="stack">
             {recent.map((w) => (
               <button key={w.id} className="card list-card" onClick={() => open({ type: "workout", id: w.id })}>
-                <span className="list-icon">🏋️</span>
+                <span className="list-icon">
+                  <Sticker name="dumbbell" size={30} />
+                </span>
                 <span className="list-main">
                   <strong>
                     {data.templates.find((x) => x.id === w.templateId)?.name ??

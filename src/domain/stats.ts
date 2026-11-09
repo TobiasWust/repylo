@@ -164,13 +164,25 @@ export const majorMuscles = muscles.filter((m) => !minorMuscles.has(m));
 
 export const trainedDays = (data: Data): Set<string> => new Set(data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).map((w) => w.date));
 
-/** Consecutive weeks (Mon–Sun) with at least one workout. The current week counts once trained, but doesn't break the streak while still open. */
-export const weekStreak = (days: ReadonlySet<string>): number => {
-  const weeks = new Set([...days].map(weekStart));
+/** Training days per week (keyed by Monday). */
+export const daysPerWeek = (days: ReadonlySet<string>): Map<string, number> => {
+  const result = new Map<string, number>();
+  for (const day of days) result.set(weekStart(day), (result.get(weekStart(day)) ?? 0) + 1);
+  return result;
+};
+
+/**
+ * Consecutive weeks (Mon–Sun) in which the weekly goal was reached. The
+ * current week counts once the goal is met, but doesn't break the streak
+ * while it is still open.
+ */
+export const weekStreak = (days: ReadonlySet<string>, goal = 1): number => {
+  const perWeek = daysPerWeek(days);
+  const reached = (week: string) => (perWeek.get(week) ?? 0) >= goal;
   let week = weekStart(today());
-  if (!weeks.has(week)) week = addDays(week, -7);
+  if (!reached(week)) week = addDays(week, -7);
   let streak = 0;
-  while (weeks.has(week)) {
+  while (reached(week)) {
     streak++;
     week = addDays(week, -7);
   }

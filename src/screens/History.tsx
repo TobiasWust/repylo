@@ -6,6 +6,7 @@ import { BackfillSheet } from "../ui/BackfillSheet";
 import { Empty, Icon } from "../ui/components";
 import { useApp } from "../ui/context";
 import { formatDate, formatMonth } from "../ui/text";
+import { Sticker } from "../ui/stickers";
 
 export const History = () => {
   const { t, data, lang, open, exerciseName } = useApp();
@@ -25,7 +26,7 @@ export const History = () => {
           <Icon name="plus" size={16} /> {t("Nachtragen", "Log past")}
         </button>
       </div>
-      {data.workouts.length === 0 && <Empty emoji="🗓️">{t("Hier erscheinen deine Trainings.", "Your workouts will appear here.")}</Empty>}
+      {data.workouts.length === 0 && <Empty sticker="calendar">{t("Hier erscheinen deine Trainings.", "Your workouts will appear here.")}</Empty>}
       {[...months].map(([month, workouts]) => (
         <section key={month}>
           <h2 className="section-title">
@@ -48,7 +49,11 @@ export const History = () => {
                       {w.exercises.length} {t("Übungen", "exercises")} · {sets.length} {t("Sätze", "sets")}
                       {volume > 0 && ` · ${formatNumber(toUnit(volume, unit), lang, 0)} ${unit}`}
                     </small>
-                    {w.note && <small className="note-line">📝 {w.note}</small>}
+                    {w.note && (
+                      <small className="note-line">
+                        <Sticker name="note" size={16} /> {w.note}
+                      </small>
+                    )}
                   </span>
                   <span className="chev">›</span>
                 </button>

@@ -10,6 +10,7 @@ import { useApp } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
 import { syncState } from "../ui/evoluDeps";
 import { goalShort } from "../ui/text";
+import { Sticker, type StickerName } from "../ui/stickers";
 
 // BarcodeDetector isn't in TypeScript's DOM lib yet.
 interface DetectedBarcode {
@@ -143,17 +144,17 @@ const ConnectSheet = ({ onClose }: { onClose: () => void }) => {
 const SyncStatus = () => {
   const { t } = useApp();
   const status = useOwnerSyncStatus(syncState);
-  const label: Record<string, [string, string, string]> = {
-    Synced: ["✓", t("Synchronisiert", "Synced"), "ok"],
-    Syncing: ["↻", t("Synchronisiert …", "Syncing …"), "busy"],
-    Disconnected: ["⏸", t("Offline – Änderungen warten", "Offline – changes are queued"), "warn"],
-    Error: ["⚠", t("Sync-Fehler", "Sync error"), "error"],
-    NoRelays: ["–", t("Kein Sync", "No sync"), "warn"],
+  const label: Record<string, [StickerName, string, string]> = {
+    Synced: ["ok", t("Synchronisiert", "Synced"), "ok"],
+    Syncing: ["repeat", t("Synchronisiert …", "Syncing …"), "busy"],
+    Disconnected: ["hourglass", t("Offline – Änderungen warten", "Offline – changes are queued"), "warn"],
+    Error: ["warn", t("Sync-Fehler", "Sync error"), "error"],
+    NoRelays: ["warn", t("Kein Sync", "No sync"), "warn"],
   };
   const [icon, text, cls] = label[status.type] ?? label.NoRelays!;
   return (
     <span className={`status-pill ${cls}`}>
-      {icon} {text}
+      <Sticker name={icon} size={16} /> {text}
     </span>
   );
 };
@@ -216,6 +217,21 @@ export const Settings = () => {
           onChange={(goal) => actions.updateSettings({ goal, restSeconds: defaultRest[goal] })}
           options={(["strength", "hypertrophy", "endurance"] as const).map((g) => ({ value: g, label: goalShort(g, lang) }))}
         />
+        <div className="field-label">{t("Wochenziel (Trainingstage pro Woche)", "Weekly goal (training days per week)")}</div>
+        <Segmented
+          value={String(s.weeklyGoal)}
+          onChange={(v) => actions.updateSettings({ weeklyGoal: Number(v) })}
+          options={["1", "2", "3", "4", "5", "6", "7"].map((v) => ({ value: v, label: v }))}
+        />
+        <div className="field-label">{t("Kraft-Richtwerte", "Strength standards")}</div>
+        <Segmented
+          value={s.standards ?? ""}
+          onChange={(v) => v && actions.updateSettings({ standards: v })}
+          options={[
+            { value: "male", label: t("Männer", "Men") },
+            { value: "female", label: t("Frauen", "Women") },
+          ]}
+        />
         <div className="field-label">{t("Pausentimer", "Rest timer")}</div>
         <Segmented
           value={String(s.restSeconds)}
@@ -223,7 +239,7 @@ export const Settings = () => {
           options={["0", "60", "90", "120", "180", "240"].map((v) => ({ value: v, label: v === "0" ? t("Aus", "Off") : `${Number(v) / 60 >= 1 && Number(v) % 60 === 0 ? `${Number(v) / 60} min` : `${v}s`}` }))}
         />
         <button className="button full" onClick={() => open({ type: "plates" })}>
-          ⚖ {t("Scheibenrechner", "Plate calculator")}
+          <Sticker name="plate" size={22} /> {t("Scheibenrechner", "Plate calculator")}
         </button>
       </section>
 
@@ -272,7 +288,7 @@ export const Settings = () => {
                 }}
                 aria-label={t("Umbenennen", "Rename")}
               >
-                ✎
+                <Icon name="pencil" size={16} />
               </button>
               <button className="mini-button ghost" onClick={() => confirm(t(`Vorlage „${tpl.name}“ löschen?`, `Delete template “${tpl.name}”?`)) && actions.deleteTemplate(tpl.id)} aria-label={t("Löschen", "Delete")}>
                 <Icon name="trash" size={16} />

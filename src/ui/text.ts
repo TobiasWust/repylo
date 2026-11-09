@@ -69,3 +69,6 @@ export const formatDate = (day: string, lang: Language, style: "long" | "short" 
   parseDay(day).toLocaleDateString(lang, style === "long" ? { weekday: "long", day: "numeric", month: "long" } : { day: "numeric", month: "short" });
 
 export const formatMonth = (day: string, lang: Language) => parseDay(day).toLocaleDateString(lang, { month: "long", year: "numeric" });
+
+/** "2026-10" → "Oktober" / "October". */
+export const monthName = (month: string, lang: Language) => parseDay(`${month}-15`).toLocaleDateString(lang, { month: "long" });

@@ -7,6 +7,7 @@ import { ExerciseStats } from "./screens/ExerciseStats";
 import { History } from "./screens/History";
 import { Home } from "./screens/Home";
 import { PlatesSheet } from "./screens/Plates";
+import { ReviewScreen } from "./screens/Review";
 import { Settings } from "./screens/Settings";
 import { Stats } from "./screens/Stats";
 import { WorkoutScreen } from "./screens/Workout";
@@ -56,6 +57,8 @@ const Shell = () => {
       <main className="app">
         {screen?.type === "workout" ? (
           <WorkoutScreen key={screen.id} id={screen.id} />
+        ) : screen?.type === "review" ? (
+          <ReviewScreen key={screen.month} month={screen.month} />
         ) : screen?.type === "exercise" ? (
           <ExerciseStats key={screen.key} exerciseKey={screen.key} />
         ) : tab === "home" ? (

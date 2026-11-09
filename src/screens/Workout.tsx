@@ -10,6 +10,7 @@ import { ExercisePicker } from "../ui/ExercisePicker";
 import { useFeedback } from "../ui/feedback";
 import { equipmentName, formatDate } from "../ui/text";
 import { initialSets, templateItems, workoutToItems } from "../ui/workoutOps";
+import { Sticker } from "../ui/stickers";
 
 const DurationField = ({ value, onCommit, label }: { value: number | null; onCommit: (v: number | null) => void; label: string }) => {
   const [text, setText] = useState(value == null ? "" : formatDuration(value));
@@ -60,7 +61,7 @@ const progressionLabel = (app: App, p: Progression): string => {
   const { t } = app;
   switch (p.kind) {
     case "addWeight":
-      return t("Mehr Gewicht 💪", "Add weight 💪");
+      return t("Mehr Gewicht", "Add weight");
     case "addReps":
       return t("Eine Wdh. mehr", "One more rep");
     case "deload":
@@ -88,6 +89,56 @@ const prMessage = (app: App, pr: Pr, exerciseName: string): string => {
   }
 };
 
+/** Big −/+ buttons around a field: easier than the keyboard with sweaty hands. */
+const Stepper = ({ label, onStep, children }: { label: string; onStep: (direction: -1 | 1) => void; children: React.ReactNode }) => (
+  <span className="stepper">
+    <button className="step" onClick={() => onStep(-1)} aria-label={`${label} −`}>
+      −
+    </button>
+    {children}
+    <button className="step" onClick={() => onStep(1)} aria-label={`${label} +`}>
+      +
+    </button>
+  </span>
+);
+
+/** Weight step per tap, by equipment and unit (EGYM adjusts in 1 kg steps). */
+const weightStep = (equipment: string, unit: "kg" | "lb"): number => {
+  if (unit === "lb") return equipment === "egym" || equipment === "dumbbell" ? 2.5 : 5;
+  return equipment === "egym" || equipment === "dumbbell" || equipment === "other" ? 1 : 2.5;
+};
+
+/**
+ * Keeps the screen on while a live workout is open. Browsers drop the lock
+ * when the tab is hidden, so it is re-requested on return.
+ */
+const useWakeLock = (active: boolean) => {
+  useEffect(() => {
+    if (!active || !("wakeLock" in navigator)) return;
+    let lock: WakeLockSentinel | null = null;
+    let cancelled = false;
+    const request = () => {
+      if (document.visibilityState !== "visible") return;
+      navigator.wakeLock
+        .request("screen")
+        .then((sentinel) => {
+          if (cancelled) void sentinel.release();
+          else lock = sentinel;
+        })
+        .catch(() => {
+          // Denied (e.g. battery saver): the app works fine without it.
+        });
+    };
+    request();
+    document.addEventListener("visibilitychange", request);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", request);
+      void lock?.release();
+    };
+  }, [active]);
+};
+
 const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel; entry: WorkoutExercise; index: number; count: number }) => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName } = app;
@@ -106,8 +157,19 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
     actions.updateSet(set.id, values);
   };
 
+  const current = (set: SetEntry): SetEntry => ({ ...set, ...pending.current.get(set.id) });
+
+  const stepWeight = (set: SetEntry, direction: -1 | 1) => {
+    const step = weightStep(exercise.equipment, unit);
+    const value = toUnit(current(set).weight ?? 0, unit);
+    const next = Math.max(0, Math.round((value + direction * step) / step) * step);
+    commit(set, { weight: fromUnit(next, unit) });
+  };
+  const stepReps = (set: SetEntry, direction: -1 | 1) => commit(set, { reps: Math.max(0, (current(set).reps ?? 0) + direction) });
+  const stepDuration = (set: SetEntry, direction: -1 | 1) => commit(set, { duration: Math.max(0, (current(set).duration ?? 0) + direction * 5) });
+
   const toggleDone = (set: SetEntry) => {
-    const merged: SetEntry = { ...set, ...pending.current.get(set.id) };
+    const merged = current(set);
     actions.updateSet(set.id, { done: !set.done });
     // Rest timer and confetti only make sense live, not when backfilling.
     if (set.done || !hasValue(merged) || workout.date !== today()) return;
@@ -138,6 +200,15 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
             {equipmentName(exercise.equipment, lang)} · {t("Statistik", "Stats")} ›
           </small>
         </button>
+        {showPlates && (
+          <button
+            className="icon-button"
+            onClick={() => open({ type: "plates", weight: Math.max(0, ...entry.sets.map((x) => x.weight ?? 0)) || undefined })}
+            aria-label={t("Scheibenrechner", "Plate calculator")}
+          >
+            <Sticker name="plate" size={26} />
+          </button>
+        )}
         <button className="icon-button" onClick={() => setMenu(!menu)} aria-label={t("Mehr", "More")}>
           <Icon name="more" />
         </button>
@@ -167,7 +238,9 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
           </div>
           {progression.kind !== "repeat" && (
             <button className="suggest-chip" onClick={applyProgression}>
-              <span>💡 {progressionLabel(app, progression)}</span>
+              <span className="with-sticker">
+                <Sticker name="bulb" size={22} /> {progressionLabel(app, progression)}
+              </span>
               <small>{describeSets(app, progression.sets, exercise.metric)}</small>
             </button>
           )}
@@ -198,25 +271,24 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
             <span className="set-index">{i + 1}</span>
             {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
               <>
-                <span className="with-action">
+                <Stepper label={weightLabel} onStep={(d) => stepWeight(set, d)}>
                   <NumberField
                     label={weightLabel}
                     value={set.weight == null ? null : Math.round(toUnit(set.weight, unit) * 100) / 100}
                     placeholder={exercise.metric === "bodyweight" ? "0" : "–"}
                     onCommit={(v) => commit(set, { weight: v == null ? null : fromUnit(v, unit) })}
                   />
-                  {showPlates && (
-                    <button className="mini-button" onClick={() => open({ type: "plates", weight: set.weight ?? undefined })} aria-label={t("Scheibenrechner", "Plate calculator")}>
-                      ⚖
-                    </button>
-                  )}
-                </span>
-                <NumberField label={t("Wiederholungen", "Reps")} value={set.reps} decimals={false} placeholder="–" onCommit={(v) => commit(set, { reps: v })} />
+                </Stepper>
+                <Stepper label={t("Wiederholungen", "Reps")} onStep={(d) => stepReps(set, d)}>
+                  <NumberField label={t("Wiederholungen", "Reps")} value={set.reps} decimals={false} placeholder="–" onCommit={(v) => commit(set, { reps: v })} />
+                </Stepper>
               </>
             )}
             {exercise.metric === "time" && (
               <span className="span2">
-                <DurationField label={t("Zeit", "Time")} value={set.duration} onCommit={(v) => commit(set, { duration: v })} />
+                <Stepper label={t("Zeit", "Time")} onStep={(d) => stepDuration(set, d)}>
+                  <DurationField label={t("Zeit", "Time")} value={set.duration} onCommit={(v) => commit(set, { duration: v })} />
+                </Stepper>
               </span>
             )}
             {exercise.metric === "cardio" && (
@@ -369,6 +441,7 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
   const { t, data, actions, back, lang } = useApp();
   const [sheet, setSheet] = useState<"add" | "copy" | "template" | null>(null);
   const workout = data.workouts.find((w) => w.id === id);
+  useWakeLock(workout?.date === today());
 
   if (!workout)
     return (

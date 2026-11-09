@@ -97,6 +97,10 @@ export const Schema = {
     language: nullOr(Text40),
     restSeconds: nullOr(NonNegativeInt),
     barWeight: nullOr(NonNegativeFiniteNumber),
+    /** Training days per week the user aims for. */
+    weeklyGoal: nullOr(NonNegativeInt),
+    /** "male" | "female": which strength standards to compare against. */
+    standards: nullOr(Text40),
   },
   exerciseSettings: {
     id: ExerciseSettingsId,
@@ -175,7 +179,7 @@ export const bodyWeightsQuery = createQuery((db) =>
 export const settingsQuery = createQuery((db) =>
   db
     .selectFrom("settings")
-    .select(["id", "goal", "unit", "language", "restSeconds", "barWeight"])
+    .select(["id", "goal", "unit", "language", "restSeconds", "barWeight", "weeklyGoal", "standards"])
     .where("isDeleted", "is not", 1),
 );
 export const exerciseSettingsQuery = createQuery((db) =>

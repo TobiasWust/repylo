@@ -45,7 +45,7 @@ export const Body = () => {
       </section>
 
       {trend.length === 0 ? (
-        <Empty emoji="⚖️">{t("Trag dein Gewicht ein, um Trend und relative Kraft zu sehen.", "Log your weight to see the trend and relative strength.")}</Empty>
+        <Empty sticker="scale">{t("Trag dein Gewicht ein, um Trend und relative Kraft zu sehen.", "Log your weight to see the trend and relative strength.")}</Empty>
       ) : (
         <>
           <div className="stat-grid">

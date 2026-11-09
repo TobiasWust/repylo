@@ -52,7 +52,7 @@ export const seedDemo = (actions: Actions, data: Data): void => {
     }));
     const date = addDays(today(), day);
     const id = actions.startWorkout(date, ids[kind] ?? null);
-    actions.updateWorkout(id, { finished: true, note: session === 4 ? "Guter Pump heute 💪" : null });
+    actions.updateWorkout(id, { finished: true, note: session === 4 ? "Guter Pump heute" : null });
     actions.addItems({ id, date, startedAt: 0, finishedAt: null, note: null, templateId: null, exercises: [] }, items);
     session++;
   }

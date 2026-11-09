@@ -99,6 +99,9 @@ small {
   font-size: 14px;
 }
 .streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   background: var(--paper);
   border: var(--line);
   box-shadow: var(--shadow-sm);
@@ -240,7 +243,6 @@ small {
   box-shadow: var(--shadow-sm);
 }
 .list-icon {
-  font-size: 22px;
   width: 42px;
   height: 42px;
   display: grid;
@@ -507,9 +509,7 @@ small {
   font-size: 17px;
   font-weight: 800;
 }
-.suggestion-emoji {
-  font-size: 22px;
-}
+
 .hint {
   font-size: 13px;
   color: var(--muted);
@@ -630,9 +630,9 @@ small {
 }
 .set-row {
   display: grid;
-  grid-template-columns: 26px 1fr 1fr 42px 30px;
+  grid-template-columns: 18px 1fr 1fr 40px 22px;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .set-header {
   font-size: 12px;
@@ -1112,9 +1112,7 @@ textarea.text-input {
   gap: 8px;
   align-items: center;
 }
-.empty-emoji {
-  font-size: 44px;
-}
+
 
 /* ---------- Settings ---------- */
 .template-row {
@@ -1354,8 +1352,8 @@ body:has(.overlay-screen) .rest-timer {
   z-index: 95;
   animation: pop 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
 }
-.celebration-emoji {
-  font-size: 30px;
+.celebration .sticker {
+  flex-shrink: 0;
 }
 @keyframes pop {
   from {
@@ -1391,3 +1389,178 @@ body:has(.overlay-screen) .rest-timer {
   }
 }
 
+
+/* ---------- Stickers ---------- */
+.sticker {
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+.with-sticker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- Weekly goal ---------- */
+.hero-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.goal-ring {
+  flex-shrink: 0;
+}
+.goal-ring circle {
+  transition: stroke-dasharray 0.6s cubic-bezier(0.2, 1.2, 0.4, 1);
+}
+.goal-ring-center {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+}
+.button.soft {
+  background: rgba(255, 255, 255, 0.7);
+  min-height: 44px;
+  font-size: 15px;
+}
+.review-teaser {
+  background: var(--lavender);
+}
+.review-link {
+  background: var(--lavender);
+}
+
+/* ---------- Steppers ---------- */
+.stepper {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.stepper .num-input {
+  border: none;
+  border-radius: 0;
+  height: 44px;
+  padding: 0;
+  font-size: 16px;
+}
+.step {
+  width: 28px;
+  flex-shrink: 0;
+  font-size: 20px;
+  font-weight: 800;
+  background: #f4f4ef;
+  user-select: none;
+  touch-action: manipulation;
+}
+.step:first-child {
+  border-right: 2px solid var(--ink);
+}
+.step:last-child {
+  border-left: 2px solid var(--ink);
+}
+.step:active {
+  background: var(--yellow);
+}
+.set-row.done .stepper,
+.set-row.done .stepper .num-input {
+  background: var(--mint);
+}
+
+/* ---------- Strength level ---------- */
+.level {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.level-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 18px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  overflow: visible;
+}
+.level-bar span:first-child {
+  border-radius: 999px 0 0 999px;
+}
+.level-bar span:last-child {
+  border-radius: 0 999px 999px 0;
+}
+.level-bar span + span {
+  border-left: 1.5px solid var(--ink);
+}
+.level-marker {
+  position: absolute;
+  top: -6px;
+  width: 8px;
+  height: 26px;
+  margin-left: -4px;
+  background: var(--ink);
+  border: 2px solid #fff;
+  border-radius: 4px;
+}
+.level-labels {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  text-align: center;
+}
+.level-labels small {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.level-labels small.active {
+  color: var(--ink);
+  font-weight: 800;
+}
+.level-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+.level-row-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.level-row-head small {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ---------- Monthly review ---------- */
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.review-tile {
+  border: var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.review-tile span {
+  font-size: 12px;
+  font-weight: 700;
+}
+.review-tile strong {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}

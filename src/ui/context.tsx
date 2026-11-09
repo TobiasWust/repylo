@@ -23,7 +23,8 @@ export type Tab = "home" | "history" | "stats" | "body" | "settings";
 export type Overlay =
   | { readonly type: "workout"; readonly id: string }
   | { readonly type: "exercise"; readonly key: string }
-  | { readonly type: "plates"; readonly weight?: number };
+  | { readonly type: "plates"; readonly weight?: number }
+  | { readonly type: "review"; readonly month: string };
 
 export interface App {
   readonly data: Data;

@@ -4,6 +4,7 @@ import { hasValue } from "../domain/stats";
 import { Icon, Sheet } from "./components";
 import { useApp } from "./context";
 import { equipmentName, metricName, muscleName, patternName } from "./text";
+import { Sticker } from "./stickers";
 
 type Filter = "all" | "recent" | "egym" | "cardio" | Muscle;
 
@@ -152,7 +153,7 @@ export const ExercisePicker = ({ onPick, onClose, exclude }: { onPick: (key: str
                 {e.primary.length > 0 && ` · ${e.primary.map((m) => muscleName(m, lang)).join(", ")}`}
               </small>
             </span>
-            {exclude.has(e.key) ? <span className="badge">✓</span> : <Icon name="plus" size={20} />}
+            {exclude.has(e.key) ? <Sticker name="ok" size={24} /> : <Icon name="plus" size={20} />}
           </button>
         ))}
         {list.length === 0 && <p className="hint">{t("Nichts gefunden.", "Nothing found.")}</p>}

@@ -6,6 +6,8 @@ import { formatNumber, toUnit } from "../domain/units";
 import { BarChart, Empty } from "../ui/components";
 import { useApp } from "../ui/context";
 import { formatDate, muscleName } from "../ui/text";
+import { Sticker } from "../ui/stickers";
+import { StrengthOverview } from "../ui/StrengthLevel";
 
 /** GitHub-style heatmap of the last 20 weeks. */
 const Heatmap = ({ days }: { days: ReadonlySet<string> }) => {
@@ -34,7 +36,7 @@ const RatioBar = ({ left, right, leftLabel, rightLabel }: { left: number; right:
         <span>
           {leftLabel} <strong>{Math.round(left)}</strong>
         </span>
-        <span className={balanced ? "ok" : "warn"}>{balanced ? "✓" : "⚠"}</span>
+        <Sticker name={balanced ? "ok" : "warn"} size={22} />
         <span>
           <strong>{Math.round(right)}</strong> {rightLabel}
         </span>
@@ -69,7 +71,7 @@ export const Stats = () => {
     return (
       <div className="screen">
         <h1 className="page-title">{t("Statistik", "Stats")}</h1>
-        <Empty emoji="📊">{t("Sobald du trainiert hast, findest du hier deine Fortschritte.", "Once you’ve trained, your progress shows up here.")}</Empty>
+        <Empty sticker="chartUp">{t("Sobald du trainiert hast, findest du hier deine Fortschritte.", "Once you’ve trained, your progress shows up here.")}</Empty>
       </div>
     );
 
@@ -97,7 +99,9 @@ export const Stats = () => {
         </div>
         <div className="stat-tile pink">
           <span>{t("Serie", "Streak")}</span>
-          <strong>🔥 {weekStreak(days)} {t("Wo.", "wk")}</strong>
+          <strong className="with-sticker">
+            <Sticker name="flame" size={26} /> {weekStreak(days, data.settings.weeklyGoal)} {t("Wo.", "wk")}
+          </strong>
         </div>
         <div className="stat-tile lavender">
           <span>{t("Bewegt gesamt", "Total lifted")}</span>
@@ -151,9 +155,22 @@ export const Stats = () => {
         <RatioBar left={last14.get("quads") ?? 0} right={last14.get("hamstrings") ?? 0} leftLabel={t("Quadrizeps", "Quads")} rightLabel={t("Beinbeuger", "Hamstrings")} />
       </section>
 
+      <StrengthOverview />
+
+      <button className="card list-card review-link" onClick={() => open({ type: "review", month: today().slice(0, 7) })}>
+        <Sticker name="party" size={34} />
+        <span className="list-main">
+          <strong>{t("Monatsrückblick", "Monthly review")}</strong>
+          <small>{t("Deine Monate auf einen Blick – auch zum Teilen", "Your months at a glance – ready to share")}</small>
+        </span>
+        <span className="chev">›</span>
+      </button>
+
       {prs.length > 0 && (
         <section className="card">
-          <h2 className="card-title">🏆 {t("Letzte Rekorde", "Recent records")}</h2>
+          <h2 className="card-title with-sticker">
+            <Sticker name="trophy" /> {t("Letzte Rekorde", "Recent records")}
+          </h2>
           <p className="hint">{t("Geschätztes Maximalgewicht für 1 Wiederholung, berechnet aus deinen Sätzen.", "Estimated one-rep max, calculated from your sets.")}</p>
           <div className="stack tight">
             {prs.map((pr, i) => (

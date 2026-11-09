@@ -3,6 +3,7 @@
  * data context so ticking the timer doesn't re-render every screen.
  */
 import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Sticker } from "./stickers";
 
 interface Feedback {
   readonly startRest: (seconds: number) => void;
@@ -136,7 +137,7 @@ export const FeedbackProvider = ({ children, labels }: { children: ReactNode; la
         <div key={celebration.id}>
           <Confetti />
           <div className="celebration">
-            <span className="celebration-emoji">🏆</span>
+            <Sticker name="trophy" size={40} />
             {celebration.message}
           </div>
         </div>

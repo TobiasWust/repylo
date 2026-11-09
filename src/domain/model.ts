@@ -78,7 +78,13 @@ export interface Settings {
   readonly restSeconds: number;
   /** kg */
   readonly barWeight: number;
+  /** Training days per week. */
+  readonly weeklyGoal: number;
+  /** Strength standards to compare against; null until the user picks. */
+  readonly standards: Standards | null;
 }
+
+export type Standards = "male" | "female";
 
 export interface Data {
   /** Newest first. */
@@ -130,6 +136,8 @@ export interface Rows {
     language: string;
     restSeconds: number;
     barWeight: number;
+    weeklyGoal: number;
+    standards: string;
   }>[];
   readonly exerciseSettings: readonly Nullable<{ exerciseKey: string; goal: string }>[];
   readonly dismissals: readonly Nullable<{ key: string; until: number }>[];
@@ -236,6 +244,8 @@ export const buildData = (rows: Rows): Data => {
     language: oneOf<Language>(s?.language ?? null, ["de", "en"], detectLanguage()),
     restSeconds: s?.restSeconds ?? defaultRest[goal],
     barWeight: s?.barWeight ?? 20,
+    weeklyGoal: Math.min(7, Math.max(1, s?.weeklyGoal ?? 3)),
+    standards: s?.standards === "male" || s?.standards === "female" ? s.standards : null,
   };
 
   const exerciseGoals = new Map<string, Goal>();

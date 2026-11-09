@@ -11,7 +11,7 @@ import {
   sqliteTrue,
 } from "@evolu/common";
 import { egymCircuit } from "../domain/exercises";
-import type { Data, Goal, Language, TemplateItem, TemplateSet, Unit, Workout } from "../domain/model";
+import type { Data, Goal, Language, Standards, TemplateItem, TemplateSet, Unit, Workout } from "../domain/model";
 import { today } from "../domain/dates";
 import {
   BodyWeightId,
@@ -190,7 +190,15 @@ export const createActions = (evolu: AppEvolu) => {
 
     deleteBodyWeight: (id: string) => evolu.update("bodyWeight", { id: BodyWeightId.orThrow(id), isDeleted: sqliteTrue }),
 
-    updateSettings: (values: { goal?: Goal; unit?: Unit; language?: Language; restSeconds?: number; barWeight?: number }) =>
+    updateSettings: (values: {
+      goal?: Goal;
+      unit?: Unit;
+      language?: Language;
+      restSeconds?: number;
+      barWeight?: number;
+      weeklyGoal?: number;
+      standards?: Standards;
+    }) =>
       evolu.upsert("settings", {
         id: settingsId,
         ...(values.goal && { goal: Text40.orThrow(values.goal) }),
@@ -198,6 +206,8 @@ export const createActions = (evolu: AppEvolu) => {
         ...(values.language && { language: Text40.orThrow(values.language) }),
         ...(values.restSeconds !== undefined && { restSeconds: int(values.restSeconds) }),
         ...(values.barWeight !== undefined && { barWeight: num(values.barWeight) }),
+        ...(values.weeklyGoal !== undefined && { weeklyGoal: int(values.weeklyGoal) }),
+        ...(values.standards && { standards: Text40.orThrow(values.standards) }),
       }),
 
     setExerciseGoal: (exerciseKey: string, goal: Goal | null) =>
