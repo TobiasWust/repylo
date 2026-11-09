@@ -85,7 +85,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   // Overlays integrate with the browser/Android back button via history state.
   const open = useCallback((overlay: Overlay) => {
-    history.pushState({ peryn: true }, "");
+    history.pushState({ repylo: true }, "");
     setOverlays((list) => [...list, overlay]);
     if (overlay.type !== "plates") window.scrollTo({ top: 0 });
   }, []);

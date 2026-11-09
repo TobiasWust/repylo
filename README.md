@@ -1,4 +1,4 @@
-# peryn — Every rep counts.
+# repylo — Every rep counts.
 
 Ein bunter, schneller Trainings-Tracker als PWA. **Kein Konto, kein Backend, kein Tracking.**
 Die Daten liegen lokal auf deinen Geräten (SQLite im Browser) und werden

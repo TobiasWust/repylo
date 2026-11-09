@@ -1,6 +1,6 @@
 import { addDays, daysBetween, today, weekStart } from "./dates";
 import { minorMuscles, muscles, type Muscle } from "./exercises";
-import { getExercise, type Data, type SetEntry } from "./model";
+import { getExercise, type Data, type SetEntry, type Workout } from "./model";
 
 export const hasValue = (s: SetEntry): boolean =>
   (s.reps ?? 0) > 0 || (s.duration ?? 0) > 0 || (s.distance ?? 0) > 0;
@@ -49,12 +49,22 @@ const summarize = (workoutId: string, date: string, note: string | null, sets: S
   return { workoutId, date, note, sets, topWeight, bestE1rm, volume, maxReps, totalReps, maxDuration, totalDuration, totalDistance };
 };
 
-/** All sessions of one exercise, oldest first. */
-export const exerciseSessions = (data: Data, key: string, excludeWorkoutId?: string): Session[] => {
+/**
+ * All sessions of one exercise, oldest first.
+ *
+ * With `beforeWorkoutId`, only sessions that happened before that workout
+ * count. That keeps "last time", progression and PRs correct when editing a
+ * backfilled workout from weeks ago: later workouts are its future, not its
+ * history. A workout not yet in `data` (just created) only excludes itself.
+ */
+export const exerciseSessions = (data: Data, key: string, beforeWorkoutId?: string): Session[] => {
+  const anchor = data.workouts.find((w) => w.id === beforeWorkoutId);
+  const isBefore = (w: Workout) =>
+    !anchor || w.date < anchor.date || (w.date === anchor.date && w.startedAt < anchor.startedAt);
   const sessions: Session[] = [];
   for (let i = data.workouts.length - 1; i >= 0; i--) {
     const w = data.workouts[i]!;
-    if (w.id === excludeWorkoutId) continue;
+    if (w.id === beforeWorkoutId || !isBefore(w)) continue;
     const sets = w.exercises.filter((e) => e.exerciseKey === key).flatMap((e) => e.sets.filter(hasValue));
     const note = w.exercises.find((e) => e.exerciseKey === key && e.note)?.note ?? null;
     if (sets.length > 0) sessions.push(summarize(w.id, w.date, note, sets));

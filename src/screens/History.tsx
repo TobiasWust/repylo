@@ -1,13 +1,16 @@
+import { useState } from "react";
 import { getExercise } from "../domain/model";
 import { hasValue } from "../domain/stats";
 import { formatNumber, toUnit } from "../domain/units";
-import { Empty } from "../ui/components";
+import { BackfillSheet } from "../ui/BackfillSheet";
+import { Empty, Icon } from "../ui/components";
 import { useApp } from "../ui/context";
 import { formatDate, formatMonth } from "../ui/text";
 
 export const History = () => {
   const { t, data, lang, open, exerciseName } = useApp();
   const unit = data.settings.unit;
+  const [backfill, setBackfill] = useState(false);
   const months = new Map<string, typeof data.workouts>();
   for (const w of data.workouts) {
     const key = w.date.slice(0, 7);
@@ -16,7 +19,12 @@ export const History = () => {
 
   return (
     <div className="screen">
-      <h1 className="page-title">{t("Verlauf", "History")}</h1>
+      <div className="section-row">
+        <h1 className="page-title">{t("Verlauf", "History")}</h1>
+        <button className="button small yellow" onClick={() => setBackfill(true)}>
+          <Icon name="plus" size={16} /> {t("Nachtragen", "Log past")}
+        </button>
+      </div>
       {data.workouts.length === 0 && <Empty emoji="🗓️">{t("Hier erscheinen deine Trainings.", "Your workouts will appear here.")}</Empty>}
       {[...months].map(([month, workouts]) => (
         <section key={month}>
@@ -50,6 +58,7 @@ export const History = () => {
         </section>
       ))}
       {data.workouts.length > 0 && <p className="hint center">{formatDate(data.workouts.at(-1)!.date, lang, "long")} · {t("erstes Training", "first workout")}</p>}
+      {backfill && <BackfillSheet onClose={() => setBackfill(false)} />}
     </div>
   );
 };

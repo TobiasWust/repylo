@@ -7,7 +7,7 @@ import type { BodyWeight, Data, Template, Workout } from "../domain/model";
 import type { Actions } from "./actions";
 
 export interface Backup {
-  readonly app: "peryn";
+  readonly app: "repylo";
   readonly version: 1;
   readonly exportedAt: string;
   readonly workouts: readonly Workout[];
@@ -17,7 +17,7 @@ export interface Backup {
 }
 
 export const createBackup = (data: Data): Backup => ({
-  app: "peryn",
+  app: "repylo",
   version: 1,
   exportedAt: new Date().toISOString(),
   workouts: data.workouts,
@@ -32,7 +32,7 @@ export const hasContent = (data: Data): boolean =>
 export const parseBackup = (json: string): Backup | null => {
   try {
     const value = JSON.parse(json) as Partial<Backup>;
-    return value.app === "peryn" && value.version === 1 && Array.isArray(value.workouts) ? (value as Backup) : null;
+    return value.app === "repylo" && value.version === 1 && Array.isArray(value.workouts) ? (value as Backup) : null;
   } catch {
     return null;
   }

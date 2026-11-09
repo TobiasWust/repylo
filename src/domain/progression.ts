@@ -38,8 +38,8 @@ const isDeclining = (sessions: readonly Session[]): boolean => {
   return recent[0]! > recent[1]! && recent[1]! > recent[2]! && recent[2]! > recent[3]!;
 };
 
-export const suggestProgression = (data: Data, exerciseKey: string, excludeWorkoutId?: string): Progression | null => {
-  const sessions = exerciseSessions(data, exerciseKey, excludeWorkoutId);
+export const suggestProgression = (data: Data, exerciseKey: string, beforeWorkoutId?: string): Progression | null => {
+  const sessions = exerciseSessions(data, exerciseKey, beforeWorkoutId);
   const last = sessions.at(-1);
   if (!last) return null;
   const exercise = getExercise(data, exerciseKey);

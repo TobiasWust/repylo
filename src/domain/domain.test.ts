@@ -92,6 +92,27 @@ describe("stats", () => {
   });
 });
 
+describe("backfilled workouts", () => {
+  const data = build([
+    { daysAgo: 1, exercises: { squat: [[110, 5]] } },
+    { daysAgo: 10, exercises: { squat: [[100, 5]] } }, // being backfilled
+    { daysAgo: 20, exercises: { squat: [[90, 5]] } },
+  ]);
+  const backfilled = data.workouts[1]!;
+
+  it("only sees sessions before the workout as history", () => {
+    expect(exerciseSessions(data, "squat", backfilled.id).map((s) => s.topWeight)).toEqual([90]);
+  });
+
+  it("bases progression on what came before, not after", () => {
+    expect(suggestProgression(data, "squat", backfilled.id)!.last.topWeight).toBe(90);
+  });
+
+  it("judges PRs against the past at that time", () => {
+    expect(detectPrs(data, backfilled.id, backfilled.exercises[0]!.sets[0]!)[0]?.kind).toBe("weight");
+  });
+});
+
 // --- Progression ------------------------------------------------------------
 
 describe("progression (double progression)", () => {

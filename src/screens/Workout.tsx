@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { today } from "../domain/dates";
 import { getExercise, defaultRest, type SetEntry, type TemplateItem, type TemplateSet, type Workout as WorkoutModel, type WorkoutExercise } from "../domain/model";
 import { suggestProgression, type Progression } from "../domain/progression";
 import { detectPrs, hasValue, type Pr } from "../domain/stats";
@@ -108,7 +109,8 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
   const toggleDone = (set: SetEntry) => {
     const merged: SetEntry = { ...set, ...pending.current.get(set.id) };
     actions.updateSet(set.id, { done: !set.done });
-    if (set.done || !hasValue(merged)) return;
+    // Rest timer and confetti only make sense live, not when backfilling.
+    if (set.done || !hasValue(merged) || workout.date !== today()) return;
     const goal = data.exerciseGoals.get(entry.exerciseKey);
     startRest(goal ? defaultRest[goal] : data.settings.restSeconds);
     const prs = detectPrs(data, workout.id, merged);
@@ -406,8 +408,17 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
 
       {workout.exercises.length === 0 && (
         <div className="card hero empty-workout">
-          <h2>{t("Was steht heute an?", "What’s on today?")}</h2>
-          <p>{t("Füge Übungen hinzu oder übernimm eine Vorlage bzw. ein früheres Training.", "Add exercises, or copy a template or past workout.")}</p>
+          {workout.date === today() ? (
+            <>
+              <h2>{t("Was steht heute an?", "What’s on today?")}</h2>
+              <p>{t("Füge Übungen hinzu oder übernimm eine Vorlage bzw. ein früheres Training.", "Add exercises, or copy a template or past workout.")}</p>
+            </>
+          ) : (
+            <>
+              <h2>{t("Was hast du gemacht?", "What did you do?")}</h2>
+              <p>{t("Trag die Übungen nach – oder übernimm ein ähnliches Training und pass die Werte an.", "Add the exercises – or copy a similar workout and adjust the numbers.")}</p>
+            </>
+          )}
         </div>
       )}
 

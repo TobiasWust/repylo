@@ -4,6 +4,7 @@ import type { Muscle } from "../domain/exercises";
 import { getExercise } from "../domain/model";
 import { computeSuggestions, dismissDays, type Suggestion } from "../domain/suggestions";
 import { hasValue, trainedDays, weekStreak } from "../domain/stats";
+import { BackfillSheet } from "../ui/BackfillSheet";
 import { Icon } from "../ui/components";
 import { useApp, type App } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
@@ -151,6 +152,7 @@ export const Home = () => {
   const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 5);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
 
+  const [backfill, setBackfill] = useState(false);
   const startToday = () => open({ type: "workout", id: ensureTodayWorkout(data, actions).id });
   const startTemplate = (templateId: string) => {
     const template = data.templates.find((x) => x.id === templateId);
@@ -165,7 +167,7 @@ export const Home = () => {
     <div className="screen">
       <header className="topbar">
         <div>
-          <div className="logo">peryn</div>
+          <div className="logo">repylo</div>
           <div className="tagline">Every rep counts.</div>
         </div>
         <div className="streak-badge" title={t("Wochen in Folge", "Weeks in a row")}>
@@ -202,6 +204,9 @@ export const Home = () => {
           {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Heute trainiert", "I trained today")}
         </button>
       </section>
+      <button className="link center" onClick={() => setBackfill(true)}>
+        {t("Früheres Training nachtragen", "Log a past workout")}
+      </button>
 
       {data.templates.length > 0 && (
         <section>
@@ -261,6 +266,7 @@ export const Home = () => {
           </div>
         )}
       </section>
+      {backfill && <BackfillSheet onClose={() => setBackfill(false)} />}
     </div>
   );
 };

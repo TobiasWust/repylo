@@ -14,7 +14,7 @@ const run = createRun(evoluDeps);
 
 const evolu = await run.ok(
   createEvolu(Schema, {
-    appName: AppName.orThrow("peryn"),
+    appName: AppName.orThrow("repylo"),
     appOwner: loadOrCreateOwner(),
     transports: getTransports(),
     indexes: (create) => [
@@ -27,7 +27,7 @@ const evolu = await run.ok(
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <EvoluContext value={evolu}>
-      <Suspense fallback={<div className="splash">peryn</div>}>
+      <Suspense fallback={<div className="splash">repylo</div>}>
         <App />
       </Suspense>
     </EvoluContext>

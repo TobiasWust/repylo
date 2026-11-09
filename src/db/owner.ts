@@ -17,9 +17,9 @@ import {
   type OwnerTransport,
 } from "@evolu/common";
 
-const MNEMONIC_KEY = "peryn.mnemonic";
-const RELAY_KEY = "peryn.relay";
-const PENDING_IMPORT_KEY = "peryn.pendingImport";
+const MNEMONIC_KEY = "repylo.mnemonic";
+const RELAY_KEY = "repylo.relay";
+const PENDING_IMPORT_KEY = "repylo.pendingImport";
 
 export const loadOrCreateOwner = (): AppOwner => {
   const stored = localStorage.getItem(MNEMONIC_KEY);

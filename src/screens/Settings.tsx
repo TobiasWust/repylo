@@ -313,7 +313,7 @@ export const Settings = () => {
         <h2 className="card-title">{t("Backup", "Backup")}</h2>
         <p className="hint">{t("Zusätzliche Sicherung als lesbare JSON-Datei.", "Extra safety net as a readable JSON file.")}</p>
         <div className="action-grid">
-          <button className="button" onClick={() => downloadJson(`peryn-backup-${today()}.json`, createBackup(data))}>
+          <button className="button" onClick={() => downloadJson(`repylo-backup-${today()}.json`, createBackup(data))}>
             <Icon name="download" /> {t("Exportieren", "Export")}
           </button>
           <button className="button" onClick={() => fileInput.current?.click()}>
@@ -330,7 +330,7 @@ export const Settings = () => {
             e.target.value = "";
             if (!file) return;
             const backup = parseBackup(await file.text());
-            if (!backup) return toast(t("Keine gültige Peryn-Sicherung", "Not a valid Peryn backup"));
+            if (!backup) return toast(t("Keine gültige Repylo-Sicherung", "Not a valid Repylo backup"));
             if (!confirm(t(`${backup.workouts.length} Trainings importieren? Sie werden zu den vorhandenen hinzugefügt.`, `Import ${backup.workouts.length} workouts? They’re added to the existing ones.`))) return;
             importBackup(backup, actions, data);
             toast(t("Import abgeschlossen", "Import complete"));
@@ -339,7 +339,7 @@ export const Settings = () => {
       </section>
 
       <p className="hint center about">
-        <strong>peryn</strong> · Every rep counts.
+        <strong>repylo</strong> · Every rep counts.
         <br />
         {t("Keine Accounts, kein Tracking. Deine Daten gehören dir.", "No accounts, no tracking. Your data is yours.")}
       </p>
