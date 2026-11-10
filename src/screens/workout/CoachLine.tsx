@@ -14,8 +14,14 @@ export const CoachLine = ({ feedback, metric }: { feedback: SetFeedback; metric:
     heavier: t(`${kg(feedback.delta)} mehr als letztes Mal – stark!`, `${kg(feedback.delta)} more than last time – strong!`),
     moreReps: t(`${amount(feedback.delta)} mehr als letztes Mal – stark!`, `${amount(feedback.delta)} more than last time – strong!`),
     same: t("Genau wie letztes Mal – solide.", "Same as last time – solid."),
-    fewerReps: t(`${amount(feedback.delta)} weniger als letztes Mal. Gönn dir etwas mehr Pause.`, `${amount(feedback.delta)} fewer than last time. Take a slightly longer rest.`),
-    lighter: t(`${kg(feedback.delta)} leichter als letztes Mal – Technik geht vor.`, `${kg(feedback.delta)} lighter than last time – technique first.`),
+    fewerReps: t(
+      `${amount(feedback.delta)} weniger als letztes Mal. Gönn dir etwas mehr Pause.`,
+      `${amount(feedback.delta)} fewer than last time. Take a slightly longer rest.`,
+    ),
+    lighter: t(
+      `${kg(feedback.delta)} leichter als letztes Mal – Technik geht vor.`,
+      `${kg(feedback.delta)} lighter than last time – technique first.`,
+    ),
     first: t("Erster Eintrag – ab jetzt vergleicht repylo für dich.", "First entry – from now on repylo compares for you."),
   };
   const positive = feedback.kind === "heavier" || feedback.kind === "moreReps";

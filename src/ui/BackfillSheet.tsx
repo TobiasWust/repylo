@@ -34,14 +34,20 @@ export const BackfillSheet = ({ onClose }: { onClose: () => void }) => {
       <DateField label={t("Datum", "Date")} value={date} max={today()} onChange={setDate} />
       <div className="chips">
         {[1, 2, 3, 7].map((days) => (
-          <button key={days} className={`chip ${date === addDays(today(), -days) ? "selected" : ""}`} onClick={() => setDate(addDays(today(), -days))}>
+          <button
+            key={days}
+            className={`chip ${date === addDays(today(), -days) ? "selected" : ""}`}
+            onClick={() => setDate(addDays(today(), -days))}
+          >
             {days === 1 ? t("Gestern", "Yesterday") : t(`vor ${days} Tagen`, `${days} days ago`)}
           </button>
         ))}
       </div>
       {existing.length > 0 && (
         <div className="stack tight">
-          <p className="hint">{t(`Am ${formatDate(date, lang, "long")} gibt es schon:`, `Already logged on ${formatDate(date, lang, "long")}:`)}</p>
+          <p className="hint">
+            {t(`Am ${formatDate(date, lang, "long")} gibt es schon:`, `Already logged on ${formatDate(date, lang, "long")}:`)}
+          </p>
           {existing.map((w) => (
             <button
               key={w.id}
@@ -52,7 +58,12 @@ export const BackfillSheet = ({ onClose }: { onClose: () => void }) => {
               }}
             >
               <span className="list-main">
-                <strong>{w.exercises.map((e) => exerciseName(getExercise(data, e.exerciseKey))).slice(0, 3).join(", ") || t("Leeres Training", "Empty workout")}</strong>
+                <strong>
+                  {w.exercises
+                    .map((e) => exerciseName(getExercise(data, e.exerciseKey)))
+                    .slice(0, 3)
+                    .join(", ") || t("Leeres Training", "Empty workout")}
+                </strong>
                 <small>{t("Öffnen und ergänzen", "Open and add to it")}</small>
               </span>
               <span className="chev">›</span>
@@ -61,7 +72,10 @@ export const BackfillSheet = ({ onClose }: { onClose: () => void }) => {
         </div>
       )}
       <button className="button dark full" onClick={create}>
-        <Icon name="plus" /> {existing.length > 0 ? t("Weiteres Training anlegen", "Add another workout") : t(`Training am ${formatDate(date, lang)} anlegen`, `Create workout on ${formatDate(date, lang)}`)}
+        <Icon name="plus" />{" "}
+        {existing.length > 0
+          ? t("Weiteres Training anlegen", "Add another workout")
+          : t(`Training am ${formatDate(date, lang)} anlegen`, `Create workout on ${formatDate(date, lang)}`)}
       </button>
     </Sheet>
   );

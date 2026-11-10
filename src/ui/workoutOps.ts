@@ -43,7 +43,10 @@ export const initialSets = (data: Data, exerciseKey: string, workoutId?: string)
 export const templateItems = (data: Data, template: Template, workoutId?: string): TemplateItem[] =>
   template.items.map((item) => ({
     exerciseKey: item.exerciseKey,
-    sets: exerciseSessions(data, item.exerciseKey, workoutId).length > 0 ? initialSets(data, item.exerciseKey, workoutId) : withEstimate(data, item),
+    sets:
+      exerciseSessions(data, item.exerciseKey, workoutId).length > 0
+        ? initialSets(data, item.exerciseKey, workoutId)
+        : withEstimate(data, item),
   }));
 
 /** Keeps a template's sets and reps but fills in an estimated weight where none is set. */

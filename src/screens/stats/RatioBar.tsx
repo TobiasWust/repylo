@@ -1,6 +1,16 @@
 import { Sticker } from "../../ui/stickers";
 
-export const RatioBar = ({ left, right, leftLabel, rightLabel }: { left: number; right: number; leftLabel: string; rightLabel: string }) => {
+export const RatioBar = ({
+  left,
+  right,
+  leftLabel,
+  rightLabel,
+}: {
+  left: number;
+  right: number;
+  leftLabel: string;
+  rightLabel: string;
+}) => {
   const total = left + right;
   const pct = total === 0 ? 50 : (left / total) * 100;
   const balanced = total === 0 || (left <= right * 1.5 && right <= left * 1.5);

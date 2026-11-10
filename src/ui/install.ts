@@ -21,9 +21,7 @@ export type InstallMode = "installed" | "prompt" | "ios" | "firefox" | "unsuppor
 const DISMISS_KEY = "repylo.installDismissedUntil";
 
 let deferred: BeforeInstallPromptEvent | null = null;
-let installed =
-  matchMedia("(display-mode: standalone)").matches ||
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
+let installed = matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((l) => l());
 

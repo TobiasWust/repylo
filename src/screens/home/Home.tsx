@@ -50,7 +50,10 @@ export const Home = () => {
     if (!template) return;
     const workout = ensureTodayWorkout(data, actions, template.id);
     const already = new Set(workout.exercises.map((e) => e.exerciseKey));
-    actions.addItems(workout, templateItems(data, template, workout.id).filter((i) => !already.has(i.exerciseKey)));
+    actions.addItems(
+      workout,
+      templateItems(data, template, workout.id).filter((i) => !already.has(i.exerciseKey)),
+    );
     open({ type: "workout", id: workout.id });
   };
 
@@ -61,7 +64,10 @@ export const Home = () => {
           <div className="logo">repylo</div>
           <div className="tagline">Every rep counts.</div>
         </div>
-        <div className="streak-badge" title={t("Wochen in Folge mit erreichtem Wochenziel", "Weeks in a row with your weekly goal reached")}>
+        <div
+          className="streak-badge"
+          title={t("Wochen in Folge mit erreichtem Wochenziel", "Weeks in a row with your weekly goal reached")}
+        >
           <Sticker name="flame" size={26} /> {streak}
         </div>
       </header>
@@ -79,7 +85,10 @@ export const Home = () => {
               {isDeloadWeek(data) && <strong>{t("Deload-Woche · ", "Deload week · ")}</strong>}
               {daysThisWeek >= goal
                 ? t("Wochenziel geschafft!", "Weekly goal reached!")
-                : t(`Noch ${goal - daysThisWeek} ${goal - daysThisWeek === 1 ? "Trainingstag" : "Trainingstage"}`, `${goal - daysThisWeek} more training ${goal - daysThisWeek === 1 ? "day" : "days"} to go`)}
+                : t(
+                    `Noch ${goal - daysThisWeek} ${goal - daysThisWeek === 1 ? "Trainingstag" : "Trainingstage"}`,
+                    `${goal - daysThisWeek} more training ${goal - daysThisWeek === 1 ? "day" : "days"} to go`,
+                  )}
             </div>
           </div>
         </div>
@@ -116,11 +125,20 @@ export const Home = () => {
           <div className="suggestion-head">
             <Sticker name="calendar" size={34} />
             <h3>{t("Soll ich dir einen Trainingsplan bauen?", "Shall I build you a training plan?")}</h3>
-            <button className="icon-button small" onClick={() => actions.dismiss("plan-offer", 365)} aria-label={t("Ausblenden", "Dismiss")}>
+            <button
+              className="icon-button small"
+              onClick={() => actions.dismiss("plan-offer", 365)}
+              aria-label={t("Ausblenden", "Dismiss")}
+            >
               <Icon name="close" size={18} />
             </button>
           </div>
-          <p>{t("Sag mir, wie oft und wo du trainierst – ich stelle passende Trainingstage zusammen.", "Tell me how often and where you train – I'll put together matching training days.")}</p>
+          <p>
+            {t(
+              "Sag mir, wie oft und wo du trainierst – ich stelle passende Trainingstage zusammen.",
+              "Tell me how often and where you train – I'll put together matching training days.",
+            )}
+          </p>
           <button className="button dark full" onClick={() => setPlanSheet(true)}>
             {t("Plan erstellen", "Create plan")}
           </button>
@@ -134,7 +152,11 @@ export const Home = () => {
           <div className="suggestion-head">
             <Sticker name="party" size={34} />
             <h3>{t(`Dein ${monthName(lastMonth, lang)}-Rückblick ist da`, `Your ${monthName(lastMonth, lang)} review is ready`)}</h3>
-            <button className="icon-button small" onClick={() => actions.dismiss(`review:${lastMonth}`, 40)} aria-label={t("Ausblenden", "Dismiss")}>
+            <button
+              className="icon-button small"
+              onClick={() => actions.dismiss(`review:${lastMonth}`, 40)}
+              aria-label={t("Ausblenden", "Dismiss")}
+            >
               <Icon name="close" size={18} />
             </button>
           </div>
@@ -194,7 +216,11 @@ export const Home = () => {
                 <span className="list-main">
                   <strong>
                     {data.templates.find((x) => x.id === w.templateId)?.name ??
-                      (w.exercises.map((e) => exerciseName(getExercise(data, e.exerciseKey))).slice(0, 3).join(", ") || t("Leeres Training", "Empty workout"))}
+                      (w.exercises
+                        .map((e) => exerciseName(getExercise(data, e.exerciseKey)))
+                        .slice(0, 3)
+                        .join(", ") ||
+                        t("Leeres Training", "Empty workout"))}
                   </strong>
                   <small>
                     {formatDate(w.date, lang, "long")} · {w.exercises.length} {t("Übungen", "exercises")}

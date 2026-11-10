@@ -13,7 +13,9 @@ const plateColor = (plate: number, unit: "kg" | "lb") => {
 export const PlatesSheet = ({ initialWeight, onClose }: { initialWeight?: number; onClose: () => void }) => {
   const { t, data, actions, lang } = useApp();
   const unit = data.settings.unit;
-  const [target, setTarget] = useState<number | null>(initialWeight ? Math.round(toUnit(initialWeight, unit) * 10) / 10 : unit === "kg" ? 60 : 135);
+  const [target, setTarget] = useState<number | null>(
+    initialWeight ? Math.round(toUnit(initialWeight, unit) * 10) / 10 : unit === "kg" ? 60 : 135,
+  );
   const bar = Math.round(toUnit(data.settings.barWeight, unit) * 10) / 10;
   const result = calculatePlates(target ?? 0, bar, unit);
   const maxPlate = unit === "kg" ? 25 : 45;
@@ -27,7 +29,12 @@ export const PlatesSheet = ({ initialWeight, onClose }: { initialWeight?: number
         </label>
         <label className="grow">
           {t("Stange", "Bar")} ({unit})
-          <NumberField label={t("Stange", "Bar")} value={bar} onCommit={(v) => v != null && actions.updateSettings({ barWeight: fromUnit(v, unit) })} className="big-input" />
+          <NumberField
+            label={t("Stange", "Bar")}
+            value={bar}
+            onCommit={(v) => v != null && actions.updateSettings({ barWeight: fromUnit(v, unit) })}
+            className="big-input"
+          />
         </label>
       </div>
       <div className="barbell">
@@ -48,10 +55,18 @@ export const PlatesSheet = ({ initialWeight, onClose }: { initialWeight?: number
       <p className="center">
         {result.perSide.length === 0
           ? t("Nur die Stange.", "Just the bar.")
-          : t(`Pro Seite: ${result.perSide.map((p) => formatNumber(p, lang, 2)).join(" + ")} ${unit}`, `Per side: ${result.perSide.map((p) => formatNumber(p, lang, 2)).join(" + ")} ${unit}`)}
+          : t(
+              `Pro Seite: ${result.perSide.map((p) => formatNumber(p, lang, 2)).join(" + ")} ${unit}`,
+              `Per side: ${result.perSide.map((p) => formatNumber(p, lang, 2)).join(" + ")} ${unit}`,
+            )}
       </p>
       {result.remainder > 0 && (
-        <p className="hint center">{t(`${formatNumber(result.remainder * 2, lang, 2)} ${unit} lassen sich nicht genau stecken.`, `${formatNumber(result.remainder * 2, lang, 2)} ${unit} can’t be loaded exactly.`)}</p>
+        <p className="hint center">
+          {t(
+            `${formatNumber(result.remainder * 2, lang, 2)} ${unit} lassen sich nicht genau stecken.`,
+            `${formatNumber(result.remainder * 2, lang, 2)} ${unit} can’t be loaded exactly.`,
+          )}
+        </p>
       )}
     </Sheet>
   );

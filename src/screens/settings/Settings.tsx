@@ -50,7 +50,9 @@ export const Settings = () => {
 
       <section className="card">
         <h2 className="card-title">{t("Training", "Training")}</h2>
-        <div className="field-label">{t("Ziel (bestimmt Wiederholungsbereich und Vorschläge)", "Goal (sets rep range and suggestions)")}</div>
+        <div className="field-label">
+          {t("Ziel (bestimmt Wiederholungsbereich und Vorschläge)", "Goal (sets rep range and suggestions)")}
+        </div>
         <Segmented<Goal>
           value={s.goal}
           onChange={(goal) => actions.updateSettings({ goal, restSeconds: defaultRest[goal] })}
@@ -84,7 +86,10 @@ export const Settings = () => {
         <Segmented
           value={String(s.restSeconds)}
           onChange={(v) => actions.updateSettings({ restSeconds: Number(v) })}
-          options={["0", "60", "90", "120", "180", "240"].map((v) => ({ value: v, label: v === "0" ? t("Aus", "Off") : `${Number(v) / 60 >= 1 && Number(v) % 60 === 0 ? `${Number(v) / 60} min` : `${v}s`}` }))}
+          options={["0", "60", "90", "120", "180", "240"].map((v) => ({
+            value: v,
+            label: v === "0" ? t("Aus", "Off") : `${Number(v) / 60 >= 1 && Number(v) % 60 === 0 ? `${Number(v) / 60} min` : `${v}s`}`,
+          }))}
         />
         <button className="button full" onClick={() => open({ type: "plates" })}>
           <Sticker name="plate" size={22} /> {t("Scheibenrechner", "Plate calculator")}
@@ -94,7 +99,14 @@ export const Settings = () => {
       <section className="card">
         <h2 className="card-title">{t("Darstellung", "Display")}</h2>
         <div className="field-label">{t("Sprache", "Language")}</div>
-        <Segmented value={lang} onChange={(language) => actions.updateSettings({ language })} options={[{ value: "de", label: "Deutsch" }, { value: "en", label: "English" }]} />
+        <Segmented
+          value={lang}
+          onChange={(language) => actions.updateSettings({ language })}
+          options={[
+            { value: "de", label: "Deutsch" },
+            { value: "en", label: "English" },
+          ]}
+        />
         <div className="field-label">{t("Einheit", "Unit")}</div>
         <Segmented
           value={s.unit}
@@ -108,13 +120,18 @@ export const Settings = () => {
 
       <section className="card">
         <h2 className="card-title">{t("Vorlagen / Splits", "Templates / splits")}</h2>
-        <p className="hint">{t("Die Reihenfolge bestimmt den Split-Rhythmus („Als Nächstes dran“).", "The order defines your split rotation (“Up next”).")}</p>
+        <p className="hint">
+          {t("Die Reihenfolge bestimmt den Split-Rhythmus („Als Nächstes dran“).", "The order defines your split rotation (“Up next”).")}
+        </p>
         <div className="stack tight">
           {data.templates.map((tpl, i) => (
             <div key={tpl.id} className="template-row">
               <span className="grow">
                 <strong>{tpl.name}</strong>
-                <small> · {tpl.items.length} {t("Übungen", "exercises")}</small>
+                <small>
+                  {" "}
+                  · {tpl.items.length} {t("Übungen", "exercises")}
+                </small>
               </span>
               <button
                 className="mini-button"
@@ -138,7 +155,13 @@ export const Settings = () => {
               >
                 <Icon name="pencil" size={16} />
               </button>
-              <button className="mini-button ghost" onClick={() => confirm(t(`Vorlage „${tpl.name}“ löschen?`, `Delete template “${tpl.name}”?`)) && actions.deleteTemplate(tpl.id)} aria-label={t("Löschen", "Delete")}>
+              <button
+                className="mini-button ghost"
+                onClick={() =>
+                  confirm(t(`Vorlage „${tpl.name}“ löschen?`, `Delete template “${tpl.name}”?`)) && actions.deleteTemplate(tpl.id)
+                }
+                aria-label={t("Löschen", "Delete")}
+              >
                 <Icon name="trash" size={16} />
               </button>
             </div>
@@ -156,7 +179,13 @@ export const Settings = () => {
             {customExercises.map((e) => (
               <div key={e.key} className="template-row">
                 <span className="grow">{exerciseName(e)}</span>
-                <button className="mini-button ghost" onClick={() => confirm(t("Übung löschen? Bisherige Einträge bleiben erhalten.", "Delete exercise? Logged sets are kept.")) && actions.deleteCustomExercise(e.key)}>
+                <button
+                  className="mini-button ghost"
+                  onClick={() =>
+                    confirm(t("Übung löschen? Bisherige Einträge bleiben erhalten.", "Delete exercise? Logged sets are kept.")) &&
+                    actions.deleteCustomExercise(e.key)
+                  }
+                >
                   <Icon name="trash" size={16} />
                 </button>
               </div>
@@ -187,7 +216,15 @@ export const Settings = () => {
             if (!file) return;
             const backup = parseBackup(await file.text());
             if (!backup) return toast(t("Keine gültige repylo-Sicherung", "Not a valid repylo backup"));
-            if (!confirm(t(`${backup.workouts.length} Trainings importieren? Sie werden zu den vorhandenen hinzugefügt.`, `Import ${backup.workouts.length} workouts? They’re added to the existing ones.`))) return;
+            if (
+              !confirm(
+                t(
+                  `${backup.workouts.length} Trainings importieren? Sie werden zu den vorhandenen hinzugefügt.`,
+                  `Import ${backup.workouts.length} workouts? They’re added to the existing ones.`,
+                ),
+              )
+            )
+              return;
             importBackup(backup, actions, data);
             toast(t("Import abgeschlossen", "Import complete"));
           }}

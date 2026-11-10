@@ -66,7 +66,8 @@ type Def = [
   variants?: string[],
 ];
 
-// Compact table form keeps ~60 exercises readable at a glance.
+// Compact table form keeps the whole library readable at a glance.
+// prettier-ignore
 const defs: Def[] = [
   // Chest
   ["bench_press", "Bankdrücken (Langhantel)", "Barbell Bench Press", "barbell", "weight", "push", ["chest"], ["triceps", "shoulders"], ["db_bench_press", "incline_bench_press", "machine_chest_press"]],

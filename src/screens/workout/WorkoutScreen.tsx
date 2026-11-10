@@ -62,12 +62,22 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
           {workout.date === today() ? (
             <>
               <h2>{t("Was steht heute an?", "What’s on today?")}</h2>
-              <p>{t("Füge Übungen hinzu oder übernimm eine Vorlage bzw. ein früheres Training.", "Add exercises, or copy a template or past workout.")}</p>
+              <p>
+                {t(
+                  "Füge Übungen hinzu oder übernimm eine Vorlage bzw. ein früheres Training.",
+                  "Add exercises, or copy a template or past workout.",
+                )}
+              </p>
             </>
           ) : (
             <>
               <h2>{t("Was hast du gemacht?", "What did you do?")}</h2>
-              <p>{t("Trag die Übungen nach – oder übernimm ein ähnliches Training und pass die Werte an.", "Add the exercises – or copy a similar workout and adjust the numbers.")}</p>
+              <p>
+                {t(
+                  "Trag die Übungen nach – oder übernimm ein ähnliches Training und pass die Werte an.",
+                  "Add the exercises – or copy a similar workout and adjust the numbers.",
+                )}
+              </p>
             </>
           )}
         </div>

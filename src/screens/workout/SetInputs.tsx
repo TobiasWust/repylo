@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { formatDuration, parseDuration } from "../../domain/units";
 
-export const DurationField = ({ value, onCommit, label }: { value: number | null; onCommit: (v: number | null) => void; label: string }) => {
+export const DurationField = ({
+  value,
+  onCommit,
+  label,
+}: {
+  value: number | null;
+  onCommit: (v: number | null) => void;
+  label: string;
+}) => {
   const [text, setText] = useState(value == null ? "" : formatDuration(value));
   const focused = useRef(false);
   useEffect(() => {

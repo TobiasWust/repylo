@@ -8,7 +8,15 @@ describe("monthly review", () => {
   it("summarises a month and finds the biggest gain", () => {
     const thisMonth = today().slice(0, 7);
     const data = build([
-      { daysAgo: 0, exercises: { squat: [[110, 5], [110, 5]] } },
+      {
+        daysAgo: 0,
+        exercises: {
+          squat: [
+            [110, 5],
+            [110, 5],
+          ],
+        },
+      },
       { daysAgo: 40, exercises: { squat: [[100, 5]] } },
     ]);
     const review = monthlyReview(data, thisMonth);

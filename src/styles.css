@@ -491,13 +491,17 @@ small {
 .suggestion {
   touch-action: pan-y;
   user-select: none;
-  transition: transform 0.2s, opacity 0.2s;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
 }
 .suggestion:active {
   transition: none;
 }
 .suggestion.leaving {
-  transition: transform 0.22s ease-in, opacity 0.22s;
+  transition:
+    transform 0.22s ease-in,
+    opacity 0.22s;
 }
 .suggestion-head {
   display: flex;
@@ -740,7 +744,6 @@ textarea.text-input {
 .note {
   min-height: 70px;
 }
-
 
 /* ---------- Sheets ---------- */
 .sheet-backdrop {
@@ -1143,7 +1146,6 @@ textarea.text-input {
   align-items: center;
 }
 
-
 /* ---------- Settings ---------- */
 .template-row {
   display: flex;
@@ -1418,7 +1420,6 @@ body:has(.overlay-screen) .rest-timer {
     grid-template-columns: 92px 1fr 30px;
   }
 }
-
 
 /* ---------- Stickers ---------- */
 .sticker {

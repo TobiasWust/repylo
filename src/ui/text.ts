@@ -67,7 +67,10 @@ const patternNames: Record<Pattern, [string, string]> = {
 export const patternName = (p: Pattern, lang: Language) => patternNames[p][lang === "de" ? 0 : 1];
 
 export const formatDate = (day: string, lang: Language, style: "long" | "short" = "short") =>
-  parseDay(day).toLocaleDateString(lang, style === "long" ? { weekday: "long", day: "numeric", month: "long" } : { day: "numeric", month: "short" });
+  parseDay(day).toLocaleDateString(
+    lang,
+    style === "long" ? { weekday: "long", day: "numeric", month: "long" } : { day: "numeric", month: "short" },
+  );
 
 export const formatMonth = (day: string, lang: Language) => parseDay(day).toLocaleDateString(lang, { month: "long", year: "numeric" });
 

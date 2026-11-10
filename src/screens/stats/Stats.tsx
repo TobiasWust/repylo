@@ -1,7 +1,17 @@
 import { useMemo } from "react";
 import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
-import { exerciseSessions, hasValue, majorMuscles, recentPrs, setsPerMuscle, trainedDays, weeklySetTarget, weeklyVolume, weekStreak } from "../../domain/stats";
+import {
+  exerciseSessions,
+  hasValue,
+  majorMuscles,
+  recentPrs,
+  setsPerMuscle,
+  trainedDays,
+  weeklySetTarget,
+  weeklyVolume,
+  weekStreak,
+} from "../../domain/stats";
 import { formatNumber, toUnit } from "../../domain/units";
 import { BarChart, Empty } from "../../ui/components";
 import { useApp } from "../../ui/context";
@@ -24,18 +34,23 @@ export const Stats = () => {
 
   const exercises = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const w of data.workouts) for (const e of w.exercises) if (e.sets.some(hasValue)) counts.set(e.exerciseKey, (counts.get(e.exerciseKey) ?? 0) + 1);
-    return [...counts].sort((a, b) => b[1] - a[1]).map(([key, count]) => {
-      const sessions = exerciseSessions(data, key);
-      return { key, count, best: Math.max(0, ...sessions.map((s) => s.bestE1rm)) };
-    });
+    for (const w of data.workouts)
+      for (const e of w.exercises) if (e.sets.some(hasValue)) counts.set(e.exerciseKey, (counts.get(e.exerciseKey) ?? 0) + 1);
+    return [...counts]
+      .sort((a, b) => b[1] - a[1])
+      .map(([key, count]) => {
+        const sessions = exerciseSessions(data, key);
+        return { key, count, best: Math.max(0, ...sessions.map((s) => s.bestE1rm)) };
+      });
   }, [data]);
 
   if (days.size === 0)
     return (
       <div className="screen">
         <h1 className="page-title">{t("Statistik", "Stats")}</h1>
-        <Empty sticker="chartUp">{t("Sobald du trainiert hast, findest du hier deine Fortschritte.", "Once you’ve trained, your progress shows up here.")}</Empty>
+        <Empty sticker="chartUp">
+          {t("Sobald du trainiert hast, findest du hier deine Fortschritte.", "Once you’ve trained, your progress shows up here.")}
+        </Empty>
       </div>
     );
 
@@ -50,7 +65,10 @@ export const Stats = () => {
     }
   }
   const totalWorkouts = data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).length;
-  const totalVolume = data.workouts.reduce((sum, w) => sum + w.exercises.reduce((s, e) => s + e.sets.reduce((v, x) => v + (x.weight ?? 0) * (x.reps ?? 0), 0), 0), 0);
+  const totalVolume = data.workouts.reduce(
+    (sum, w) => sum + w.exercises.reduce((s, e) => s + e.sets.reduce((v, x) => v + (x.weight ?? 0) * (x.reps ?? 0), 0), 0),
+    0,
+  );
 
   return (
     <div className="screen">
@@ -85,7 +103,11 @@ export const Stats = () => {
       <section className="card">
         <h2 className="card-title">{t("Volumen pro Woche", "Volume per week")}</h2>
         <BarChart
-          bars={weeks.map((w) => ({ label: formatDate(w.week, lang).replace(/\.$/, ""), value: toUnit(w.volume, unit), highlight: w.week === weekStart(today()) }))}
+          bars={weeks.map((w) => ({
+            label: formatDate(w.week, lang).replace(/\.$/, ""),
+            value: toUnit(w.volume, unit),
+            highlight: w.week === weekStart(today()),
+          }))}
           format={(v) => `${formatNumber(v, lang, 0)} ${unit}`}
         />
       </section>
@@ -93,7 +115,10 @@ export const Stats = () => {
       <section className="card">
         <h2 className="card-title">{t("Sätze pro Muskelgruppe (7 Tage)", "Sets per muscle (7 days)")}</h2>
         <p className="hint">
-          {t(`Ziel: ${target}–${upper} Sätze pro Woche. Hilfsmuskeln zählen halb.`, `Target: ${target}–${upper} sets per week. Secondary muscles count half.`)}
+          {t(
+            `Ziel: ${target}–${upper} Sätze pro Woche. Hilfsmuskeln zählen halb.`,
+            `Target: ${target}–${upper} sets per week. Secondary muscles count half.`,
+          )}
         </p>
         <div className="muscle-bars">
           {majorMuscles.map((m) => {
@@ -116,7 +141,12 @@ export const Stats = () => {
       <section className="card">
         <h2 className="card-title">{t("Balance (14 Tage)", "Balance (14 days)")}</h2>
         <RatioBar left={pushPull.push} right={pushPull.pull} leftLabel={t("Drücken", "Push")} rightLabel={t("Ziehen", "Pull")} />
-        <RatioBar left={last14.get("quads") ?? 0} right={last14.get("hamstrings") ?? 0} leftLabel={t("Quadrizeps", "Quads")} rightLabel={t("Beinbeuger", "Hamstrings")} />
+        <RatioBar
+          left={last14.get("quads") ?? 0}
+          right={last14.get("hamstrings") ?? 0}
+          leftLabel={t("Quadrizeps", "Quads")}
+          rightLabel={t("Beinbeuger", "Hamstrings")}
+        />
       </section>
 
       <ReadinessCard />
@@ -137,7 +167,12 @@ export const Stats = () => {
           <h2 className="card-title with-sticker">
             <Sticker name="trophy" /> {t("Letzte Rekorde", "Recent records")}
           </h2>
-          <p className="hint">{t("Geschätztes Maximalgewicht für 1 Wiederholung, berechnet aus deinen Sätzen.", "Estimated one-rep max, calculated from your sets.")}</p>
+          <p className="hint">
+            {t(
+              "Geschätztes Maximalgewicht für 1 Wiederholung, berechnet aus deinen Sätzen.",
+              "Estimated one-rep max, calculated from your sets.",
+            )}
+          </p>
           <div className="stack tight">
             {prs.map((pr, i) => (
               <button key={i} className="pr-line" onClick={() => open({ type: "exercise", key: pr.exerciseKey })}>

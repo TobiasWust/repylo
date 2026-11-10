@@ -26,8 +26,7 @@ export const createBackup = (data: Data): Backup => ({
   customExercises: [...data.exercises.values()].filter((e) => e.custom),
 });
 
-export const hasContent = (data: Data): boolean =>
-  data.workouts.length > 0 || data.templates.length > 0 || data.bodyWeights.length > 0;
+export const hasContent = (data: Data): boolean => data.workouts.length > 0 || data.templates.length > 0 || data.bodyWeights.length > 0;
 
 export const parseBackup = (json: string): Backup | null => {
   try {
@@ -60,7 +59,11 @@ export const importBackup = (backup: Backup, actions: Actions, data: Data): void
   const templateIds = new Map<string, string>();
   let templateData = data;
   for (const t of backup.templates) {
-    const id = actions.saveTemplate(templateData, t.name, t.items.map((i) => ({ ...i, exerciseKey: key(i.exerciseKey) })));
+    const id = actions.saveTemplate(
+      templateData,
+      t.name,
+      t.items.map((i) => ({ ...i, exerciseKey: key(i.exerciseKey) })),
+    );
     templateIds.set(t.id, id);
     templateData = { ...templateData, templates: [...templateData.templates, { ...t, id, position: templateData.templates.length }] };
   }

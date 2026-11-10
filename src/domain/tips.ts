@@ -8,7 +8,11 @@ type Tips = { readonly de: readonly string[]; readonly en: readonly string[] };
 
 const tips: Record<string, Tips> = {
   bench_press: {
-    de: ["Schulterblätter zusammen und nach unten ziehen", "Füße fest am Boden, leichtes Hohlkreuz", "Stange zur unteren Brust, Ellbogen ca. 45° vom Körper"],
+    de: [
+      "Schulterblätter zusammen und nach unten ziehen",
+      "Füße fest am Boden, leichtes Hohlkreuz",
+      "Stange zur unteren Brust, Ellbogen ca. 45° vom Körper",
+    ],
     en: ["Pull shoulder blades back and down", "Feet planted, slight arch", "Bar to lower chest, elbows about 45° from your body"],
   },
   incline_bench_press: {
@@ -17,7 +21,11 @@ const tips: Record<string, Tips> = {
   },
   db_bench_press: {
     de: ["Hanteln auf Brusthöhe kontrolliert absenken", "Unten kurz dehnen, nicht abfedern", "Oben nicht klackend zusammenstoßen"],
-    en: ["Lower the dumbbells under control to chest level", "Brief stretch at the bottom, no bouncing", "Don't clank them together at the top"],
+    en: [
+      "Lower the dumbbells under control to chest level",
+      "Brief stretch at the bottom, no bouncing",
+      "Don't clank them together at the top",
+    ],
   },
   machine_chest_press: {
     de: ["Griffe auf Brusthöhe einstellen", "Schulterblätter an der Lehne lassen", "Langsam zurück, Gewicht nicht absetzen"],
@@ -40,11 +48,19 @@ const tips: Record<string, Tips> = {
     en: ["Body forms a straight line", "Hands slightly wider than shoulders", "Chest to just above the floor"],
   },
   deadlift: {
-    de: ["Stange nah am Schienbein, über Fußmitte", "Rücken gerade, Brust raus, dann vom Boden drücken", "Hüfte und Schultern steigen gleichzeitig"],
+    de: [
+      "Stange nah am Schienbein, über Fußmitte",
+      "Rücken gerade, Brust raus, dann vom Boden drücken",
+      "Hüfte und Schultern steigen gleichzeitig",
+    ],
     en: ["Bar close to shins, over mid-foot", "Flat back, chest up, then push the floor away", "Hips and shoulders rise together"],
   },
   rdl: {
-    de: ["Hüfte nach hinten schieben, Knie leicht gebeugt", "Stange gleitet an den Oberschenkeln entlang", "Runter, bis die Beinrückseite deutlich zieht"],
+    de: [
+      "Hüfte nach hinten schieben, Knie leicht gebeugt",
+      "Stange gleitet an den Oberschenkeln entlang",
+      "Runter, bis die Beinrückseite deutlich zieht",
+    ],
     en: ["Push hips back, knees slightly bent", "Bar slides down your thighs", "Lower until hamstrings stretch clearly"],
   },
   squat: {
@@ -105,7 +121,11 @@ const tips: Record<string, Tips> = {
   },
   db_row: {
     de: ["Freie Hand und Knie auf der Bank abstützen", "Ellbogen nah am Körper zur Hüfte ziehen", "Oben Schulterblatt nach hinten"],
-    en: ["Support yourself with free hand and knee", "Pull elbow close to your body towards the hip", "Squeeze the shoulder blade back at the top"],
+    en: [
+      "Support yourself with free hand and knee",
+      "Pull elbow close to your body towards the hip",
+      "Squeeze the shoulder blade back at the top",
+    ],
   },
   cable_row: {
     de: ["Aufrecht sitzen, Brust raus", "Griff zum Bauch, Schulterblätter zusammen", "Nicht mit dem Oberkörper schaukeln"],
@@ -183,7 +203,11 @@ const egymTips: Tips = {
     "Ruhig und gleichmäßig dem Tempo auf dem Bildschirm folgen",
     "In der Endposition nicht ablegen, Spannung halten",
   ],
-  en: ["Log in so the machine sets seat and lever for you", "Follow the on-screen tempo calmly and evenly", "Don't rest at the end position, keep tension"],
+  en: [
+    "Log in so the machine sets seat and lever for you",
+    "Follow the on-screen tempo calmly and evenly",
+    "Don't rest at the end position, keep tension",
+  ],
 };
 
 export const tipsFor = (exerciseKey: string, lang: Language): readonly string[] | null => {

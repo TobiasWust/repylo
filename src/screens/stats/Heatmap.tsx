@@ -23,7 +23,10 @@ const DayInfo = ({ day, column }: { day: string; column: number }) => {
           const volume = sets.reduce((sum, s) => sum + (s.weight ?? 0) * (s.reps ?? 0), 0);
           const name =
             data.templates.find((x) => x.id === w.templateId)?.name ??
-            w.exercises.map((e) => exerciseName(getExercise(data, e.exerciseKey))).slice(0, 2).join(", ");
+            w.exercises
+              .map((e) => exerciseName(getExercise(data, e.exerciseKey)))
+              .slice(0, 2)
+              .join(", ");
           return (
             <button key={w.id} className="day-bubble-row" onClick={() => open({ type: "workout", id: w.id })}>
               <Sticker name="dumbbell" size={26} />
@@ -68,7 +71,11 @@ export const Heatmap = ({ days }: { days: ReadonlySet<string> }) => {
           </div>
         ))}
       </div>
-      {selected ? <DayInfo day={selected.day} column={selected.column} /> : <p className="hint">{t("Tippe auf einen Tag für Details.", "Tap a day for details.")}</p>}
+      {selected ? (
+        <DayInfo day={selected.day} column={selected.column} />
+      ) : (
+        <p className="hint">{t("Tippe auf einen Tag für Details.", "Tap a day for details.")}</p>
+      )}
     </>
   );
 };

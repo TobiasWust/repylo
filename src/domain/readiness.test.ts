@@ -14,7 +14,16 @@ describe("readiness", () => {
   it("suggests lighter weights on a low-readiness day", () => {
     const data = build([
       { daysAgo: 0, exercises: { squat: [[100, 8]] } },
-      { daysAgo: 4, exercises: { squat: [[100, 8], [100, 8], [100, 8]] } },
+      {
+        daysAgo: 4,
+        exercises: {
+          squat: [
+            [100, 8],
+            [100, 8],
+            [100, 8],
+          ],
+        },
+      },
     ]);
     const today0 = { ...data.workouts[0]!, sleep: 1, energy: 1 };
     const lowDay = { ...data, workouts: [today0, ...data.workouts.slice(1)] };

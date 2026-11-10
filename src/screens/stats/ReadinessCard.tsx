@@ -9,13 +9,22 @@ export const ReadinessCard = () => {
   const { t, data, lang } = useApp();
   const insights = useMemo(() => readinessInsights(data), [data]);
   if (insights.reduce((n, i) => n + i.workouts, 0) < 3) return null;
-  const label = { low: t("Schwache Tagesform", "Low readiness"), mid: t("Mittlere Tagesform", "Medium readiness"), high: t("Top-Tagesform", "High readiness") };
+  const label = {
+    low: t("Schwache Tagesform", "Low readiness"),
+    mid: t("Mittlere Tagesform", "Medium readiness"),
+    high: t("Top-Tagesform", "High readiness"),
+  };
   return (
     <section className="card">
       <h2 className="card-title with-sticker">
         <Sticker name="scale" /> {t("Tagesform & Leistung", "Readiness & performance")}
       </h2>
-      <p className="hint">{t("Durchschnittliche Veränderung deines 1RM gegenüber dem jeweils letzten Mal.", "Average change of your 1RM compared with the previous session.")}</p>
+      <p className="hint">
+        {t(
+          "Durchschnittliche Veränderung deines 1RM gegenüber dem jeweils letzten Mal.",
+          "Average change of your 1RM compared with the previous session.",
+        )}
+      </p>
       <div className="stack tight">
         {insights.map((i) => (
           <div key={i.level} className="pr-line">

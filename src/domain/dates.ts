@@ -2,8 +2,7 @@
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-const toDay = (date: Date): string =>
-  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+const toDay = (date: Date): string => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
 export const today = (): string => toDay(new Date());
 
@@ -44,7 +43,8 @@ export const dayToInput = (day: string, lang: "de" | "en"): string => {
 export const parseDayInput = (text: string, lang: "de" | "en", reference: string = today()): string | null => {
   const trimmed = text.trim();
   const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(trimmed);
-  const local = lang === "de" ? /^(\d{1,2})\.(\d{1,2})\.?(\d{2}|\d{4})?$/.exec(trimmed) : /^(\d{1,2})\/(\d{1,2})\/?(\d{2}|\d{4})?$/.exec(trimmed);
+  const local =
+    lang === "de" ? /^(\d{1,2})\.(\d{1,2})\.?(\d{2}|\d{4})?$/.exec(trimmed) : /^(\d{1,2})\/(\d{1,2})\/?(\d{2}|\d{4})?$/.exec(trimmed);
   let year: number, month: number, dayOfMonth: number;
   if (iso) [year, month, dayOfMonth] = [Number(iso[1]), Number(iso[2]), Number(iso[3])];
   else if (local) {

@@ -17,20 +17,52 @@ export const build = (workouts: WorkoutSpec[], extra: Partial<Rows> = {}): Data 
     templates: [],
     customExercises: [],
     bodyWeights: [],
-    settings: [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 1, standards: "male", prefill: "last", deloadWeek: null }],
+    settings: [
+      {
+        goal: "hypertrophy",
+        unit: "kg",
+        language: "de",
+        restSeconds: 90,
+        barWeight: 20,
+        weeklyGoal: 1,
+        standards: "male",
+        prefill: "last",
+        deloadWeek: null,
+      },
+    ],
     exerciseSettings: [],
     dismissals: [],
     ...extra,
   };
-  const w = rows.workouts as unknown[], we = rows.workoutExercises as unknown[], s = rows.sets as unknown[];
+  const w = rows.workouts as unknown[],
+    we = rows.workoutExercises as unknown[],
+    s = rows.sets as unknown[];
   workouts.forEach((spec, wi) => {
     const workoutId = `w${wi}`;
-    w.push({ id: workoutId, date: addDays(today(), -spec.daysAgo), startedAt: wi, finishedAt: null, note: null, templateId: spec.templateId ?? null });
+    w.push({
+      id: workoutId,
+      date: addDays(today(), -spec.daysAgo),
+      startedAt: wi,
+      finishedAt: null,
+      note: null,
+      templateId: spec.templateId ?? null,
+    });
     Object.entries(spec.exercises).forEach(([key, sets], ei) => {
       const exId = `${workoutId}e${ei}`;
       we.push({ id: exId, workoutId, exerciseKey: key, position: ei, note: null });
       sets.forEach(([weight, reps], si) =>
-        s.push({ id: `${exId}s${si}`, workoutId, workoutExerciseId: exId, exerciseKey: key, position: si, weight, reps, duration: null, distance: null, done: 1 }),
+        s.push({
+          id: `${exId}s${si}`,
+          workoutId,
+          workoutExerciseId: exId,
+          exerciseKey: key,
+          position: si,
+          weight,
+          reps,
+          duration: null,
+          distance: null,
+          done: 1,
+        }),
       );
     });
   });

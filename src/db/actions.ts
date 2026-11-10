@@ -130,7 +130,13 @@ export const createActions = (evolu: AppEvolu) => {
     },
 
     addSet: (workoutId: string, workoutExerciseId: string, exerciseKey: string, copyFrom: TemplateSet | undefined, position: number) =>
-      addSets(workoutId, workoutExerciseId, exerciseKey, [copyFrom ?? { weight: null, reps: null, duration: null, distance: null }], position),
+      addSets(
+        workoutId,
+        workoutExerciseId,
+        exerciseKey,
+        [copyFrom ?? { weight: null, reps: null, duration: null, distance: null }],
+        position,
+      ),
 
     updateSet: (id: string, values: Partial<TemplateSet> & { done?: boolean }) =>
       evolu.update("workoutSet", {
@@ -167,7 +173,14 @@ export const createActions = (evolu: AppEvolu) => {
 
     deleteTemplate: (id: string) => evolu.update("template", { id: TemplateId.orThrow(id), isDeleted: sqliteTrue }),
 
-    createCustomExercise: (values: { name: string; equipment: string; metric: string; pattern: string; primary: string[]; secondary: string[] }) =>
+    createCustomExercise: (values: {
+      name: string;
+      equipment: string;
+      metric: string;
+      pattern: string;
+      primary: string[];
+      secondary: string[];
+    }) =>
       evolu.insert("customExercise", {
         name: name100(values.name),
         equipment: Text40.orThrow(values.equipment),

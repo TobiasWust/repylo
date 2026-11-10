@@ -29,9 +29,16 @@ export const seedDemo = (actions: Actions, data: Data): void => {
   ];
   let templateData = data;
   const ids: string[] = [];
-  for (const [name, items] of [["Push", push], ["Pull", pull], ["Beine", legs]] as const) {
+  for (const [name, items] of [
+    ["Push", push],
+    ["Pull", pull],
+    ["Beine", legs],
+  ] as const) {
     ids.push(actions.saveTemplate(templateData, name, items));
-    templateData = { ...templateData, templates: [...templateData.templates, { id: "", name, position: templateData.templates.length, items }] };
+    templateData = {
+      ...templateData,
+      templates: [...templateData.templates, { id: "", name, position: templateData.templates.length, items }],
+    };
   }
 
   const plan = [push, pull, legs];
@@ -53,7 +60,10 @@ export const seedDemo = (actions: Actions, data: Data): void => {
     const date = addDays(today(), day);
     const id = actions.startWorkout(date, ids[kind] ?? null);
     actions.updateWorkout(id, { finished: true, note: session === 4 ? "Guter Pump heute" : null });
-    actions.addItems({ id, date, startedAt: 0, finishedAt: null, note: null, templateId: null, sleep: null, energy: null, exercises: [] }, items);
+    actions.addItems(
+      { id, date, startedAt: 0, finishedAt: null, note: null, templateId: null, sleep: null, energy: null, exercises: [] },
+      items,
+    );
     session++;
   }
 

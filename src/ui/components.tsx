@@ -32,7 +32,17 @@ const paths = {
 export type IconName = keyof typeof paths;
 
 export const Icon = ({ name, size = 22 }: { name: IconName; size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d={paths[name]} />
   </svg>
 );
@@ -147,8 +157,10 @@ export const LineChart = ({
   const width = 340;
   const pad = { top: 16, right: 12, bottom: 24, left: 40 };
   const all = [...points, ...(secondary ?? [])];
-  const minX = Math.min(...all.map((p) => p.x)), maxX = Math.max(...all.map((p) => p.x));
-  let minY = Math.min(...all.map((p) => p.y)), maxY = Math.max(...all.map((p) => p.y));
+  const minX = Math.min(...all.map((p) => p.x)),
+    maxX = Math.max(...all.map((p) => p.x));
+  let minY = Math.min(...all.map((p) => p.y)),
+    maxY = Math.max(...all.map((p) => p.y));
   if (minY === maxY) {
     minY -= 1;
     maxY += 1;
@@ -156,7 +168,8 @@ export const LineChart = ({
   const spread = maxY - minY;
   minY -= spread * 0.1;
   maxY += spread * 0.1;
-  const sx = (x: number) => pad.left + (maxX === minX ? (width - pad.left - pad.right) / 2 : ((x - minX) / (maxX - minX)) * (width - pad.left - pad.right));
+  const sx = (x: number) =>
+    pad.left + (maxX === minX ? (width - pad.left - pad.right) / 2 : ((x - minX) / (maxX - minX)) * (width - pad.left - pad.right));
   const sy = (y: number) => pad.top + (1 - (y - minY) / (maxY - minY)) * (height - pad.top - pad.bottom);
   const line = (list: readonly Point[]) => list.map((p, i) => `${i ? "L" : "M"}${sx(p.x).toFixed(1)},${sy(p.y).toFixed(1)}`).join("");
   const ticks = [minY + spread * 0.1, (minY + maxY) / 2, maxY - spread * 0.1];
@@ -173,7 +186,14 @@ export const LineChart = ({
           </g>
         ))}
         {secondary && <path d={line(secondary)} fill="none" stroke="var(--pink)" strokeWidth={3} strokeLinecap="round" />}
-        <path d={line(points)} fill="none" stroke={color} strokeWidth={secondary ? 1.5 : 3} strokeLinejoin="round" strokeDasharray={secondary ? "3 4" : undefined} />
+        <path
+          d={line(points)}
+          fill="none"
+          stroke={color}
+          strokeWidth={secondary ? 1.5 : 3}
+          strokeLinejoin="round"
+          strokeDasharray={secondary ? "3 4" : undefined}
+        />
         {points.map((p, i) => (
           <circle
             key={i}
@@ -200,7 +220,15 @@ export const LineChart = ({
   );
 };
 
-export const BarChart = ({ bars, format, height = 150 }: { bars: readonly { label: string; value: number; highlight?: boolean }[]; format: (v: number) => string; height?: number }) => {
+export const BarChart = ({
+  bars,
+  format,
+  height = 150,
+}: {
+  bars: readonly { label: string; value: number; highlight?: boolean }[];
+  format: (v: number) => string;
+  height?: number;
+}) => {
   const max = Math.max(1, ...bars.map((b) => b.value));
   return (
     <div className="bar-chart" style={{ height }}>
@@ -214,10 +242,24 @@ export const BarChart = ({ bars, format, height = 150 }: { bars: readonly { labe
   );
 };
 
-export const Segmented = <T extends string>({ value, options, onChange }: { value: T; options: readonly { value: T; label: string }[]; onChange: (v: T) => void }) => (
+export const Segmented = <T extends string>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: readonly { value: T; label: string }[];
+  onChange: (v: T) => void;
+}) => (
   <div className="segmented" role="radiogroup">
     {options.map((o) => (
-      <button key={o.value} role="radio" aria-checked={o.value === value} className={o.value === value ? "active" : ""} onClick={() => onChange(o.value)}>
+      <button
+        key={o.value}
+        role="radio"
+        aria-checked={o.value === value}
+        className={o.value === value ? "active" : ""}
+        onClick={() => onChange(o.value)}
+      >
         {o.label}
       </button>
     ))}

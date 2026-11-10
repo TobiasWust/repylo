@@ -46,7 +46,9 @@ const StandardsPicker = () => {
   const { t, actions } = useApp();
   return (
     <div className="stack tight">
-      <p className="hint">{t("Mit welchen Richtwerten möchtest du dich vergleichen?", "Which standards do you want to compare against?")}</p>
+      <p className="hint">
+        {t("Mit welchen Richtwerten möchtest du dich vergleichen?", "Which standards do you want to compare against?")}
+      </p>
       <Segmented
         value={"" as "male" | "female" | ""}
         onChange={(v) => v && actions.updateSettings({ standards: v })}
@@ -73,7 +75,12 @@ export const ExerciseLevelCard = ({ exerciseKey }: { exerciseKey: string }) => {
       {!data.settings.standards ? (
         <StandardsPicker />
       ) : !bodyWeight ? (
-        <p className="hint">{t("Trag unter „Körper“ dein Gewicht ein, um deine Kraft relativ zum Körpergewicht einzuordnen.", "Log your body weight under “Body” to rate your strength relative to it.")}</p>
+        <p className="hint">
+          {t(
+            "Trag unter „Körper“ dein Gewicht ein, um deine Kraft relativ zum Körpergewicht einzuordnen.",
+            "Log your body weight under “Body” to rate your strength relative to it.",
+          )}
+        </p>
       ) : !rating ? (
         <p className="hint">{t("Keine Einheiten in den letzten 90 Tagen.", "No sessions in the last 90 days.")}</p>
       ) : (
@@ -92,7 +99,12 @@ export const ExerciseLevelCard = ({ exerciseKey }: { exerciseKey: string }) => {
           )}
         </>
       )}
-      <p className="hint">{t("Grobe Richtwerte auf Basis deines geschätzten 1RM der letzten 90 Tage.", "Rough guide values based on your estimated 1RM of the last 90 days.")}</p>
+      <p className="hint">
+        {t(
+          "Grobe Richtwerte auf Basis deines geschätzten 1RM der letzten 90 Tage.",
+          "Rough guide values based on your estimated 1RM of the last 90 days.",
+        )}
+      </p>
     </section>
   );
 };
@@ -112,7 +124,12 @@ export const StrengthOverview = () => {
       {!data.settings.standards ? (
         <StandardsPicker />
       ) : !bodyWeight ? (
-        <p className="hint">{t("Trag unter „Körper“ dein Gewicht ein, um deine Kraft einzuordnen.", "Log your body weight under “Body” to rate your strength.")}</p>
+        <p className="hint">
+          {t(
+            "Trag unter „Körper“ dein Gewicht ein, um deine Kraft einzuordnen.",
+            "Log your body weight under “Body” to rate your strength.",
+          )}
+        </p>
       ) : (
         <div className="stack">
           {ratings.map((r) => (
@@ -126,7 +143,9 @@ export const StrengthOverview = () => {
               <LevelBar rating={r} />
             </button>
           ))}
-          {ratings.length === 0 && <p className="hint">{t("Keine Einheiten in den letzten 90 Tagen.", "No sessions in the last 90 days.")}</p>}
+          {ratings.length === 0 && (
+            <p className="hint">{t("Keine Einheiten in den letzten 90 Tagen.", "No sessions in the last 90 days.")}</p>
+          )}
         </div>
       )}
     </section>

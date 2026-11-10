@@ -48,7 +48,8 @@ export const monthlyReview = (data: Data, month: string): MonthlyReview => {
   const goalWeeks = mondays.filter((m) => (perWeek.get(m) ?? 0) >= data.settings.weeklyGoal).length;
 
   const counts = new Map<string, number>();
-  for (const w of workouts) for (const e of w.exercises) if (e.sets.some(hasValue)) counts.set(e.exerciseKey, (counts.get(e.exerciseKey) ?? 0) + 1);
+  for (const w of workouts)
+    for (const e of w.exercises) if (e.sets.some(hasValue)) counts.set(e.exerciseKey, (counts.get(e.exerciseKey) ?? 0) + 1);
   const favoriteEntry = [...counts].sort((a, b) => b[1] - a[1])[0];
 
   let biggestGain: MonthlyReview["biggestGain"] = null;

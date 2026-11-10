@@ -26,7 +26,9 @@ export const History = () => {
           <Icon name="plus" size={16} /> {t("Nachtragen", "Log past")}
         </button>
       </div>
-      {data.workouts.length === 0 && <Empty sticker="calendar">{t("Hier erscheinen deine Trainings.", "Your workouts will appear here.")}</Empty>}
+      {data.workouts.length === 0 && (
+        <Empty sticker="calendar">{t("Hier erscheinen deine Trainings.", "Your workouts will appear here.")}</Empty>
+      )}
       {[...months].map(([month, workouts]) => (
         <section key={month}>
           <h2 className="section-title">
@@ -44,7 +46,14 @@ export const History = () => {
                     <small>{new Date(`${w.date}T12:00`).toLocaleDateString(lang, { weekday: "short" })}</small>
                   </span>
                   <span className="list-main">
-                    <strong>{template?.name ?? (w.exercises.map((e) => exerciseName(getExercise(data, e.exerciseKey))).slice(0, 2).join(", ") || t("Leeres Training", "Empty workout"))}</strong>
+                    <strong>
+                      {template?.name ??
+                        (w.exercises
+                          .map((e) => exerciseName(getExercise(data, e.exerciseKey)))
+                          .slice(0, 2)
+                          .join(", ") ||
+                          t("Leeres Training", "Empty workout"))}
+                    </strong>
                     <small>
                       {w.exercises.length} {t("Übungen", "exercises")} · {sets.length} {t("Sätze", "sets")}
                       {volume > 0 && ` · ${formatNumber(toUnit(volume, unit), lang, 0)} ${unit}`}
@@ -62,7 +71,11 @@ export const History = () => {
           </div>
         </section>
       ))}
-      {data.workouts.length > 0 && <p className="hint center">{formatDate(data.workouts.at(-1)!.date, lang, "long")} · {t("erstes Training", "first workout")}</p>}
+      {data.workouts.length > 0 && (
+        <p className="hint center">
+          {formatDate(data.workouts.at(-1)!.date, lang, "long")} · {t("erstes Training", "first workout")}
+        </p>
+      )}
       {backfill && <BackfillSheet onClose={() => setBackfill(false)} />}
     </div>
   );

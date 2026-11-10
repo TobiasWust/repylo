@@ -8,7 +8,12 @@ describe("plan assistant", () => {
   const data = build([]);
   it("builds the right split for the number of days", () => {
     expect(generatePlan(data, 2, "gym", "hypertrophy", "de").map((p) => p.name)).toEqual(["Ganzkörper A", "Ganzkörper B"]);
-    expect(generatePlan(data, 4, "gym", "hypertrophy", "de").map((p) => p.name)).toEqual(["Oberkörper A", "Unterkörper A", "Oberkörper B", "Unterkörper B"]);
+    expect(generatePlan(data, 4, "gym", "hypertrophy", "de").map((p) => p.name)).toEqual([
+      "Oberkörper A",
+      "Unterkörper A",
+      "Oberkörper B",
+      "Unterkörper B",
+    ]);
     expect(generatePlan(data, 6, "home", "strength", "en")).toHaveLength(6);
   });
 
@@ -29,7 +34,11 @@ describe("circuit plans", () => {
     expect(gym.name).toBe("Zirkeltraining");
     expect(gym.items.length).toBeGreaterThanOrEqual(10);
     expect(gym.items[0]!.sets[0]!.reps).toBe(15);
-    expect(generateCircuit(data, "home", "hypertrophy", "de").items.every((i) => !getExercise(data, i.exerciseKey).equipment.match(/machine|cable|egym/))).toBe(true);
+    expect(
+      generateCircuit(data, "home", "hypertrophy", "de").items.every(
+        (i) => !getExercise(data, i.exerciseKey).equipment.match(/machine|cable|egym/),
+      ),
+    ).toBe(true);
     const egym = generateCircuit(data, "egym", "hypertrophy", "en");
     expect(egym.items.map((i) => i.exerciseKey)).toEqual(egymCircuit);
     expect(egym.items[0]!.sets[0]!.reps).toBe(20);

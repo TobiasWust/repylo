@@ -56,7 +56,8 @@ export const SummarySheet = ({ workoutId, onClose }: { workoutId: string; onClos
             <div key={g.exerciseKey} className="coach-line">
               <Sticker name="chartUp" size={24} />
               <span>
-                {exerciseName(getExercise(data, g.exerciseKey))}: <strong>+{formatNumber(g.percent, lang, 1)} %</strong> {t("gegenüber letztem Mal", "vs. last time")}
+                {exerciseName(getExercise(data, g.exerciseKey))}: <strong>+{formatNumber(g.percent, lang, 1)} %</strong>{" "}
+                {t("gegenüber letztem Mal", "vs. last time")}
               </span>
             </div>
           ))}

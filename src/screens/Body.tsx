@@ -42,11 +42,15 @@ export const Body = () => {
         <button className="button dark full" onClick={save} disabled={value == null}>
           <Icon name="check" /> {t("Speichern", "Save")}
         </button>
-        <p className="hint">{t("Am besten morgens nüchtern wiegen. Ein Eintrag pro Tag.", "Best weighed in the morning before eating. One entry per day.")}</p>
+        <p className="hint">
+          {t("Am besten morgens nüchtern wiegen. Ein Eintrag pro Tag.", "Best weighed in the morning before eating. One entry per day.")}
+        </p>
       </section>
 
       {trend.length === 0 ? (
-        <Empty sticker="scale">{t("Trag dein Gewicht ein, um Trend und relative Kraft zu sehen.", "Log your weight to see the trend and relative strength.")}</Empty>
+        <Empty sticker="scale">
+          {t("Trag dein Gewicht ein, um Trend und relative Kraft zu sehen.", "Log your weight to see the trend and relative strength.")}
+        </Empty>
       ) : (
         <>
           <div className="stat-grid">
@@ -72,25 +76,38 @@ export const Body = () => {
             <h2 className="card-title">{t("Verlauf", "Progress")}</h2>
             <LineChart
               points={trend.map((p) => ({ x: parseDay(p.date).getTime(), y: toUnit(p.weight, unit), label: formatDate(p.date, lang) }))}
-              secondary={trend.length > 2 ? trend.map((p) => ({ x: parseDay(p.date).getTime(), y: toUnit(p.trend, unit), label: formatDate(p.date, lang) })) : undefined}
+              secondary={
+                trend.length > 2
+                  ? trend.map((p) => ({ x: parseDay(p.date).getTime(), y: toUnit(p.trend, unit), label: formatDate(p.date, lang) }))
+                  : undefined
+              }
               format={(y) => formatNumber(y, lang, 1)}
             />
-            {trend.length > 2 && <p className="hint">{t("Pink: geglätteter Trend · gestrichelt: Messwerte", "Pink: smoothed trend · dashed: weigh-ins")}</p>}
+            {trend.length > 2 && (
+              <p className="hint">{t("Pink: geglätteter Trend · gestrichelt: Messwerte", "Pink: smoothed trend · dashed: weigh-ins")}</p>
+            )}
           </section>
           <section>
             <h2 className="section-title">{t("Einträge", "Entries")}</h2>
             <div className="stack tight">
-              {[...data.bodyWeights].reverse().slice(0, 30).map((b) => (
-                <div key={b.id} className="card list-card static">
-                  <span className="list-main">
-                    <strong>{weight(b.weight)}</strong>
-                    <small>{formatDate(b.date, lang, "long")}</small>
-                  </span>
-                  <button className="mini-button ghost" onClick={() => actions.deleteBodyWeight(b.id)} aria-label={t("Löschen", "Delete")}>
-                    <Icon name="trash" size={18} />
-                  </button>
-                </div>
-              ))}
+              {[...data.bodyWeights]
+                .reverse()
+                .slice(0, 30)
+                .map((b) => (
+                  <div key={b.id} className="card list-card static">
+                    <span className="list-main">
+                      <strong>{weight(b.weight)}</strong>
+                      <small>{formatDate(b.date, lang, "long")}</small>
+                    </span>
+                    <button
+                      className="mini-button ghost"
+                      onClick={() => actions.deleteBodyWeight(b.id)}
+                      aria-label={t("Löschen", "Delete")}
+                    >
+                      <Icon name="trash" size={18} />
+                    </button>
+                  </div>
+                ))}
             </div>
           </section>
         </>

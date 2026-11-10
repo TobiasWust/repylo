@@ -28,7 +28,13 @@ const CustomExerciseForm = ({ onCreated, onCancel }: { onCreated: (key: string) 
     <div className="form">
       <label>
         {t("Name", "Name")}
-        <input className="text-input" value={name} autoFocus onChange={(e) => setName(e.target.value)} placeholder={t("z. B. Beinpresse 45°", "e.g. 45° leg press")} />
+        <input
+          className="text-input"
+          value={name}
+          autoFocus
+          onChange={(e) => setName(e.target.value)}
+          placeholder={t("z. B. Beinpresse 45°", "e.g. 45° leg press")}
+        />
       </label>
       <label>
         {t("Gerät", "Equipment")}
@@ -71,7 +77,11 @@ const CustomExerciseForm = ({ onCreated, onCancel }: { onCreated: (key: string) 
       <div className="field-label">{t("Hilfsmuskeln", "Secondary muscles")}</div>
       <div className="chips">
         {muscles.map((m) => (
-          <button key={m} className={`chip ${secondary.includes(m) ? "selected alt" : ""}`} onClick={() => setSecondary(toggle(secondary, m))}>
+          <button
+            key={m}
+            className={`chip ${secondary.includes(m) ? "selected alt" : ""}`}
+            onClick={() => setSecondary(toggle(secondary, m))}
+          >
             {muscleName(m, lang)}
           </button>
         ))}
@@ -83,7 +93,18 @@ const CustomExerciseForm = ({ onCreated, onCancel }: { onCreated: (key: string) 
         <button
           className="button dark grow"
           disabled={!name.trim()}
-          onClick={() => onCreated(actions.createCustomExercise({ name, equipment, metric, pattern, primary, secondary: secondary.filter((m) => !primary.includes(m)) }))}
+          onClick={() =>
+            onCreated(
+              actions.createCustomExercise({
+                name,
+                equipment,
+                metric,
+                pattern,
+                primary,
+                secondary: secondary.filter((m) => !primary.includes(m)),
+              }),
+            )
+          }
         >
           {t("Übung anlegen", "Create exercise")}
         </button>
@@ -92,7 +113,15 @@ const CustomExerciseForm = ({ onCreated, onCancel }: { onCreated: (key: string) 
   );
 };
 
-export const ExercisePicker = ({ onPick, onClose, exclude }: { onPick: (key: string) => void; onClose: () => void; exclude: ReadonlySet<string> }) => {
+export const ExercisePicker = ({
+  onPick,
+  onClose,
+  exclude,
+}: {
+  onPick: (key: string) => void;
+  onClose: () => void;
+  exclude: ReadonlySet<string>;
+}) => {
   const { t, lang, data, exerciseName } = useApp();
   const [query, setQuery] = useState("");
   const [equipment, setEquipment] = useState<EquipmentFilter>("all");
@@ -140,7 +169,13 @@ export const ExercisePicker = ({ onPick, onClose, exclude }: { onPick: (key: str
 
   return (
     <Sheet title={t("Übung hinzufügen", "Add exercise")} onClose={onClose}>
-      <input className="text-input search" placeholder={t("Suchen …", "Search …")} value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
+      <input
+        className="text-input search"
+        placeholder={t("Suchen …", "Search …")}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        autoFocus
+      />
       <div className="chips scroll-x" role="group" aria-label={t("Gerät", "Equipment")}>
         {equipmentFilters.map((f) => (
           <button key={f.value} className={`chip ${equipment === f.value ? "selected" : ""}`} onClick={() => setEquipment(f.value)}>
@@ -176,4 +211,3 @@ export const ExercisePicker = ({ onPick, onClose, exclude }: { onPick: (key: str
     </Sheet>
   );
 };
-

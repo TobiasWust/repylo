@@ -38,16 +38,20 @@ export const setFeedback = (data: Data, workoutId: string, exerciseKey: string, 
 
   const progression = suggestProgression(data, exerciseKey, workoutId);
   const nextIndex = index + 1;
-  const next = nextIndex < sets.length && !sets[nextIndex]!.done ? (progression?.sets[nextIndex] ?? progression?.sets.at(-1) ?? null) : null;
+  const next =
+    nextIndex < sets.length && !sets[nextIndex]!.done ? (progression?.sets[nextIndex] ?? progression?.sets.at(-1) ?? null) : null;
 
   const last = exerciseSessions(data, exerciseKey, workoutId).at(-1);
   const previous = last?.sets[index] ?? last?.sets.at(-1);
   if (!previous) return { kind: "first", delta: 0, next };
 
-  const weight = set.weight ?? 0, previousWeight = previous.weight ?? 0;
-  const reps = set.reps ?? 0, previousReps = previous.reps ?? 0;
+  const weight = set.weight ?? 0,
+    previousWeight = previous.weight ?? 0;
+  const reps = set.reps ?? 0,
+    previousReps = previous.reps ?? 0;
   // Time-based sets compare seconds as "reps".
-  const amount = set.duration ?? reps, previousAmount = previous.duration ?? previousReps;
+  const amount = set.duration ?? reps,
+    previousAmount = previous.duration ?? previousReps;
 
   if (weight > previousWeight + 0.01) return { kind: "heavier", delta: weight - previousWeight, next };
   if (weight < previousWeight - 0.01) return { kind: "lighter", delta: previousWeight - weight, next };
@@ -88,7 +92,8 @@ export const workoutSummary = (data: Data, workoutId: string, now: number = Date
     const history = exerciseSessions(data, entry.exerciseKey, workoutId);
     const previous = history.at(-1)?.bestE1rm ?? 0;
     const best = Math.max(0, ...history.map((s) => s.bestE1rm));
-    if (current > 0 && previous > 0 && current > previous) gains.push({ exerciseKey: entry.exerciseKey, percent: ((current - previous) / previous) * 100 });
+    if (current > 0 && previous > 0 && current > previous)
+      gains.push({ exerciseKey: entry.exerciseKey, percent: ((current - previous) / previous) * 100 });
     if (current > 0 && best > 0 && current > best * 1.005) records.push(entry.exerciseKey);
   }
   gains.sort((a, b) => b.percent - a.percent);
@@ -98,7 +103,16 @@ export const workoutSummary = (data: Data, workoutId: string, now: number = Date
 
   const monday = weekStart(workout.date);
   const daysThisWeek = trainedDaysInWeek(data, monday);
-  return { sets: sets.length, volume, minutes, gains: gains.slice(0, 3), records, nextTemplate, daysThisWeek, weeklyGoal: data.settings.weeklyGoal };
+  return {
+    sets: sets.length,
+    volume,
+    minutes,
+    gains: gains.slice(0, 3),
+    records,
+    nextTemplate,
+    daysThisWeek,
+    weeklyGoal: data.settings.weeklyGoal,
+  };
 };
 
 const e1rmOf = (s: SetEntry) => e1rm(s.weight ?? 0, s.reps ?? 0);

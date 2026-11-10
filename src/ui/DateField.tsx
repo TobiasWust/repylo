@@ -36,7 +36,17 @@ const usePicker = (value: string, max: string | undefined, onPick: (day: string)
 };
 
 /** Text date field in the app's format (TT.MM.JJJJ in German) plus a calendar button. */
-export const DateField = ({ value, onChange, max, label }: { value: string; onChange: (day: string) => void; max?: string; label: string }) => {
+export const DateField = ({
+  value,
+  onChange,
+  max,
+  label,
+}: {
+  value: string;
+  onChange: (day: string) => void;
+  max?: string;
+  label: string;
+}) => {
   const { t, lang } = useApp();
   const [text, setText] = useState(dayToInput(value, lang));
   const [invalid, setInvalid] = useState(false);

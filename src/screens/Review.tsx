@@ -20,12 +20,27 @@ const tilesFor = (app: App, review: MonthlyReview): Tile[] => {
   const unit = data.settings.unit;
   const tiles: Tile[] = [
     { sticker: "dumbbell", label: t("Trainings", "Workouts"), value: String(review.workouts), color: "#ffd96a" },
-    { sticker: "flame", label: t("Wochenziel geschafft", "Weekly goal reached"), value: `${review.goalWeeks} / ${review.weeks}`, color: "#ff8a8a" },
+    {
+      sticker: "flame",
+      label: t("Wochenziel geschafft", "Weekly goal reached"),
+      value: `${review.goalWeeks} / ${review.weeks}`,
+      color: "#ff8a8a",
+    },
     { sticker: "chartUp", label: t("Sätze", "Sets"), value: String(review.sets), color: "#cfc8ff" },
-    { sticker: "muscle", label: t("Bewegt", "Lifted"), value: `${formatNumber(toUnit(review.volume, unit) / 1000, lang, 1)} t`, color: "#a5f0dc" },
+    {
+      sticker: "muscle",
+      label: t("Bewegt", "Lifted"),
+      value: `${formatNumber(toUnit(review.volume, unit) / 1000, lang, 1)} t`,
+      color: "#a5f0dc",
+    },
   ];
   if (review.favorite)
-    tiles.push({ sticker: "medal", label: t("Lieblingsübung", "Favourite"), value: exerciseName(getExercise(data, review.favorite.exerciseKey)), color: "#9fd5ff" });
+    tiles.push({
+      sticker: "medal",
+      label: t("Lieblingsübung", "Favourite"),
+      value: exerciseName(getExercise(data, review.favorite.exerciseKey)),
+      color: "#9fd5ff",
+    });
   if (review.biggestGain)
     tiles.push({
       sticker: "trophy",
@@ -33,7 +48,8 @@ const tilesFor = (app: App, review: MonthlyReview): Tile[] => {
       value: `${exerciseName(getExercise(data, review.biggestGain.exerciseKey))} +${formatNumber(review.biggestGain.percent, lang, 1)} %`,
       color: "#ffd96a",
     });
-  if (review.records > 0) tiles.push({ sticker: "party", label: t("Neue Bestwerte", "New bests"), value: String(review.records), color: "#ff8a8a" });
+  if (review.records > 0)
+    tiles.push({ sticker: "party", label: t("Neue Bestwerte", "New bests"), value: String(review.records), color: "#ff8a8a" });
   if (review.bodyWeightChange !== null)
     tiles.push({
       sticker: "scale",
@@ -102,7 +118,9 @@ const renderImage = async (title: string, tiles: readonly Tile[], stickers: HTML
   ctx.fillText(title, 70, 310);
 
   const svgs = [...stickers.querySelectorAll("svg")];
-  const cols = 2, gap = 32, w = (1080 - 140 - gap) / cols;
+  const cols = 2,
+    gap = 32,
+    w = (1080 - 140 - gap) / cols;
   const rows = Math.ceil(tiles.length / cols);
   const h = Math.min(230, (1350 - 370 - 70 - gap * (rows - 1)) / rows);
   for (let i = 0; i < tiles.length; i++) {
@@ -170,7 +188,11 @@ export const ReviewScreen = ({ month: initialMonth }: { month: string }) => {
       </header>
 
       <div className="row gap">
-        <button className="button small" disabled={index < 0 || index >= months.length - 1} onClick={() => setMonth(months[index + 1] ?? previousMonth(month))}>
+        <button
+          className="button small"
+          disabled={index < 0 || index >= months.length - 1}
+          onClick={() => setMonth(months[index + 1] ?? previousMonth(month))}
+        >
           <Icon name="back" size={16} /> {t("Früher", "Earlier")}
         </button>
         <span className="grow center">

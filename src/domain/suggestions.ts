@@ -123,7 +123,10 @@ const missingRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): 
   const top = missing.slice(0, 3);
   return [
     {
-      key: `missing:${top.map((m) => m.key).sort().join(",")}`,
+      key: `missing:${top
+        .map((m) => m.key)
+        .sort()
+        .join(",")}`,
       kind: "missing",
       priority: 60 + Math.min(top[0]!.days, 60) / 6,
       exerciseKeys: top.map((m) => m.key),
@@ -134,7 +137,8 @@ const missingRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): 
 
 const imbalanceRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): Suggestion[] => {
   const from = addDays(now, -13);
-  let push = 0, pull = 0;
+  let push = 0,
+    pull = 0;
   for (const w of data.workouts) {
     if (w.date < from) continue;
     for (const e of w.exercises) {
@@ -145,16 +149,29 @@ const imbalanceRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>)
     }
   }
   const result: Suggestion[] = [];
-  const ratioCard = (key: string, more: number, less: number, target: (e: Exercise) => boolean, params: Record<string, string | number>) => {
+  const ratioCard = (
+    key: string,
+    more: number,
+    less: number,
+    target: (e: Exercise) => boolean,
+    params: Record<string, string | number>,
+  ) => {
     if (more < 6 || more <= less * 1.5) return;
     const exerciseKeys = pickExercises(data, target, recovering, 2);
     if (exerciseKeys.length === 0) return;
-    result.push({ key, kind: "imbalance", priority: 65 + Math.min(more / Math.max(less, 1), 4) * 3, exerciseKeys, params: { ...params, more: Math.round(more), less: Math.round(less) } });
+    result.push({
+      key,
+      kind: "imbalance",
+      priority: 65 + Math.min(more / Math.max(less, 1), 4) * 3,
+      exerciseKeys,
+      params: { ...params, more: Math.round(more), less: Math.round(less) },
+    });
   };
   ratioCard("imbalance:pull", push, pull, (e) => e.pattern === "pull", { side: "pull" });
   ratioCard("imbalance:push", pull, push, (e) => e.pattern === "push", { side: "push" });
   const muscles = setsPerMuscle(data, from, now);
-  const quads = muscles.get("quads") ?? 0, hams = muscles.get("hamstrings") ?? 0;
+  const quads = muscles.get("quads") ?? 0,
+    hams = muscles.get("hamstrings") ?? 0;
   ratioCard("imbalance:hamstrings", quads, hams, (e) => e.primary.includes("hamstrings"), { side: "hamstrings" });
   ratioCard("imbalance:quads", hams, quads, (e) => e.primary.includes("quads"), { side: "quads" });
   return result;

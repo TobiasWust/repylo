@@ -80,12 +80,18 @@ export const ConnectSheet = ({ onClose, initialText = "" }: { onClose: () => voi
       {fromLink ? (
         <p className="with-sticker">
           <Sticker name="ok" size={28} />
-          {t("Link erkannt. Verbinde dieses Gerät, um deine repylo-Daten hier zu sehen.", "Link recognised. Connect this device to see your repylo data here.")}
+          {t(
+            "Link erkannt. Verbinde dieses Gerät, um deine repylo-Daten hier zu sehen.",
+            "Link recognised. Connect this device to see your repylo data here.",
+          )}
         </p>
       ) : (
         <>
           <p className="hint">
-            {t("Öffne auf dem anderen Gerät Einstellungen → „Dieses Gerät teilen“ und scanne den Code.", "On the other device, open Settings → “Share this device” and scan the code.")}
+            {t(
+              "Öffne auf dem anderen Gerät Einstellungen → „Dieses Gerät teilen“ und scanne den Code.",
+              "On the other device, open Settings → “Share this device” and scan the code.",
+            )}
           </p>
           {scanning && !mnemonic && (
             <Scanner
@@ -95,7 +101,13 @@ export const ConnectSheet = ({ onClose, initialText = "" }: { onClose: () => voi
               }}
             />
           )}
-          <textarea className="text-input" rows={3} placeholder={t("… oder die 24 Wörter einfügen", "… or paste the 24 words")} value={text} onChange={(e) => setText(e.target.value)} />
+          <textarea
+            className="text-input"
+            rows={3}
+            placeholder={t("… oder die 24 Wörter einfügen", "… or paste the 24 words")}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
         </>
       )}
       {text && !mnemonic && <p className="hint warn">{t("Das ist kein gültiger Code.", "That’s not a valid code.")}</p>}
@@ -105,10 +117,18 @@ export const ConnectSheet = ({ onClose, initialText = "" }: { onClose: () => voi
           {localData && (
             <label className="check-line">
               <input type="checkbox" checked={carry} onChange={(e) => setCarry(e.target.checked)} />
-              <span>{t("Trainings dieses Geräts mitnehmen (sonst sind sie danach ausgeblendet)", "Bring this device’s workouts along (otherwise they’re hidden afterwards)")}</span>
+              <span>
+                {t(
+                  "Trainings dieses Geräts mitnehmen (sonst sind sie danach ausgeblendet)",
+                  "Bring this device’s workouts along (otherwise they’re hidden afterwards)",
+                )}
+              </span>
             </label>
           )}
-          <button className="button dark full" onClick={() => switchOwner(mnemonic, localData && carry ? JSON.stringify(createBackup(data)) : null)}>
+          <button
+            className="button dark full"
+            onClick={() => switchOwner(mnemonic, localData && carry ? JSON.stringify(createBackup(data)) : null)}
+          >
             <Icon name="sync" /> {t("Verbinden", "Connect")}
           </button>
         </>

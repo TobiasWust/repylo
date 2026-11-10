@@ -15,7 +15,9 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
   const [replace, setReplace] = useState(true);
   const [style, setStyle] = useState<"split" | "circuit">("split");
   const plan =
-    style === "circuit" ? [generateCircuit(data, place, data.settings.goal, lang)] : generatePlan(data, Number(days), place, data.settings.goal, lang);
+    style === "circuit"
+      ? [generateCircuit(data, place, data.settings.goal, lang)]
+      : generatePlan(data, Number(days), place, data.settings.goal, lang);
 
   return (
     <Sheet title={t("Trainingsplan erstellen", "Create a training plan")} onClose={onClose}>
@@ -40,7 +42,10 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
       />
       <p className="hint">
         {style === "split"
-          ? t("Verschiedene Trainingstage im Wechsel, z. B. Oberkörper und Unterkörper.", "Different training days in rotation, e.g. upper and lower body.")
+          ? t(
+              "Verschiedene Trainingstage im Wechsel, z. B. Oberkörper und Unterkörper.",
+              "Different training days in rotation, e.g. upper and lower body.",
+            )
           : t(
               "Ein Ganzkörper-Durchgang: alle Übungen direkt nacheinander mit kurzen Pausen, insgesamt 3 Runden. Gut bei wenig Zeit und für Gerätezirkel.",
               "One full-body round: all exercises back to back with short rests, 3 rounds in total. Great when short on time and for machine circuits.",
@@ -69,7 +74,9 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
       {data.templates.length > 0 && (
         <label className="check-line">
           <input type="checkbox" checked={replace} onChange={(e) => setReplace(e.target.checked)} />
-          <span>{t(`Bisherige ${data.templates.length} Vorlagen ersetzen`, `Replace the ${data.templates.length} existing templates`)}</span>
+          <span>
+            {t(`Bisherige ${data.templates.length} Vorlagen ersetzen`, `Replace the ${data.templates.length} existing templates`)}
+          </span>
         </label>
       )}
       <button

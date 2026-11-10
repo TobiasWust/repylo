@@ -1,6 +1,13 @@
 import { useRef, useState } from "react";
 import { today } from "../../domain/dates";
-import { getExercise, defaultRest, type SetEntry, type TemplateSet, type Workout as WorkoutModel, type WorkoutExercise } from "../../domain/model";
+import {
+  getExercise,
+  defaultRest,
+  type SetEntry,
+  type TemplateSet,
+  type Workout as WorkoutModel,
+  type WorkoutExercise,
+} from "../../domain/model";
 import { suggestProgression } from "../../domain/progression";
 import { detectPrs, hasValue } from "../../domain/stats";
 import { setFeedback } from "../../domain/coach";
@@ -18,7 +25,17 @@ import { DurationField, Stepper } from "./SetInputs";
 import { weightStep } from "./weightStep";
 import { CoachLine } from "./CoachLine";
 
-export const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel; entry: WorkoutExercise; index: number; count: number }) => {
+export const ExerciseBlock = ({
+  workout,
+  entry,
+  index,
+  count,
+}: {
+  workout: WorkoutModel;
+  entry: WorkoutExercise;
+  index: number;
+  count: number;
+}) => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName } = app;
   const { startRest, celebrate } = useFeedback();
@@ -48,7 +65,8 @@ export const ExerciseBlock = ({ workout, entry, index, count }: { workout: Worko
     commit(set, { weight: fromUnit(next, unit) });
   };
   const stepReps = (set: SetEntry, direction: -1 | 1) => commit(set, { reps: Math.max(0, (current(set).reps ?? 0) + direction) });
-  const stepDuration = (set: SetEntry, direction: -1 | 1) => commit(set, { duration: Math.max(0, (current(set).duration ?? 0) + direction * 5) });
+  const stepDuration = (set: SetEntry, direction: -1 | 1) =>
+    commit(set, { duration: Math.max(0, (current(set).duration ?? 0) + direction * 5) });
 
   const toggleDone = (set: SetEntry) => {
     const merged = current(set);
@@ -111,7 +129,13 @@ export const ExerciseBlock = ({ workout, entry, index, count }: { workout: Worko
           <button className="chip" onClick={() => setShowNote(true)}>
             <Icon name="note" size={16} /> {t("Notiz", "Note")}
           </button>
-          <button className="chip danger" onClick={() => confirm(t("Übung aus diesem Training entfernen?", "Remove exercise from this workout?")) && actions.removeExercise(workout, entry.id)}>
+          <button
+            className="chip danger"
+            onClick={() =>
+              confirm(t("Übung aus diesem Training entfernen?", "Remove exercise from this workout?")) &&
+              actions.removeExercise(workout, entry.id)
+            }
+          >
             <Icon name="trash" size={16} /> {t("Entfernen", "Remove")}
           </button>
         </div>
@@ -134,7 +158,10 @@ export const ExerciseBlock = ({ workout, entry, index, count }: { workout: Worko
             </div>
           </div>
           {entry.sets.every((s) => s.weight == null && !s.done) && estimate.sets[0]?.weight != null && (
-            <button className="suggest-chip" onClick={() => estimate.sets.forEach((values, i) => entry.sets[i] && commit(entry.sets[i]!, values))}>
+            <button
+              className="suggest-chip"
+              onClick={() => estimate.sets.forEach((values, i) => entry.sets[i] && commit(entry.sets[i]!, values))}
+            >
               <span className="with-sticker">
                 <Sticker name="bulb" size={22} /> {t("Schätzung übernehmen", "Use estimate")}
               </span>
@@ -147,7 +174,9 @@ export const ExerciseBlock = ({ workout, entry, index, count }: { workout: Worko
       {progression && (
         <div className="progress-hint">
           <div>
-            <small>{t("Letztes Mal", "Last time")} ({formatDate(progression.last.date, lang)})</small>
+            <small>
+              {t("Letztes Mal", "Last time")} ({formatDate(progression.last.date, lang)})
+            </small>
             <div>{describeSets(app, progression.last.sets, exercise.metric)}</div>
           </div>
           {progression.kind !== "repeat" && (
@@ -194,7 +223,13 @@ export const ExerciseBlock = ({ workout, entry, index, count }: { workout: Worko
                   />
                 </Stepper>
                 <Stepper label={t("Wiederholungen", "Reps")} onStep={(d) => stepReps(set, d)}>
-                  <NumberField label={t("Wiederholungen", "Reps")} value={set.reps} decimals={false} placeholder="–" onCommit={(v) => commit(set, { reps: v })} />
+                  <NumberField
+                    label={t("Wiederholungen", "Reps")}
+                    value={set.reps}
+                    decimals={false}
+                    placeholder="–"
+                    onCommit={(v) => commit(set, { reps: v })}
+                  />
                 </Stepper>
               </>
             )}
@@ -208,20 +243,33 @@ export const ExerciseBlock = ({ workout, entry, index, count }: { workout: Worko
             {exercise.metric === "cardio" && (
               <>
                 <DurationField label={t("Zeit", "Time")} value={set.duration} onCommit={(v) => commit(set, { duration: v })} />
-                <NumberField label="km" value={set.distance == null ? null : set.distance / 1000} placeholder="–" onCommit={(v) => commit(set, { distance: v == null ? null : v * 1000 })} />
+                <NumberField
+                  label="km"
+                  value={set.distance == null ? null : set.distance / 1000}
+                  placeholder="–"
+                  onCommit={(v) => commit(set, { distance: v == null ? null : v * 1000 })}
+                />
               </>
             )}
             <button className={`check ${set.done ? "on" : ""}`} onClick={() => toggleDone(set)} aria-label={t("Satz erledigt", "Set done")}>
               <Icon name="check" size={18} />
             </button>
-            <button className="mini-button ghost" tabIndex={-1} onClick={() => actions.removeSet(set.id)} aria-label={t("Satz löschen", "Delete set")}>
+            <button
+              className="mini-button ghost"
+              tabIndex={-1}
+              onClick={() => actions.removeSet(set.id)}
+              aria-label={t("Satz löschen", "Delete set")}
+            >
               <Icon name="close" size={16} />
             </button>
           </div>
         ))}
       </div>
       {feedback && <CoachLine feedback={feedback} metric={exercise.metric} />}
-      <button className="button small full" onClick={() => actions.addSet(workout.id, entry.id, entry.exerciseKey, entry.sets.at(-1), (entry.sets.at(-1)?.position ?? -1) + 1)}>
+      <button
+        className="button small full"
+        onClick={() => actions.addSet(workout.id, entry.id, entry.exerciseKey, entry.sets.at(-1), (entry.sets.at(-1)?.position ?? -1) + 1)}
+      >
         <Icon name="plus" size={16} /> {t("Satz", "Set")}
       </button>
       {showNote && (

@@ -82,7 +82,10 @@ export const takePendingImport = (): string | null => {
  * Undefined means Evolu's default relay.
  */
 export const getTransports = (): ReadonlyArray<OwnerTransport> | undefined => {
-  const configured = (import.meta.env.VITE_RELAY_URL ?? "").split(",").map((u: string) => u.trim()).filter(Boolean);
+  const configured = (import.meta.env.VITE_RELAY_URL ?? "")
+    .split(",")
+    .map((u: string) => u.trim())
+    .filter(Boolean);
   const transports: OwnerTransport[] = [];
   for (const raw of configured) {
     const url = WebSocketUrl.fromUnknown(raw);

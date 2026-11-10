@@ -18,7 +18,14 @@ const cardColors: Record<Suggestion["kind"], string> = {
   plateau: "var(--sky)",
   deload: "var(--lavender)",
 };
-const cardSticker: Record<Suggestion["kind"], StickerName> = { split: "repeat", neglected: "target", missing: "hourglass", imbalance: "balance", plateau: "chartUp", deload: "scale" };
+const cardSticker: Record<Suggestion["kind"], StickerName> = {
+  split: "repeat",
+  neglected: "target",
+  missing: "hourglass",
+  imbalance: "balance",
+  plateau: "chartUp",
+  deload: "scale",
+};
 
 const suggestionText = (s: Suggestion, app: App): { title: string; text: string } => {
   const { t, lang, data, exerciseName } = app;
@@ -28,7 +35,9 @@ const suggestionText = (s: Suggestion, app: App): { title: string; text: string 
     case "split":
       return {
         title: t(`Als Nächstes dran: ${p.name}`, `Up next: ${p.name}`),
-        text: p.last ? t(`Zuletzt hast du „${p.last}“ trainiert.`, `Last time you did “${p.last}”.`) : t("Starte deinen Split.", "Start your split."),
+        text: p.last
+          ? t(`Zuletzt hast du „${p.last}“ trainiert.`, `Last time you did “${p.last}”.`)
+          : t("Starte deinen Split.", "Start your split."),
       };
     case "neglected":
       return {
@@ -43,15 +52,21 @@ const suggestionText = (s: Suggestion, app: App): { title: string; text: string 
     case "imbalance": {
       const side = String(p.side);
       const title =
-        side === "pull" ? t("Mehr ziehen", "More pulling")
-        : side === "push" ? t("Mehr drücken", "More pushing")
-        : side === "hamstrings" ? t("Beinbeuger ausgleichen", "Balance your hamstrings")
-        : t("Quadrizeps ausgleichen", "Balance your quads");
+        side === "pull"
+          ? t("Mehr ziehen", "More pulling")
+          : side === "push"
+            ? t("Mehr drücken", "More pushing")
+            : side === "hamstrings"
+              ? t("Beinbeuger ausgleichen", "Balance your hamstrings")
+              : t("Quadrizeps ausgleichen", "Balance your quads");
       const what =
-        side === "pull" ? t("Drück- vs. Zug", "Push vs. pull")
-        : side === "push" ? t("Zug- vs. Drück", "Pull vs. push")
-        : side === "hamstrings" ? t("Quadrizeps- vs. Beinbeuger-", "Quad vs. hamstring")
-        : t("Beinbeuger- vs. Quadrizeps-", "Hamstring vs. quad");
+        side === "pull"
+          ? t("Drück- vs. Zug", "Push vs. pull")
+          : side === "push"
+            ? t("Zug- vs. Drück", "Pull vs. push")
+            : side === "hamstrings"
+              ? t("Quadrizeps- vs. Beinbeuger-", "Quad vs. hamstring")
+              : t("Beinbeuger- vs. Quadrizeps-", "Hamstring vs. quad");
       return { title, text: t(`${what}sätze in 14 Tagen: ${p.more} zu ${p.less}.`, `${what} sets in 14 days: ${p.more} to ${p.less}.`) };
     }
     case "deload":
@@ -88,7 +103,9 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
   const accept = () => {
     if (suggestion.kind === "deload") {
       actions.updateSettings({ deloadWeek: weekStart(today()) });
-      toast(t("Deload-Woche gestartet – die Vorschläge sind diese Woche leichter", "Deload week started – suggestions are lighter this week"));
+      toast(
+        t("Deload-Woche gestartet – die Vorschläge sind diese Woche leichter", "Deload week started – suggestions are lighter this week"),
+      );
       return;
     }
     const template = data.templates.find((x) => x.id === suggestion.templateId);
@@ -96,7 +113,9 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
     const already = new Set(workout.exercises.map((e) => e.exerciseKey));
     const items = template
       ? templateItems(data, template, workout.id).filter((i) => !already.has(i.exerciseKey))
-      : suggestion.exerciseKeys.filter((k) => !already.has(k)).map((exerciseKey) => ({ exerciseKey, sets: initialSets(data, exerciseKey, workout.id) }));
+      : suggestion.exerciseKeys
+          .filter((k) => !already.has(k))
+          .map((exerciseKey) => ({ exerciseKey, sets: initialSets(data, exerciseKey, workout.id) }));
     actions.addItems(workout, items);
     toast(t("Ins heutige Training übernommen", "Added to today’s workout"));
     open({ type: "workout", id: workout.id });
@@ -105,7 +124,11 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
   return (
     <div
       className={`card suggestion ${leaving ? "leaving" : ""}`}
-      style={{ background: cardColors[suggestion.kind], transform: `translateX(${dx}px) rotate(${dx / 40}deg)`, opacity: 1 - Math.min(Math.abs(dx) / 400, 0.6) }}
+      style={{
+        background: cardColors[suggestion.kind],
+        transform: `translateX(${dx}px) rotate(${dx / 40}deg)`,
+        opacity: 1 - Math.min(Math.abs(dx) / 400, 0.6),
+      }}
       onPointerDown={(e) => (start.current = { x: e.clientX, y: e.clientY, dragging: false })}
       onPointerMove={(e) => {
         const s = start.current;

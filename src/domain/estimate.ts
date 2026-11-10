@@ -20,24 +20,98 @@ import { fromUnit, toUnit } from "./units";
 
 /** Average recreational lifter's est. 1RM in kg (dumbbells: per hand). */
 const baselineKg: Record<string, number> = {
-  squat: 85, front_squat: 65, deadlift: 105, sumo_deadlift: 100, trap_bar_deadlift: 110, rdl: 80, good_morning: 45,
-  bench_press: 65, incline_bench_press: 55, decline_bench_press: 70, close_grip_bench: 55, smith_bench_press: 60,
-  overhead_press: 42, barbell_row: 60, t_bar_row: 55, power_clean: 55, thruster: 45, upright_row: 35,
-  barbell_curl: 32, ez_curl: 32, reverse_curl: 22, skull_crusher: 30,
-  hip_thrust: 95, leg_press: 150, hack_squat: 100, smith_squat: 80, leg_extension: 55, leg_curl_seated: 45, leg_curl_lying: 40,
-  calf_raise_standing: 80, calf_raise_seated: 50, leg_press_calf_raise: 110, hip_abduction: 60, hip_adduction: 60,
-  lat_pulldown: 60, cable_row: 60, machine_row: 60, assisted_pull_up: 30, machine_chest_press: 65, incline_machine_press: 55,
-  machine_shoulder_press: 45, pec_deck: 50, reverse_fly: 35, machine_lateral_raise: 30, preacher_curl: 30, machine_dips: 60,
-  ab_machine: 45, triceps_pushdown: 30, overhead_triceps: 25, cable_curl: 25, face_pull: 25, cable_fly: 20,
-  cable_lateral_raise: 8, cable_crunch: 45, straight_arm_pulldown: 25, woodchopper: 20, pallof_press: 15, cable_kickback: 20,
-  db_bench_press: 26, incline_db_press: 22, db_shoulder_press: 20, arnold_press: 16, db_row: 30, chest_supported_row: 22,
-  db_curl: 13, hammer_curl: 15, incline_db_curl: 10, concentration_curl: 12, lateral_raise: 9, front_raise: 9,
-  rear_delt_raise: 8, db_fly: 14, db_pullover: 22, triceps_kickback: 9, db_overhead_extension: 20, wrist_curl: 14,
-  shrug: 32, goblet_squat: 30, lunge: 18, walking_lunge: 18, step_up: 16, bulgarian_split_squat: 16, farmers_walk: 30,
-  kb_swing: 24, kb_goblet_squat: 24, kb_press: 16, kb_row: 24, turkish_get_up: 12,
+  squat: 85,
+  front_squat: 65,
+  deadlift: 105,
+  sumo_deadlift: 100,
+  trap_bar_deadlift: 110,
+  rdl: 80,
+  good_morning: 45,
+  bench_press: 65,
+  incline_bench_press: 55,
+  decline_bench_press: 70,
+  close_grip_bench: 55,
+  smith_bench_press: 60,
+  overhead_press: 42,
+  barbell_row: 60,
+  t_bar_row: 55,
+  power_clean: 55,
+  thruster: 45,
+  upright_row: 35,
+  barbell_curl: 32,
+  ez_curl: 32,
+  reverse_curl: 22,
+  skull_crusher: 30,
+  hip_thrust: 95,
+  leg_press: 150,
+  hack_squat: 100,
+  smith_squat: 80,
+  leg_extension: 55,
+  leg_curl_seated: 45,
+  leg_curl_lying: 40,
+  calf_raise_standing: 80,
+  calf_raise_seated: 50,
+  leg_press_calf_raise: 110,
+  hip_abduction: 60,
+  hip_adduction: 60,
+  lat_pulldown: 60,
+  cable_row: 60,
+  machine_row: 60,
+  assisted_pull_up: 30,
+  machine_chest_press: 65,
+  incline_machine_press: 55,
+  machine_shoulder_press: 45,
+  pec_deck: 50,
+  reverse_fly: 35,
+  machine_lateral_raise: 30,
+  preacher_curl: 30,
+  machine_dips: 60,
+  ab_machine: 45,
+  triceps_pushdown: 30,
+  overhead_triceps: 25,
+  cable_curl: 25,
+  face_pull: 25,
+  cable_fly: 20,
+  cable_lateral_raise: 8,
+  cable_crunch: 45,
+  straight_arm_pulldown: 25,
+  woodchopper: 20,
+  pallof_press: 15,
+  cable_kickback: 20,
+  db_bench_press: 26,
+  incline_db_press: 22,
+  db_shoulder_press: 20,
+  arnold_press: 16,
+  db_row: 30,
+  chest_supported_row: 22,
+  db_curl: 13,
+  hammer_curl: 15,
+  incline_db_curl: 10,
+  concentration_curl: 12,
+  lateral_raise: 9,
+  front_raise: 9,
+  rear_delt_raise: 8,
+  db_fly: 14,
+  db_pullover: 22,
+  triceps_kickback: 9,
+  db_overhead_extension: 20,
+  wrist_curl: 14,
+  shrug: 32,
+  goblet_squat: 30,
+  lunge: 18,
+  walking_lunge: 18,
+  step_up: 16,
+  bulgarian_split_squat: 16,
+  farmers_walk: 30,
+  kb_swing: 24,
+  kb_goblet_squat: 24,
+  kb_press: 16,
+  kb_row: 24,
+  turkish_get_up: 12,
 };
 
-const isLarge = (muscles: readonly Muscle[]) => muscles.some((m) => !minorMuscles.has(m) && !["biceps", "triceps", "shoulders", "abs", "calves"].includes(m));
+const isLarge = (muscles: readonly Muscle[]) =>
+  muscles.some((m) => !minorMuscles.has(m) && !["biceps", "triceps", "shoulders", "abs", "calves"].includes(m));
 
 /** Rule of thumb when there is no explicit baseline. */
 const ruleBaseline = (e: Exercise): number => {
@@ -85,7 +159,8 @@ export const estimateStart = (data: Data, exerciseKey: string): Estimate | null 
 
   if (target.metric === "cardio") return null;
   if (target.metric === "time") return { sets: three({ weight: null, reps: null, duration: 30, distance: null }), basedOn: [] };
-  if (target.metric === "bodyweight") return { sets: three({ weight: null, reps: Math.min(reps, 10), duration: null, distance: null }), basedOn: [] };
+  if (target.metric === "bodyweight")
+    return { sets: three({ weight: null, reps: Math.min(reps, 10), duration: null, distance: null }), basedOn: [] };
 
   const baseline = baselineE1rm(target);
   if (baseline <= 0) return null;
@@ -101,11 +176,17 @@ export const estimateStart = (data: Data, exerciseKey: string): Estimate | null 
     const other = getExercise(data, key);
     const otherBaseline = baselineE1rm(other);
     if (other.metric !== "weight" || otherBaseline <= 0) continue;
-    const best = Math.max(0, ...exerciseSessions(data, key).filter((s) => s.date >= since).map((s) => s.bestE1rm));
+    const best = Math.max(
+      0,
+      ...exerciseSessions(data, key)
+        .filter((s) => s.date >= since)
+        .map((s) => s.bestE1rm),
+    );
     if (best > 0) candidates.push({ key, similarity: similarity(target, other), ratio: best / otherBaseline });
   }
   const sources = candidates.sort((a, b) => b.similarity - a.similarity).slice(0, 5);
-  let weighted = 0, total = 0;
+  let weighted = 0,
+    total = 0;
   for (const c of sources) {
     weighted += c.ratio * c.similarity ** 2;
     total += c.similarity ** 2;

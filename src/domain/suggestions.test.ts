@@ -24,7 +24,16 @@ describe("suggestions", () => {
 
   it("does not suggest muscles that were trained hard in the last 48 h", () => {
     const data = build([
-      { daysAgo: 0, exercises: { squat: [[100, 5], [100, 5], [100, 5]] } },
+      {
+        daysAgo: 0,
+        exercises: {
+          squat: [
+            [100, 5],
+            [100, 5],
+            [100, 5],
+          ],
+        },
+      },
       { daysAgo: 6, exercises: { bench_press: [[60, 8]] } },
       { daysAgo: 12, exercises: { bench_press: [[60, 8]] } },
     ]);
@@ -36,9 +45,36 @@ describe("suggestions", () => {
 
   it("flags neglected muscle groups", () => {
     const data = build([
-      { daysAgo: 1, exercises: { bench_press: [[60, 8], [60, 8], [60, 8]] } },
-      { daysAgo: 5, exercises: { bench_press: [[60, 8], [60, 8], [60, 8]] } },
-      { daysAgo: 12, exercises: { bench_press: [[60, 8], [60, 8], [60, 8]] } },
+      {
+        daysAgo: 1,
+        exercises: {
+          bench_press: [
+            [60, 8],
+            [60, 8],
+            [60, 8],
+          ],
+        },
+      },
+      {
+        daysAgo: 5,
+        exercises: {
+          bench_press: [
+            [60, 8],
+            [60, 8],
+            [60, 8],
+          ],
+        },
+      },
+      {
+        daysAgo: 12,
+        exercises: {
+          bench_press: [
+            [60, 8],
+            [60, 8],
+            [60, 8],
+          ],
+        },
+      },
     ]);
     const neglected = computeSuggestions(data).filter((s) => s.kind === "neglected");
     expect(neglected.length).toBeGreaterThan(0);
@@ -78,7 +114,16 @@ describe("suggestions", () => {
 });
 
 describe("planned deload", () => {
-  const sevenWeeks: WorkoutSpec[] = Array.from({ length: 7 }, (_, i) => ({ daysAgo: 7 * (i + 1), exercises: { squat: [[100, 8], [100, 8], [100, 8]] } }));
+  const sevenWeeks: WorkoutSpec[] = Array.from({ length: 7 }, (_, i) => ({
+    daysAgo: 7 * (i + 1),
+    exercises: {
+      squat: [
+        [100, 8],
+        [100, 8],
+        [100, 8],
+      ],
+    },
+  }));
 
   it("suggests a deload week after six training weeks in a row", () => {
     const data = build(sevenWeeks);
@@ -87,7 +132,19 @@ describe("planned deload", () => {
   });
 
   it("makes suggestions lighter during the deload week", () => {
-    const settings = [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 3, standards: null, prefill: "last", deloadWeek: weekStart(today()) }];
+    const settings = [
+      {
+        goal: "hypertrophy",
+        unit: "kg",
+        language: "de",
+        restSeconds: 90,
+        barWeight: 20,
+        weeklyGoal: 3,
+        standards: null,
+        prefill: "last",
+        deloadWeek: weekStart(today()),
+      },
+    ];
     const data = build(sevenWeeks, { settings: settings as unknown as Rows["settings"] });
     const p = suggestProgression(data, "squat")!;
     expect(p.kind).toBe("deload");

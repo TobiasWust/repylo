@@ -25,7 +25,11 @@ export const Readiness = ({ workout }: { workout: WorkoutModel }) => {
         <div className="suggestion-head">
           <Sticker name="scale" size={30} />
           <h3>{t("Wie ist deine Tagesform?", "How are you feeling today?")}</h3>
-          <button className="icon-button small" onClick={() => actions.updateWorkout(workout.id, { sleep: 0, energy: 0 })} aria-label={t("Überspringen", "Skip")}>
+          <button
+            className="icon-button small"
+            onClick={() => actions.updateWorkout(workout.id, { sleep: 0, energy: 0 })}
+            aria-label={t("Überspringen", "Skip")}
+          >
             <Icon name="close" size={18} />
           </button>
         </div>

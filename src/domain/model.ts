@@ -107,16 +107,14 @@ export interface Data {
   readonly dismissedUntil: ReadonlyMap<string, number>;
 }
 
-export const getExercise = (data: Pick<Data, "exercises">, key: string): Exercise =>
-  data.exercises.get(key) ?? unknownExercise(key);
+export const getExercise = (data: Pick<Data, "exercises">, key: string): Exercise => data.exercises.get(key) ?? unknownExercise(key);
 
 export const goalFor = (data: Pick<Data, "settings" | "exerciseGoals">, key: string): Goal =>
   data.exerciseGoals.get(key) ?? data.settings.goal;
 
 export const defaultRest: Record<Goal, number> = { strength: 180, hypertrophy: 90, endurance: 60 };
 
-const detectLanguage = (): Language =>
-  navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
+const detectLanguage = (): Language => (navigator.language.toLowerCase().startsWith("de") ? "de" : "en");
 
 const oneOf = <T extends string>(value: string | null, allowed: readonly T[], fallback: T): T =>
   allowed.includes(value as T) ? (value as T) : fallback;
@@ -239,7 +237,11 @@ export const buildData = (rows: Rows): Data => {
     exercises.set(r.id, {
       key: r.id,
       name: { de: r.name, en: r.name },
-      equipment: oneOf<Equipment>(r.equipment, ["barbell", "dumbbell", "kettlebell", "machine", "egym", "cable", "bodyweight", "cardio", "other"], "other"),
+      equipment: oneOf<Equipment>(
+        r.equipment,
+        ["barbell", "dumbbell", "kettlebell", "machine", "egym", "cable", "bodyweight", "cardio", "other"],
+        "other",
+      ),
       metric: oneOf<Metric>(r.metric, ["weight", "bodyweight", "time", "cardio"], "weight"),
       pattern: oneOf<Pattern>(r.pattern, ["push", "pull", "legs", "core", "cardio"], "core"),
       primary: parseMuscles(r.primary),

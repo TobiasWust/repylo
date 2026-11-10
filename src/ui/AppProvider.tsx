@@ -19,18 +19,17 @@ import { AppContext, type App, type Overlay, type Tab } from "./context";
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const evolu = useEvolu();
-  const [workouts, workoutExercises, sets, templates, customExercises, bodyWeights, settings, exerciseSettings, dismissals] =
-    useQueries([
-      workoutsQuery,
-      workoutExercisesQuery,
-      setsQuery,
-      templatesQuery,
-      customExercisesQuery,
-      bodyWeightsQuery,
-      settingsQuery,
-      exerciseSettingsQuery,
-      dismissalsQuery,
-    ]);
+  const [workouts, workoutExercises, sets, templates, customExercises, bodyWeights, settings, exerciseSettings, dismissals] = useQueries([
+    workoutsQuery,
+    workoutExercisesQuery,
+    setsQuery,
+    templatesQuery,
+    customExercisesQuery,
+    bodyWeightsQuery,
+    settingsQuery,
+    exerciseSettingsQuery,
+    dismissalsQuery,
+  ]);
 
   const data = useMemo(
     () =>

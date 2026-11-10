@@ -45,7 +45,13 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
   };
   const points = sessions.map((s) => ({ x: parseDay(s.date).getTime(), y: value(s), label: formatDate(s.date, lang) }));
   const format = (y: number) =>
-    metric === "duration" ? formatDuration(Math.round(y)) : metric === "distance" ? `${formatNumber(y, lang, 2)} km` : metric === "reps" ? formatNumber(y, lang, 0) : `${formatNumber(y, lang, metric === "volume" ? 0 : 1)}`;
+    metric === "duration"
+      ? formatDuration(Math.round(y))
+      : metric === "distance"
+        ? `${formatNumber(y, lang, 2)} km`
+        : metric === "reps"
+          ? formatNumber(y, lang, 0)
+          : `${formatNumber(y, lang, metric === "volume" ? 0 : 1)}`;
 
   const first = sessions[0];
   const last = sessions.at(-1);
@@ -99,7 +105,9 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
                 </div>
                 <div className="stat-tile lavender">
                   <span>{t("Bestes Volumen", "Best volume")}</span>
-                  <strong>{formatNumber(toUnit(best.bestVolume, unit), lang, 0)} {unit}</strong>
+                  <strong>
+                    {formatNumber(toUnit(best.bestVolume, unit), lang, 0)} {unit}
+                  </strong>
                 </div>
               </>
             )}
@@ -204,7 +212,9 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
             ]}
           />
           {exercise.equipment === "egym" && !ownGoal && (
-            <p className="hint">{t("Tipp: Für den EGYM-Standard mit 20 Wdh. passt „Kraftausdauer“.", "Tip: for EGYM’s standard 20 reps, choose “Endurance”.")}</p>
+            <p className="hint">
+              {t("Tipp: Für den EGYM-Standard mit 20 Wdh. passt „Kraftausdauer“.", "Tip: for EGYM’s standard 20 reps, choose “Endurance”.")}
+            </p>
           )}
         </section>
       )}
@@ -219,7 +229,11 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
                   <strong>{formatDate(s.date, lang, "long")}</strong>
                   <small>
                     {s.sets
-                      .map((x) => (isTimed ? formatDuration(x.duration ?? 0) + (x.distance ? ` · ${formatNumber(x.distance / 1000, lang, 2)} km` : "") : `${x.reps ?? "–"}${x.weight ? ` × ${weight(x.weight)}` : ""}`))
+                      .map((x) =>
+                        isTimed
+                          ? formatDuration(x.duration ?? 0) + (x.distance ? ` · ${formatNumber(x.distance / 1000, lang, 2)} km` : "")
+                          : `${x.reps ?? "–"}${x.weight ? ` × ${weight(x.weight)}` : ""}`,
+                      )
                       .join(" · ")}
                   </small>
                   {s.note && (

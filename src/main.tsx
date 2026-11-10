@@ -22,13 +22,13 @@ const run = createRun(evoluDeps);
 const evolu = await run
   .ok(
     createEvolu(Schema, {
-    appName: AppName.orThrow("repylo"),
-    appOwner: loadOrCreateOwner(),
-    transports: getTransports(),
-    indexes: (create) => [
-      create("workoutSetWorkoutId").on("workoutSet").column("workoutId"),
-      create("workoutExerciseWorkoutId").on("workoutExercise").column("workoutId"),
-    ],
+      appName: AppName.orThrow("repylo"),
+      appOwner: loadOrCreateOwner(),
+      transports: getTransports(),
+      indexes: (create) => [
+        create("workoutSetWorkoutId").on("workoutSet").column("workoutId"),
+        create("workoutExerciseWorkoutId").on("workoutExercise").column("workoutId"),
+      ],
     }),
   )
   .catch((error: unknown) => {

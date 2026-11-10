@@ -33,7 +33,12 @@ export const InstallCard = ({ always = false }: { always?: boolean }) => {
           </button>
         )}
       </div>
-      <p>{t("Liegt dann auf deinem Startbildschirm, startet schneller und läuft im Vollbild – auch offline.", "It then sits on your home screen, starts faster and runs full screen – offline too.")}</p>
+      <p>
+        {t(
+          "Liegt dann auf deinem Startbildschirm, startet schneller und läuft im Vollbild – auch offline.",
+          "It then sits on your home screen, starts faster and runs full screen – offline too.",
+        )}
+      </p>
       {mode === "prompt" && (
         <div className="action-grid">
           {!always && (
@@ -54,12 +59,18 @@ export const InstallCard = ({ always = false }: { always?: boolean }) => {
       )}
       {mode === "ios" && (
         <p className="hint">
-          {t("In Safari unten auf „Teilen“ tippen und dann „Zum Home-Bildschirm“ wählen.", "In Safari, tap “Share” at the bottom, then choose “Add to Home Screen”.")}
+          {t(
+            "In Safari unten auf „Teilen“ tippen und dann „Zum Home-Bildschirm“ wählen.",
+            "In Safari, tap “Share” at the bottom, then choose “Add to Home Screen”.",
+          )}
         </p>
       )}
       {mode === "firefox" && (
         <p className="hint">
-          {t("Oben rechts auf das Menü (⋮) tippen und „Installieren“ bzw. „Zum Startbildschirm hinzufügen“ wählen.", "Tap the menu (⋮) at the top right, then “Install” or “Add to Home screen”.")}
+          {t(
+            "Oben rechts auf das Menü (⋮) tippen und „Installieren“ bzw. „Zum Startbildschirm hinzufügen“ wählen.",
+            "Tap the menu (⋮) at the top right, then “Install” or “Add to Home screen”.",
+          )}
         </p>
       )}
       {(mode === "ios" || mode === "firefox") && !always && (

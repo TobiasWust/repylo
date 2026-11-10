@@ -12,13 +12,37 @@ describe("stats", () => {
   });
 
   it("keeps only real rep records", () => {
-    const data = build([{ daysAgo: 3, exercises: { bench_press: [[65, 10], [65, 8], [70, 5]] } }]);
+    const data = build([
+      {
+        daysAgo: 3,
+        exercises: {
+          bench_press: [
+            [65, 10],
+            [65, 8],
+            [70, 5],
+          ],
+        },
+      },
+    ]);
     const best = records(exerciseSessions(data, "bench_press"));
-    expect([...best.byReps]).toEqual([[10, 65], [5, 70]]);
+    expect([...best.byReps]).toEqual([
+      [10, 65],
+      [5, 70],
+    ]);
   });
 
   it("counts secondary muscles as half sets", () => {
-    const data = build([{ daysAgo: 0, exercises: { bench_press: [[60, 8], [60, 8]] } }]);
+    const data = build([
+      {
+        daysAgo: 0,
+        exercises: {
+          bench_press: [
+            [60, 8],
+            [60, 8],
+          ],
+        },
+      },
+    ]);
     const sets = setsPerMuscle(data, addDays(today(), -6));
     expect(sets.get("chest")).toBe(2);
     expect(sets.get("triceps")).toBe(1);

@@ -125,8 +125,7 @@ export const Schema = {
 export type AppSchema = typeof Schema;
 export type AppEvolu = Evolu<AppSchema>;
 
-export const { EvoluContext, useEvolu, useQueries, useOwnerSyncStatus } =
-  createEvoluBinding<AppSchema>();
+export const { EvoluContext, useEvolu, useQueries, useOwnerSyncStatus } = createEvoluBinding<AppSchema>();
 
 const createQuery = createQueryBuilder(Schema);
 
@@ -141,34 +140,16 @@ export const workoutsQuery = createQuery((db) =>
     .orderBy("startedAt", "desc"),
 );
 export const workoutExercisesQuery = createQuery((db) =>
-  db
-    .selectFrom("workoutExercise")
-    .select(["id", "workoutId", "exerciseKey", "position", "note"])
-    .where("isDeleted", "is not", 1),
+  db.selectFrom("workoutExercise").select(["id", "workoutId", "exerciseKey", "position", "note"]).where("isDeleted", "is not", 1),
 );
 export const setsQuery = createQuery((db) =>
   db
     .selectFrom("workoutSet")
-    .select([
-      "id",
-      "workoutId",
-      "workoutExerciseId",
-      "exerciseKey",
-      "position",
-      "weight",
-      "reps",
-      "duration",
-      "distance",
-      "done",
-    ])
+    .select(["id", "workoutId", "workoutExerciseId", "exerciseKey", "position", "weight", "reps", "duration", "distance", "done"])
     .where("isDeleted", "is not", 1),
 );
 export const templatesQuery = createQuery((db) =>
-  db
-    .selectFrom("template")
-    .select(["id", "name", "position", "items"])
-    .where("isDeleted", "is not", 1)
-    .orderBy("position"),
+  db.selectFrom("template").select(["id", "name", "position", "items"]).where("isDeleted", "is not", 1).orderBy("position"),
 );
 export const customExercisesQuery = createQuery((db) =>
   db
@@ -177,11 +158,7 @@ export const customExercisesQuery = createQuery((db) =>
     .where("isDeleted", "is not", 1),
 );
 export const bodyWeightsQuery = createQuery((db) =>
-  db
-    .selectFrom("bodyWeight")
-    .select(["id", "date", "weight"])
-    .where("isDeleted", "is not", 1)
-    .orderBy("date"),
+  db.selectFrom("bodyWeight").select(["id", "date", "weight"]).where("isDeleted", "is not", 1).orderBy("date"),
 );
 export const settingsQuery = createQuery((db) =>
   db
@@ -190,10 +167,7 @@ export const settingsQuery = createQuery((db) =>
     .where("isDeleted", "is not", 1),
 );
 export const exerciseSettingsQuery = createQuery((db) =>
-  db
-    .selectFrom("exerciseSettings")
-    .select(["id", "exerciseKey", "goal"])
-    .where("isDeleted", "is not", 1),
+  db.selectFrom("exerciseSettings").select(["id", "exerciseKey", "goal"]).where("isDeleted", "is not", 1),
 );
 export const dismissalsQuery = createQuery((db) =>
   db.selectFrom("dismissal").select(["id", "key", "until"]).where("isDeleted", "is not", 1),

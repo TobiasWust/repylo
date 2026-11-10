@@ -2,8 +2,7 @@ import { addDays, daysBetween, today, weekStart } from "./dates";
 import { minorMuscles, muscles, type Muscle } from "./exercises";
 import { getExercise, type Data, type SetEntry, type Workout } from "./model";
 
-export const hasValue = (s: SetEntry): boolean =>
-  (s.reps ?? 0) > 0 || (s.duration ?? 0) > 0 || (s.distance ?? 0) > 0;
+export const hasValue = (s: SetEntry): boolean => (s.reps ?? 0) > 0 || (s.duration ?? 0) > 0 || (s.distance ?? 0) > 0;
 
 /**
  * Estimated one-rep max (Epley). Above ~12 reps the estimate gets unreliable,
@@ -33,10 +32,18 @@ export interface Session {
 }
 
 const summarize = (workoutId: string, date: string, note: string | null, sets: SetEntry[]): Session => {
-  let topWeight = 0, bestE1rm = 0, volume = 0, maxReps = 0, totalReps = 0;
-  let maxDuration = 0, totalDuration = 0, totalDistance = 0;
+  let topWeight = 0,
+    bestE1rm = 0,
+    volume = 0,
+    maxReps = 0,
+    totalReps = 0;
+  let maxDuration = 0,
+    totalDuration = 0,
+    totalDistance = 0;
   for (const s of sets) {
-    const w = s.weight ?? 0, r = s.reps ?? 0, d = s.duration ?? 0;
+    const w = s.weight ?? 0,
+      r = s.reps ?? 0,
+      d = s.duration ?? 0;
     if (r > 0) topWeight = Math.max(topWeight, w);
     bestE1rm = Math.max(bestE1rm, e1rm(w, r));
     volume += w * r;
@@ -59,8 +66,7 @@ const summarize = (workoutId: string, date: string, note: string | null, sets: S
  */
 export const exerciseSessions = (data: Data, key: string, beforeWorkoutId?: string): Session[] => {
   const anchor = data.workouts.find((w) => w.id === beforeWorkoutId);
-  const isBefore = (w: Workout) =>
-    !anchor || w.date < anchor.date || (w.date === anchor.date && w.startedAt < anchor.startedAt);
+  const isBefore = (w: Workout) => !anchor || w.date < anchor.date || (w.date === anchor.date && w.startedAt < anchor.startedAt);
   const sessions: Session[] = [];
   for (let i = data.workouts.length - 1; i >= 0; i--) {
     const w = data.workouts[i]!;
@@ -84,7 +90,12 @@ export interface Records {
 }
 
 export const records = (sessions: readonly Session[]): Records => {
-  let maxWeight = 0, bestE1rm = 0, bestVolume = 0, maxReps = 0, maxDuration = 0, maxDistance = 0;
+  let maxWeight = 0,
+    bestE1rm = 0,
+    bestVolume = 0,
+    maxReps = 0,
+    maxDuration = 0,
+    maxDistance = 0;
   const byReps = new Map<number, number>();
   for (const s of sessions) {
     maxWeight = Math.max(maxWeight, s.topWeight);
@@ -94,7 +105,8 @@ export const records = (sessions: readonly Session[]): Records => {
     maxDuration = Math.max(maxDuration, s.maxDuration);
     maxDistance = Math.max(maxDistance, s.totalDistance);
     for (const set of s.sets) {
-      const r = set.reps ?? 0, w = set.weight ?? 0;
+      const r = set.reps ?? 0,
+        w = set.weight ?? 0;
       if (r > 0 && r <= 20 && w > 0) byReps.set(r, Math.max(byReps.get(r) ?? 0, w));
     }
   }
@@ -121,7 +133,9 @@ export const detectPrs = (data: Data, workoutId: string, set: SetEntry): Pr[] =>
   if (history.length === 0) return [];
   const best = records(history);
   const prs: Pr[] = [];
-  const w = set.weight ?? 0, r = set.reps ?? 0, d = set.duration ?? 0;
+  const w = set.weight ?? 0,
+    r = set.reps ?? 0,
+    d = set.duration ?? 0;
   const metric = getExercise(data, set.exerciseKey).metric;
   if (metric === "weight" || (metric === "bodyweight" && w > 0)) {
     if (w > best.maxWeight && r > 0) prs.push({ kind: "weight", value: w });
@@ -162,7 +176,8 @@ export const weeklySetTarget = { strength: [6, 12], hypertrophy: [10, 20], endur
 
 export const majorMuscles = muscles.filter((m) => !minorMuscles.has(m));
 
-export const trainedDays = (data: Data): Set<string> => new Set(data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).map((w) => w.date));
+export const trainedDays = (data: Data): Set<string> =>
+  new Set(data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).map((w) => w.date));
 
 /** Training days per week (keyed by Monday). */
 export const daysPerWeek = (days: ReadonlySet<string>): Map<string, number> => {

@@ -20,14 +20,23 @@ export const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose
   };
   const apply = () => {
     if (!selected) return;
-    actions.addItems(workout, selected.items.filter((_, i) => checked.has(i)));
+    actions.addItems(
+      workout,
+      selected.items.filter((_, i) => checked.has(i)),
+    );
     if (selected.templateId && !workout.templateId) actions.updateWorkout(workout.id, { templateId: selected.templateId });
     onClose();
   };
 
   const sources =
     source === "templates"
-      ? data.templates.map((tpl) => ({ id: tpl.id, title: tpl.name, subtitle: `${tpl.items.length} ${t("Übungen", "exercises")}`, items: templateItems(data, tpl, workout.id), templateId: tpl.id }))
+      ? data.templates.map((tpl) => ({
+          id: tpl.id,
+          title: tpl.name,
+          subtitle: `${tpl.items.length} ${t("Übungen", "exercises")}`,
+          items: templateItems(data, tpl, workout.id),
+          templateId: tpl.id,
+        }))
       : data.workouts
           .filter((w) => w.id !== workout.id && w.exercises.length > 0)
           .slice(0, 40)
@@ -55,7 +64,10 @@ export const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose
       {sources.length === 0 && (
         <p className="hint">
           {source === "templates"
-            ? t("Noch keine Vorlagen. Speichere ein Training als Vorlage oder lass dir unter Mehr → Vorlagen einen Trainingsplan erstellen.", "No templates yet. Save a workout as a template, or create a training plan under More → Templates.")
+            ? t(
+                "Noch keine Vorlagen. Speichere ein Training als Vorlage oder lass dir unter Mehr → Vorlagen einen Trainingsplan erstellen.",
+                "No templates yet. Save a workout as a template, or create a training plan under More → Templates.",
+              )
             : t("Noch keine früheren Trainings.", "No past workouts yet.")}
         </p>
       )}

@@ -43,7 +43,16 @@ export const Scanner = ({ onResult }: { onResult: (text: string) => void }) => {
       stream?.getTracks().forEach((track) => track.stop());
     };
   }, [onResult]);
-  if (unsupported) return <p className="hint">{t("Dein Browser kann keine QR-Codes scannen. Füge die Wörter unten ein.", "Your browser can’t scan QR codes. Paste the words below.")}</p>;
-  if (cameraError) return <p className="hint">{t("Kein Kamerazugriff. Füge die Wörter unten ein.", "No camera access. Paste the words below.")}</p>;
+  if (unsupported)
+    return (
+      <p className="hint">
+        {t(
+          "Dein Browser kann keine QR-Codes scannen. Füge die Wörter unten ein.",
+          "Your browser can’t scan QR codes. Paste the words below.",
+        )}
+      </p>
+    );
+  if (cameraError)
+    return <p className="hint">{t("Kein Kamerazugriff. Füge die Wörter unten ein.", "No camera access. Paste the words below.")}</p>;
   return <video ref={video} className="scanner" muted playsInline />;
 };

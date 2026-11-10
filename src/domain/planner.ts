@@ -104,11 +104,36 @@ const dayNames: Record<DayKind, [string, string]> = {
 
 /** Proven splits for each number of training days. Variant 0 = A, 1 = B. */
 const splits: Record<number, readonly [DayKind, 0 | 1, string][]> = {
-  2: [["full", 0, "A"], ["full", 1, "B"]],
-  3: [["full", 0, "A"], ["full", 1, "B"], ["full", 0, "C"]],
-  4: [["upper", 0, "A"], ["lower", 0, "A"], ["upper", 1, "B"], ["lower", 1, "B"]],
-  5: [["push", 0, ""], ["pull", 0, ""], ["legs", 0, ""], ["upper", 1, ""], ["lower", 1, ""]],
-  6: [["push", 0, "A"], ["pull", 0, "A"], ["legs", 0, "A"], ["push", 1, "B"], ["pull", 1, "B"], ["legs", 1, "B"]],
+  2: [
+    ["full", 0, "A"],
+    ["full", 1, "B"],
+  ],
+  3: [
+    ["full", 0, "A"],
+    ["full", 1, "B"],
+    ["full", 0, "C"],
+  ],
+  4: [
+    ["upper", 0, "A"],
+    ["lower", 0, "A"],
+    ["upper", 1, "B"],
+    ["lower", 1, "B"],
+  ],
+  5: [
+    ["push", 0, ""],
+    ["pull", 0, ""],
+    ["legs", 0, ""],
+    ["upper", 1, ""],
+    ["lower", 1, ""],
+  ],
+  6: [
+    ["push", 0, "A"],
+    ["pull", 0, "A"],
+    ["legs", 0, "A"],
+    ["push", 1, "B"],
+    ["pull", 1, "B"],
+    ["legs", 1, "B"],
+  ],
 };
 
 const startReps: Record<Goal, number> = { strength: 5, hypertrophy: 10, endurance: 15 };
@@ -148,7 +173,21 @@ export const generatePlan = (data: Data, days: number, place: Place, goal: Goal,
 };
 
 /** Order of a full-body circuit: alternate upper and lower body so muscles recover while you move on. */
-const circuitSlots: readonly Slot[] = ["squat", "hpush", "vpull", "hinge", "vpush", "hpull", "quads", "chestIso", "hams", "biceps", "glutes", "triceps", "core"];
+const circuitSlots: readonly Slot[] = [
+  "squat",
+  "hpush",
+  "vpull",
+  "hinge",
+  "vpush",
+  "hpull",
+  "quads",
+  "chestIso",
+  "hams",
+  "biceps",
+  "glutes",
+  "triceps",
+  "core",
+];
 
 /**
  * Circuit training: one full-body round, exercises back to back with short
