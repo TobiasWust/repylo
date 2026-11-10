@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { setFeedback, workoutSummary } from "./coach";
+import { e1rm } from "./stats";
 
 import { type SetSpec, build } from "../test/fixtures";
 
@@ -67,5 +68,7 @@ describe("workout summary", () => {
     expect(s.volume).toBe(105 * 5 * 2 + 60 * 8);
     expect(s.gains.map((g) => g.exerciseKey)).toEqual(["squat"]);
     expect(s.records).toEqual(["squat"]);
+    // squat +5 %, bench 60×8 vs 60×10 ≈ −5 % → about 0 on average
+    expect(s.averageChange).toBeCloseTo((5 + ((e1rm(60, 8) - e1rm(60, 10)) / e1rm(60, 10)) * 100) / 2, 5);
   });
 });

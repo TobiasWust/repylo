@@ -1692,3 +1692,53 @@ body:has(.overlay-screen) .rest-timer {
   border-radius: 12px;
   padding: 10px 12px;
 }
+
+.day-bubble.pinned {
+  box-shadow: var(--shadow-sm);
+}
+.day-bubble-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.day-bubble-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.day-bubble-stats span {
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 1px 8px;
+  background: #fff;
+}
+.day-bubble-stats .up {
+  background: var(--mint);
+}
+.day-bubble-stats .down {
+  background: var(--pink);
+}
+.day-bubble-hint {
+  font-size: 11px;
+}
+
+.trend {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.trend small {
+  font-weight: 800;
+  font-size: 12px;
+}
+.trend .up {
+  color: #127a64;
+}
+.trend .down {
+  color: #b3261e;
+}

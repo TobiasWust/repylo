@@ -70,6 +70,11 @@ export interface WorkoutSummary {
   readonly gains: readonly { exerciseKey: string; percent: number }[];
   /** Exercises with a new all-time best est. 1RM. */
   readonly records: readonly string[];
+  /**
+   * Average change of best est. 1RM vs. each exercise's previous session, in %,
+   * over the exercises that have one; null if none do.
+   */
+  readonly averageChange: number | null;
   /** Name of the next split, if the workout came from a template rotation. */
   readonly nextTemplate: string | null;
   readonly daysThisWeek: number;
@@ -87,11 +92,13 @@ export const workoutSummary = (data: Data, workoutId: string, now: number = Date
 
   const gains: { exerciseKey: string; percent: number }[] = [];
   const records: string[] = [];
+  const changes: number[] = [];
   for (const entry of workout.exercises) {
     const current = Math.max(0, ...entry.sets.filter(hasValue).map((s) => e1rmOf(s)));
     const history = exerciseSessions(data, entry.exerciseKey, workoutId);
     const previous = history.at(-1)?.bestE1rm ?? 0;
     const best = Math.max(0, ...history.map((s) => s.bestE1rm));
+    if (current > 0 && previous > 0) changes.push(((current - previous) / previous) * 100);
     if (current > 0 && previous > 0 && current > previous)
       gains.push({ exerciseKey: entry.exerciseKey, percent: ((current - previous) / previous) * 100 });
     if (current > 0 && best > 0 && current > best * 1.005) records.push(entry.exerciseKey);
@@ -109,6 +116,7 @@ export const workoutSummary = (data: Data, workoutId: string, now: number = Date
     minutes,
     gains: gains.slice(0, 3),
     records,
+    averageChange: changes.length > 0 ? changes.reduce((a, b) => a + b, 0) / changes.length : null,
     nextTemplate,
     daysThisWeek,
     weeklyGoal: data.settings.weeklyGoal,
