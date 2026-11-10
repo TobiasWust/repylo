@@ -12,6 +12,20 @@
     <script data-goatcounter="https://repylo.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
   </head>
   <body>
+    <!-- Pencil look for outlines: a gentle wobble plus graphite grain (used via CSS filter: url(#pencil)). -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" result="wobble" />
+        <feDisplacementMap in="SourceGraphic" in2="wobble" scale="5.5" xChannelSelector="R" yChannelSelector="G" result="drawn" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.9 1.6" numOctaves="1" seed="8" result="grain" />
+        <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 1.25" result="grainMask" />
+        <feComposite in="drawn" in2="grainMask" operator="in" />
+      </filter>
+      <filter id="pencil-2" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="11" result="wobble" />
+        <feDisplacementMap in="SourceGraphic" in2="wobble" scale="6.5" xChannelSelector="G" yChannelSelector="R" />
+      </filter>
+    </svg>
     <div id="root"></div>
     <script src="/boot-watchdog.js"></script>
     <script type="module" src="/src/main.tsx"></script>

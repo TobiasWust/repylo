@@ -1,4 +1,5 @@
 import "@fontsource-variable/lexend";
+import "@fontsource-variable/shantell-sans";
 import { AppName } from "@evolu/common";
 import { createEvolu } from "@evolu/common/local-first";
 import { createRun } from "@evolu/web";

@@ -1895,3 +1895,146 @@ body:has(.overlay-screen) .rest-timer {
     animation: none;
   }
 }
+
+/* ---------- Sketchbook look ----------
+   A colourful notepad: graph paper, hand-drawn pencil outlines with a faint
+   second stroke, hatched shadows, handwritten headings with a marker swipe.
+   The pencil filters live in index.html. */
+:root {
+  --hand: "Shantell Sans Variable", "Shantell Sans", var(--font);
+  --hatch: repeating-linear-gradient(-45deg, var(--ink) 0 1.3px, transparent 1.3px 4px);
+}
+body {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+:is(
+  .week-dot,
+  .list-icon,
+  .date-block,
+  .mini-button:not(.ghost),
+  .chip,
+  .check,
+  .bar,
+  .rep-record,
+  .empty,
+  .status-pill,
+  .tips-box,
+  .review-tile
+) {
+  position: relative;
+  border-color: transparent;
+}
+:is(.tabbar, .celebration) {
+  border-color: transparent;
+  box-shadow: none;
+}
+:is(.card, .stat-tile, .button:not(.dashed), .icon-button, .tile-icon, .pick-card, .plan-day, .streak-badge, .suggest-chip) {
+  --drop: 3.5px;
+  position: relative;
+  border-color: transparent;
+  box-shadow: none;
+}
+:is(.card, .stat-tile, .tabbar, .celebration, .pick-card) {
+  --drop: 7px;
+}
+/* Faint squares on the paper itself. */
+.card {
+  background-image:
+    linear-gradient(rgba(20, 20, 20, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 20, 20, 0.045) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+/* The outline as a single wobbly pencil line. */
+:is(
+  .card,
+  .stat-tile,
+  .button:not(.dashed),
+  .icon-button,
+  .tile-icon,
+  .pick-card,
+  .plan-day,
+  .streak-badge,
+  .suggest-chip,
+  .week-dot,
+  .list-icon,
+  .date-block,
+  .mini-button:not(.ghost),
+  .chip,
+  .check,
+  .bar,
+  .rep-record,
+  .empty,
+  .status-pill,
+  .tips-box,
+  .review-tile,
+  .tabbar,
+  .celebration
+)::after {
+  content: "";
+  position: absolute;
+  inset: -2.5px;
+  border: var(--line);
+  border-radius: inherit;
+  filter: url(#pencil);
+  pointer-events: none;
+}
+/* Hatched shadow: an L-shaped strip below and right of the element. */
+:is(
+  .card,
+  .stat-tile,
+  .button:not(.dashed),
+  .icon-button,
+  .tile-icon,
+  .pick-card,
+  .plan-day,
+  .streak-badge,
+  .suggest-chip,
+  .tabbar,
+  .celebration
+)::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--drop) - 2.5px) calc(-2.5px - var(--drop)) calc(-2.5px - var(--drop)) calc(var(--drop) - 2.5px);
+  border-radius: inherit;
+  background: var(--hatch);
+  clip-path: polygon(
+    calc(100% - var(--drop)) 0,
+    100% 0,
+    100% 100%,
+    0 100%,
+    0 calc(100% - var(--drop)),
+    calc(100% - var(--drop)) calc(100% - var(--drop))
+  );
+  filter: url(#pencil-2);
+  pointer-events: none;
+}
+:is(.button, .icon-button, .list-card, .suggest-chip):active::before {
+  opacity: 0;
+}
+
+/* Handwritten headings; page and section titles get a marker swipe. */
+:is(.logo, .page-title, .section-title, .card-title, .day-card h3, .overlay-title h1, .stat-tile strong, .streak-badge) {
+  font-family: var(--hand);
+  letter-spacing: -0.01em;
+}
+:is(.page-title, .section-title) {
+  width: fit-content;
+  padding: 0 6px;
+  margin-left: -6px;
+  background: linear-gradient(176deg, transparent 52%, var(--yellow) 52% 86%, transparent 86%);
+}
+
+/* Stuck-in-a-notebook tilt for the small tiles. */
+.stat-grid > :nth-child(odd),
+.tile:nth-child(odd) .tile-icon {
+  rotate: -0.7deg;
+}
+.stat-grid > :nth-child(even),
+.tile:nth-child(even) .tile-icon {
+  rotate: 0.6deg;
+}
+.day-card {
+  rotate: -0.5deg;
+}
