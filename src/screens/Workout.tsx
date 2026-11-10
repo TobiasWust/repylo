@@ -193,9 +193,6 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
     });
   };
 
-  // Ticking sets off only matters live (rest timer, PRs, progress).
-  // For backfilled workouts the column is just noise, so it's hidden.
-  const live = workout.date === today();
   const weightLabel = exercise.metric === "bodyweight" ? `+${unit}` : unit;
   const showPlates = exercise.equipment === "barbell";
 
@@ -256,7 +253,7 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
       )}
 
       <div className="set-table">
-        <div className={`set-row set-header ${live ? "" : "no-check"}`}>
+        <div className="set-row set-header">
           <span>#</span>
           {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
             <>
@@ -271,11 +268,11 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
               <span>km</span>
             </>
           )}
-          {live && <span />}
+          <span />
           <span />
         </div>
         {entry.sets.map((set, i) => (
-          <div key={set.id} className={`set-row ${set.done && live ? "done" : ""} ${live ? "" : "no-check"}`}>
+          <div key={set.id} className={`set-row ${set.done ? "done" : ""}`}>
             <span className="set-index">{i + 1}</span>
             {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
               <>
@@ -305,11 +302,9 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
                 <NumberField label="km" value={set.distance == null ? null : set.distance / 1000} placeholder="–" onCommit={(v) => commit(set, { distance: v == null ? null : v * 1000 })} />
               </>
             )}
-            {live && (
-              <button className={`check ${set.done ? "on" : ""}`} onClick={() => toggleDone(set)} aria-label={t("Satz erledigt", "Set done")}>
-                <Icon name="check" size={18} />
-              </button>
-            )}
+            <button className={`check ${set.done ? "on" : ""}`} onClick={() => toggleDone(set)} aria-label={t("Satz erledigt", "Set done")}>
+              <Icon name="check" size={18} />
+            </button>
             <button className="mini-button ghost" tabIndex={-1} onClick={() => actions.removeSet(set.id)} aria-label={t("Satz löschen", "Delete set")}>
               <Icon name="close" size={16} />
             </button>
@@ -481,7 +476,7 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
             {formatDate(workout.date, lang, "long")}
           </DatePill>
         </div>
-        {total > 0 && workout.date === today() && (
+        {total > 0 && (
           <span className="progress-pill">
             {done}/{total}
           </span>

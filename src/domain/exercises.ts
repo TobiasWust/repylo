@@ -139,6 +139,7 @@ const defs: Def[] = [
   ["egym_leg_press", "EGYM Beinpresse", "EGYM Leg Press", "egym", "weight", "legs", ["quads", "glutes"], ["hamstrings"], ["leg_press", "egym_squat"]],
   ["egym_squat", "EGYM Squat", "EGYM Squat", "egym", "weight", "legs", ["quads", "glutes"], ["hamstrings"], ["squat", "egym_leg_press"]],
   ["egym_glute", "EGYM Gluteus", "EGYM Glute", "egym", "weight", "legs", ["glutes"], ["hamstrings"], ["hip_thrust", "egym_abductor"]],
+  ["egym_hip_thrust", "EGYM Hip Thrust", "EGYM Hip Thrust", "egym", "weight", "legs", ["glutes"], ["hamstrings"], ["hip_thrust", "egym_glute"]],
   ["egym_butterfly", "EGYM Butterfly", "EGYM Butterfly", "egym", "weight", "push", ["chest"], [], ["pec_deck", "egym_chest_press"]],
   ["egym_reverse_butterfly", "EGYM Butterfly Reverse", "EGYM Reverse Butterfly", "egym", "weight", "pull", ["rearDelts"], ["upperBack"], ["reverse_fly", "face_pull"]],
   ["egym_rotation", "EGYM Rotation", "EGYM Torso Rotation", "egym", "weight", "core", ["abs"], [], ["egym_abdominal"]],
