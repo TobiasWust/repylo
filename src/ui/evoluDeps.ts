@@ -6,4 +6,3 @@ import { createEvoluDeps } from "@evolu/react-web";
  */
 export const evoluDeps = createEvoluDeps();
 export const syncState = evoluDeps.syncState;
-export const evoluError = evoluDeps.evoluError;

@@ -22,6 +22,8 @@ export const Home = () => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName, setTab } = app;
   const todays = data.workouts.find((w) => w.date === today());
+  // Read the clock once per mount; render must stay pure.
+  const [now] = useState(Date.now);
   // Recompute when data changes; "now" is fixed per render on purpose.
   const suggestions = useMemo(() => computeSuggestions(data), [data]);
   const days = useMemo(() => trainedDays(data), [data]);
@@ -38,7 +40,7 @@ export const Home = () => {
   const showReview =
     Number(today().slice(8)) <= 7 &&
     data.workouts.some((w) => w.date.startsWith(lastMonth)) &&
-    (data.dismissedUntil.get(`review:${lastMonth}`) ?? 0) < Date.now();
+    (data.dismissedUntil.get(`review:${lastMonth}`) ?? 0) < now;
 
   const [backfill, setBackfill] = useState(false);
   const [planSheet, setPlanSheet] = useState(false);
@@ -109,7 +111,7 @@ export const Home = () => {
         </button>
       </section>
 
-      {data.templates.length === 0 && (data.dismissedUntil.get("plan-offer") ?? 0) < Date.now() && (
+      {data.templates.length === 0 && (data.dismissedUntil.get("plan-offer") ?? 0) < now && (
         <section className="card plan-offer">
           <div className="suggestion-head">
             <Sticker name="calendar" size={34} />

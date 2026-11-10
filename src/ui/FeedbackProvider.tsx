@@ -1,23 +1,6 @@
-/**
- * Cross-screen feedback: the rest timer and PR celebrations. Kept outside the
- * data context so ticking the timer doesn't re-render every screen.
- */
-import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { FeedbackContext } from "./feedback";
 import { Sticker } from "./stickers";
-
-interface Feedback {
-  readonly startRest: (seconds: number) => void;
-  readonly celebrate: (message: string) => void;
-  readonly toast: (message: string) => void;
-}
-
-const FeedbackContext = createContext<Feedback | null>(null);
-
-export const useFeedback = (): Feedback => {
-  const value = use(FeedbackContext);
-  if (!value) throw new Error("FeedbackProvider missing");
-  return value;
-};
 
 const beep = () => {
   try {

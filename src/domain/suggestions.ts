@@ -192,7 +192,7 @@ const plateauRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): 
 };
 
 /** After this many training weeks in a row, a planned easier week helps recovery. */
-export const deloadAfterWeeks = 6;
+const deloadAfterWeeks = 6;
 
 /**
  * Consecutive weeks with training, counted back from last week and stopping

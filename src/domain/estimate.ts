@@ -56,7 +56,7 @@ const ruleBaseline = (e: Exercise): number => {
   return table[e.equipment][large ? 0 : 1];
 };
 
-export const baselineE1rm = (e: Exercise): number => baselineKg[e.key] ?? ruleBaseline(e);
+const baselineE1rm = (e: Exercise): number => baselineKg[e.key] ?? ruleBaseline(e);
 
 /** How alike two exercises are, as a weight for averaging strength factors. */
 const similarity = (a: Exercise, b: Exercise): number => {

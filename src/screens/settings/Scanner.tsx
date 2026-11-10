@@ -13,12 +13,10 @@ declare const BarcodeDetector: (new (options: { formats: string[] }) => BarcodeD
 export const Scanner = ({ onResult }: { onResult: (text: string) => void }) => {
   const { t } = useApp();
   const video = useRef<HTMLVideoElement>(null);
-  const [error, setError] = useState<string | null>(null);
+  const unsupported = typeof BarcodeDetector === "undefined";
+  const [cameraError, setCameraError] = useState(false);
   useEffect(() => {
-    if (typeof BarcodeDetector === "undefined") {
-      setError(t("Dein Browser kann keine QR-Codes scannen. Füge die Wörter unten ein.", "Your browser can’t scan QR codes. Paste the words below."));
-      return;
-    }
+    if (typeof BarcodeDetector === "undefined") return;
     let stream: MediaStream | null = null;
     let timer = 0;
     let stopped = false;
@@ -38,12 +36,14 @@ export const Scanner = ({ onResult }: { onResult: (text: string) => void }) => {
         };
         void tick();
       })
-      .catch(() => setError(t("Kein Kamerazugriff. Füge die Wörter unten ein.", "No camera access. Paste the words below.")));
+      .catch(() => setCameraError(true));
     return () => {
       stopped = true;
       clearTimeout(timer);
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, [onResult, t]);
-  return error ? <p className="hint">{error}</p> : <video ref={video} className="scanner" muted playsInline />;
+  }, [onResult]);
+  if (unsupported) return <p className="hint">{t("Dein Browser kann keine QR-Codes scannen. Füge die Wörter unten ein.", "Your browser can’t scan QR codes. Paste the words below.")}</p>;
+  if (cameraError) return <p className="hint">{t("Kein Kamerazugriff. Füge die Wörter unten ein.", "No camera access. Paste the words below.")}</p>;
+  return <video ref={video} className="scanner" muted playsInline />;
 };

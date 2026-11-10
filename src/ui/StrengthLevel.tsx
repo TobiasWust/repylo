@@ -16,7 +16,7 @@ const levelNames: Record<Level, [string, string]> = {
 const levelColors = ["var(--sky)", "var(--mint)", "var(--yellow)", "var(--pink)", "var(--lavender)"];
 
 /** Five-segment bar with a marker for where the lifter stands. */
-export const LevelBar = ({ rating }: { rating: Rating }) => {
+const LevelBar = ({ rating }: { rating: Rating }) => {
   const { lang } = useApp();
   const index = levels.indexOf(rating.level);
   const position = ((index + rating.progress) / levels.length) * 100;
@@ -39,10 +39,10 @@ export const LevelBar = ({ rating }: { rating: Rating }) => {
   );
 };
 
-export const levelName = (level: Level, lang: "de" | "en") => levelNames[level][lang === "de" ? 0 : 1];
+const levelName = (level: Level, lang: "de" | "en") => levelNames[level][lang === "de" ? 0 : 1];
 
 /** Asks once which standards to use (they differ a lot between men and women). */
-export const StandardsPicker = () => {
+const StandardsPicker = () => {
   const { t, actions } = useApp();
   return (
     <div className="stack tight">

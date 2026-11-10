@@ -14,7 +14,8 @@ import { useFeedback } from "../../ui/feedback";
 import { equipmentName, formatDate } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
 import { describeSets, prMessage, progressionLabel } from "./format";
-import { DurationField, Stepper, weightStep } from "./SetInputs";
+import { DurationField, Stepper } from "./SetInputs";
+import { weightStep } from "./weightStep";
 import { CoachLine } from "./CoachLine";
 
 export const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel; entry: WorkoutExercise; index: number; count: number }) => {

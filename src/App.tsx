@@ -14,8 +14,10 @@ import { Settings } from "./screens/settings/Settings";
 import { Stats } from "./screens/stats/Stats";
 import { WorkoutScreen } from "./screens/workout/WorkoutScreen";
 import { Icon, type IconName } from "./ui/components";
-import { AppProvider, useApp, type Tab } from "./ui/context";
-import { FeedbackProvider, useFeedback } from "./ui/feedback";
+import { AppProvider } from "./ui/AppProvider";
+import { useApp, type Tab } from "./ui/context";
+import { FeedbackProvider } from "./ui/FeedbackProvider";
+import { useFeedback } from "./ui/feedback";
 
 /** After joining another device, import the data this device had before. */
 const PendingImport = () => {
@@ -39,18 +41,22 @@ const PendingImport = () => {
   return null;
 };
 
-/** Opened via a connect link (QR code from another device): offer to connect. */
+/**
+ * A connect link (QR code from another device) is read once when the app
+ * loads, and removed from the address bar right away.
+ */
+const connectLinkOnStart = takeConnectLink();
+
+/** Opened via a connect link: offer to connect, unless it's this device already. */
 const ConnectFromLink = () => {
   const evolu = useEvolu();
   const { t } = useApp();
   const { toast } = useFeedback();
-  const [link, setLink] = useState<string | null>(null);
+  const sameDevice = connectLinkOnStart !== null && parseMnemonic(connectLinkOnStart) === evolu.appOwner.mnemonic;
+  const [link, setLink] = useState(sameDevice ? null : connectLinkOnStart);
   useEffect(() => {
-    const value = takeConnectLink();
-    if (!value) return;
-    if (parseMnemonic(value) === evolu.appOwner.mnemonic) toast(t("Dieses Gerät ist bereits verbunden", "This device is already connected"));
-    else setLink(value);
-  }, [evolu, t, toast]);
+    if (sameDevice) toast(t("Dieses Gerät ist bereits verbunden", "This device is already connected"));
+  }, [sameDevice, t, toast]);
   return link ? <ConnectSheet initialText={link} onClose={() => setLink(null)} /> : null;
 };
 

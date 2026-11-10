@@ -115,7 +115,7 @@ export const goalFor = (data: Pick<Data, "settings" | "exerciseGoals">, key: str
 
 export const defaultRest: Record<Goal, number> = { strength: 180, hypertrophy: 90, endurance: 60 };
 
-export const detectLanguage = (): Language =>
+const detectLanguage = (): Language =>
   navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
 
 const oneOf = <T extends string>(value: string | null, allowed: readonly T[], fallback: T): T =>
