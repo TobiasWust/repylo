@@ -6,6 +6,7 @@ import { Icon, Segmented } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
 import { InstallCard } from "../../ui/InstallCard";
+import { LegalFooter } from "../../ui/Legal";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { goalShort } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
@@ -241,6 +242,8 @@ export const Settings = () => {
           "Only app opens are counted anonymously (GoatCounter, no cookies, no workout data).",
         )}
       </p>
+
+      <LegalFooter />
 
       {plan && <PlanSheet onClose={() => setPlan(false)} />}
       {sheet === "share" && <ShowCodeSheet onClose={() => setSheet(null)} />}
