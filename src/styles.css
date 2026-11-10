@@ -1669,3 +1669,10 @@ body:has(.overlay-screen) .rest-timer {
 .plan-day small {
   color: var(--muted);
 }
+
+.readiness {
+  background: var(--sky);
+}
+.pr-line strong.negative {
+  color: #b3261e;
+}

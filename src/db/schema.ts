@@ -44,6 +44,9 @@ export const Schema = {
     finishedAt: nullOr(NonNegativeInt),
     note: nullOr(Text1000),
     templateId: nullOr(TemplateId),
+    /** Readiness check: 1 = poor, 2 = okay, 3 = good; 0 = skipped. */
+    sleep: nullOr(NonNegativeInt),
+    energy: nullOr(NonNegativeInt),
   },
   workoutExercise: {
     id: WorkoutExerciseId,
@@ -133,7 +136,7 @@ const createQuery = createQueryBuilder(Schema);
 export const workoutsQuery = createQuery((db) =>
   db
     .selectFrom("workout")
-    .select(["id", "date", "startedAt", "finishedAt", "note", "templateId"])
+    .select(["id", "date", "startedAt", "finishedAt", "note", "templateId", "sleep", "energy"])
     .where("isDeleted", "is not", 1)
     .orderBy("startedAt", "desc"),
 );

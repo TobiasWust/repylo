@@ -45,6 +45,9 @@ export interface Workout {
   readonly finishedAt: number | null;
   readonly note: string | null;
   readonly templateId: string | null;
+  /** Readiness check: 1 poor, 2 okay, 3 good, 0 skipped, null not asked. */
+  readonly sleep: number | null;
+  readonly energy: number | null;
   readonly exercises: readonly WorkoutExercise[];
 }
 
@@ -223,6 +226,8 @@ export const buildData = (rows: Rows): Data => {
       finishedAt: r.finishedAt,
       note: r.note,
       templateId: r.templateId,
+      sleep: r.sleep,
+      energy: r.energy,
       exercises: (exercisesByWorkout.get(r.id) ?? []).sort(byPosition),
     });
   }

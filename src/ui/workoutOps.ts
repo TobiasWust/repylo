@@ -16,7 +16,7 @@ export const ensureTodayWorkout = (data: Data, actions: Actions, templateId: str
     return existing;
   }
   const id = actions.startWorkout(today(), templateId);
-  return { id, date: today(), startedAt: Date.now(), finishedAt: null, note: null, templateId, exercises: [] };
+  return { id, date: today(), startedAt: Date.now(), finishedAt: null, note: null, templateId, sleep: null, energy: null, exercises: [] };
 };
 
 const emptySet: TemplateSet = { weight: null, reps: null, duration: null, distance: null };

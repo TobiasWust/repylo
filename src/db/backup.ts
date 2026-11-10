@@ -67,7 +67,13 @@ export const importBackup = (backup: Backup, actions: Actions, data: Data): void
 
   for (const w of backup.workouts) {
     const id = actions.startWorkout(w.date, w.templateId ? (templateIds.get(w.templateId) ?? null) : null);
-    actions.updateWorkout(id, { note: w.note, finished: w.finishedAt != null });
+    actions.updateWorkout(id, {
+      note: w.note,
+      finished: w.finishedAt != null,
+      // Older backups have no readiness fields.
+      ...(w.sleep != null && { sleep: w.sleep }),
+      ...(w.energy != null && { energy: w.energy }),
+    });
     actions.addItems(
       { ...w, id, exercises: [] },
       w.exercises.map((e) => ({ exerciseKey: key(e.exerciseKey), sets: e.sets })),

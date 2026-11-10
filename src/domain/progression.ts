@@ -16,6 +16,7 @@ import { getExercise, goalFor, type Data, type Goal, type TemplateSet } from "./
 import { exerciseSessions, type Session } from "./stats";
 import { fromUnit, toUnit } from "./units";
 import { today, weekStart } from "./dates";
+import { readinessOf } from "./readiness";
 
 export const repRange: Record<Goal, readonly [number, number]> = {
   strength: [3, 6],
@@ -62,9 +63,11 @@ export const suggestProgression = (data: Data, exerciseKey: string, beforeWorkou
   const inc = unit === "kg" ? incrementKg[exercise.equipment] : incrementLb[exercise.equipment];
   const step = unit === "kg" ? 0.5 : 1;
 
-  // A planned deload week: ~90 % weight and one set fewer, to recover on purpose.
-  const day = data.workouts.find((w) => w.id === beforeWorkoutId)?.date ?? today();
-  if (isDeloadWeek(data, day) && top > 0) {
+  // A planned deload week (~90 % weight, one set fewer) or a day with poor
+  // readiness (sleep + energy): go lighter on purpose instead of grinding.
+  const workout = data.workouts.find((w) => w.id === beforeWorkoutId);
+  const day = workout?.date ?? today();
+  if ((isDeloadWeek(data, day) || (workout && readinessOf(workout) === "low")) && top > 0) {
     const weight = fromUnit(roundTo(toUnit(top, unit) * 0.9, step), unit);
     const sets = last.sets.slice(0, Math.max(2, last.sets.length - 1));
     return { kind: "deload", last, sets: sets.map((s) => ({ ...copy(s), weight, reps: min })) };
