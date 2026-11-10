@@ -4,7 +4,8 @@
  */
 import type { Data, SetEntry, TemplateSet } from "./model";
 import { suggestProgression } from "./progression";
-import { exerciseSessions, hasValue } from "./stats";
+import { addDays, weekStart } from "./dates";
+import { e1rm, exerciseSessions, hasValue, trainedDays } from "./stats";
 
 export type SetFeedbackKind =
   | "heavier" // more weight than the same set last time
@@ -53,4 +54,58 @@ export const setFeedback = (data: Data, workoutId: string, exerciseKey: string, 
   if (amount > previousAmount) return { kind: "moreReps", delta: amount - previousAmount, next };
   if (amount < previousAmount) return { kind: "fewerReps", delta: previousAmount - amount, next };
   return { kind: "same", delta: 0, next };
+};
+
+export interface WorkoutSummary {
+  readonly sets: number;
+  /** kg × reps */
+  readonly volume: number;
+  /** Minutes, only for a workout finished on the day it started. */
+  readonly minutes: number | null;
+  /** Best est. 1RM vs. the previous session, biggest gains first. */
+  readonly gains: readonly { exerciseKey: string; percent: number }[];
+  /** Exercises with a new all-time best est. 1RM. */
+  readonly records: readonly string[];
+  /** Name of the next split, if the workout came from a template rotation. */
+  readonly nextTemplate: string | null;
+  readonly daysThisWeek: number;
+  readonly weeklyGoal: number;
+}
+
+export const workoutSummary = (data: Data, workoutId: string, now: number = Date.now()): WorkoutSummary | null => {
+  const workout = data.workouts.find((w) => w.id === workoutId);
+  if (!workout) return null;
+  const sets = workout.exercises.flatMap((e) => e.sets.filter(hasValue));
+  const volume = sets.reduce((sum, s) => sum + (s.weight ?? 0) * (s.reps ?? 0), 0);
+  const elapsed = Math.round(((workout.finishedAt ?? now) - workout.startedAt) / 60_000);
+  // Backfilled workouts have no meaningful start time; neither do overnight ones.
+  const minutes = elapsed > 0 && elapsed <= 240 ? elapsed : null;
+
+  const gains: { exerciseKey: string; percent: number }[] = [];
+  const records: string[] = [];
+  for (const entry of workout.exercises) {
+    const current = Math.max(0, ...entry.sets.filter(hasValue).map((s) => e1rmOf(s)));
+    const history = exerciseSessions(data, entry.exerciseKey, workoutId);
+    const previous = history.at(-1)?.bestE1rm ?? 0;
+    const best = Math.max(0, ...history.map((s) => s.bestE1rm));
+    if (current > 0 && previous > 0 && current > previous) gains.push({ exerciseKey: entry.exerciseKey, percent: ((current - previous) / previous) * 100 });
+    if (current > 0 && best > 0 && current > best * 1.005) records.push(entry.exerciseKey);
+  }
+  gains.sort((a, b) => b.percent - a.percent);
+
+  const index = data.templates.findIndex((t) => t.id === workout.templateId);
+  const nextTemplate = index >= 0 && data.templates.length > 1 ? data.templates[(index + 1) % data.templates.length]!.name : null;
+
+  const monday = weekStart(workout.date);
+  const daysThisWeek = trainedDaysInWeek(data, monday);
+  return { sets: sets.length, volume, minutes, gains: gains.slice(0, 3), records, nextTemplate, daysThisWeek, weeklyGoal: data.settings.weeklyGoal };
+};
+
+const e1rmOf = (s: SetEntry) => e1rm(s.weight ?? 0, s.reps ?? 0);
+
+const trainedDaysInWeek = (data: Data, monday: string): number => {
+  const days = trainedDays(data);
+  let count = 0;
+  for (let i = 0; i < 7; i++) if (days.has(addDays(monday, i))) count++;
+  return count;
 };

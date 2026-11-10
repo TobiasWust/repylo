@@ -3,7 +3,7 @@ import { today } from "../domain/dates";
 import { getExercise, defaultRest, type SetEntry, type TemplateItem, type TemplateSet, type Workout as WorkoutModel, type WorkoutExercise } from "../domain/model";
 import { suggestProgression, type Progression } from "../domain/progression";
 import { detectPrs, hasValue, type Pr } from "../domain/stats";
-import { setFeedback, type SetFeedback } from "../domain/coach";
+import { setFeedback, workoutSummary, type SetFeedback } from "../domain/coach";
 import { formatDuration, formatNumber, fromUnit, parseDuration, toUnit } from "../domain/units";
 import { Icon, NumberField, Segmented, Sheet } from "../ui/components";
 import { useApp, type App } from "../ui/context";
@@ -485,9 +485,86 @@ const SaveTemplateSheet = ({ workout, onClose }: { workout: WorkoutModel; onClos
   );
 };
 
+/** Shown after "Done": what was achieved and what comes next. */
+const SummarySheet = ({ workoutId, onClose }: { workoutId: string; onClose: () => void }) => {
+  const { t, data, lang, weight, exerciseName } = useApp();
+  const summary = workoutSummary(data, workoutId);
+  if (!summary) return null;
+  const goalReached = summary.daysThisWeek >= summary.weeklyGoal;
+  const headline =
+    summary.records.length > 0
+      ? t("Rekord-Training!", "Record workout!")
+      : summary.gains.length > 0
+        ? t("Stärker als letztes Mal!", "Stronger than last time!")
+        : t("Training geschafft!", "Workout done!");
+  return (
+    <Sheet title={headline} onClose={onClose}>
+      <div className="stat-grid">
+        <div className="stat-tile yellow">
+          <span>{t("Sätze", "Sets")}</span>
+          <strong>{summary.sets}</strong>
+        </div>
+        <div className="stat-tile lavender">
+          <span>{t("Bewegt", "Lifted")}</span>
+          <strong>{weight(summary.volume)}</strong>
+        </div>
+        {summary.minutes !== null && (
+          <div className="stat-tile mint">
+            <span>{t("Dauer", "Duration")}</span>
+            <strong>{summary.minutes} min</strong>
+          </div>
+        )}
+        <div className={`stat-tile ${goalReached ? "mint" : "pink"}`}>
+          <span>{t("Wochenziel", "Weekly goal")}</span>
+          <strong>
+            {summary.daysThisWeek} / {summary.weeklyGoal}
+          </strong>
+        </div>
+      </div>
+      {summary.records.length > 0 && (
+        <div className="coach-line positive">
+          <Sticker name="trophy" size={28} />
+          <span>
+            {t("Neue Bestwerte: ", "New bests: ")}
+            <strong>{summary.records.map((k) => exerciseName(getExercise(data, k))).join(", ")}</strong>
+          </span>
+        </div>
+      )}
+      {summary.gains.length > 0 && (
+        <div className="stack tight">
+          {summary.gains.map((g) => (
+            <div key={g.exerciseKey} className="coach-line">
+              <Sticker name="chartUp" size={24} />
+              <span>
+                {exerciseName(getExercise(data, g.exerciseKey))}: <strong>+{formatNumber(g.percent, lang, 1)} %</strong> {t("gegenüber letztem Mal", "vs. last time")}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      {(summary.nextTemplate || !goalReached) && (
+        <div className="coach-line">
+          <Sticker name="calendar" size={26} />
+          <span>
+            {summary.nextTemplate && t(`Als Nächstes: ${summary.nextTemplate}. `, `Up next: ${summary.nextTemplate}. `)}
+            {!goalReached &&
+              t(
+                `Noch ${summary.weeklyGoal - summary.daysThisWeek} Training${summary.weeklyGoal - summary.daysThisWeek === 1 ? "" : "s"} bis zum Wochenziel.`,
+                `${summary.weeklyGoal - summary.daysThisWeek} more to reach your weekly goal.`,
+              )}
+          </span>
+        </div>
+      )}
+      <button className="button dark big full" onClick={onClose}>
+        {t("Weiter so!", "Keep it up!")}
+      </button>
+    </Sheet>
+  );
+};
+
 export const WorkoutScreen = ({ id }: { id: string }) => {
   const { t, data, actions, back, lang } = useApp();
-  const [sheet, setSheet] = useState<"add" | "copy" | "template" | null>(null);
+  const [sheet, setSheet] = useState<"add" | "copy" | "template" | "summary" | null>(null);
   const workout = data.workouts.find((w) => w.id === id);
   useWakeLock(workout?.date === today());
 
@@ -572,7 +649,9 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
           className="button pink"
           onClick={() => {
             actions.updateWorkout(workout.id, { finished: true });
-            back();
+            // An empty workout has nothing to summarise.
+            if (workout.exercises.some((e) => e.sets.some(hasValue))) setSheet("summary");
+            else back();
           }}
         >
           <Icon name="check" /> {t("Fertig", "Done")}
@@ -601,6 +680,15 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
       )}
       {sheet === "copy" && <CopySheet workout={workout} onClose={() => setSheet(null)} />}
       {sheet === "template" && <SaveTemplateSheet workout={workout} onClose={() => setSheet(null)} />}
+      {sheet === "summary" && (
+        <SummarySheet
+          workoutId={workout.id}
+          onClose={() => {
+            setSheet(null);
+            back();
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { parseMnemonic } from "../db/owner";
 import { addDays, dayToInput, parseDayInput, today, weekStart } from "./dates";
 import { buildData, type Data, type Rows } from "./model";
 import { calculatePlates } from "./plates";
-import { setFeedback } from "./coach";
+import { setFeedback, workoutSummary } from "./coach";
 import { monthlyReview } from "./review";
 import { rate } from "./standards";
 import { suggestProgression } from "./progression";
@@ -331,5 +331,19 @@ describe("coach feedback", () => {
     const { data, w, sets } = doneData([[62.5, 8], [60, 7], [60, 8]]);
     expect(setFeedback(data, w.id, "bench_press", sets.slice(0, 1))!.kind).toBe("heavier");
     expect(setFeedback(data, w.id, "bench_press", sets.slice(0, 2))!.kind).toBe("fewerReps");
+  });
+});
+
+describe("workout summary", () => {
+  it("counts sets, volume, gains and records", () => {
+    const data = build([
+      { daysAgo: 0, exercises: { squat: [[105, 5], [105, 5]], bench_press: [[60, 8]] } },
+      { daysAgo: 4, exercises: { squat: [[100, 5]], bench_press: [[60, 10]] } },
+    ]);
+    const s = workoutSummary(data, data.workouts[0]!.id)!;
+    expect(s.sets).toBe(3);
+    expect(s.volume).toBe(105 * 5 * 2 + 60 * 8);
+    expect(s.gains.map((g) => g.exerciseKey)).toEqual(["squat"]);
+    expect(s.records).toEqual(["squat"]);
   });
 });
