@@ -32,7 +32,7 @@ export const seedDemo = (actions: Actions, data: Data): void => {
   for (const [name, items] of [
     ["Push", push],
     ["Pull", pull],
-    ["Beine", legs],
+    [data.settings.language === "de" ? "Beine" : "Legs", legs],
   ] as const) {
     ids.push(actions.saveTemplate(templateData, name, items));
     templateData = {
