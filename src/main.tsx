@@ -12,10 +12,16 @@ import { evoluDeps } from "./ui/evoluDeps";
 import "./ui/install";
 import "./styles.css";
 
+// Surface Evolu's errors (plain objects) to the boot watchdog in index.html.
+evoluDeps.evoluError.subscribe(() => {
+  window.__repyloEvoluError = evoluDeps.evoluError.get();
+});
+
 const run = createRun(evoluDeps);
 
-const evolu = await run.ok(
-  createEvolu(Schema, {
+const evolu = await run
+  .ok(
+    createEvolu(Schema, {
     appName: AppName.orThrow("repylo"),
     appOwner: loadOrCreateOwner(),
     transports: getTransports(),
@@ -23,8 +29,12 @@ const evolu = await run.ok(
       create("workoutSetWorkoutId").on("workoutSet").column("workoutId"),
       create("workoutExerciseWorkoutId").on("workoutExercise").column("workoutId"),
     ],
-  }),
-);
+    }),
+  )
+  .catch((error: unknown) => {
+    window.__repyloBootError = error;
+    throw error;
+  });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
