@@ -1,133 +1,16 @@
-import { useMemo, useState } from "react";
-import { addDays, today, weekStart } from "../domain/dates";
-import { getExercise } from "../domain/model";
-import { exerciseSessions, hasValue, majorMuscles, recentPrs, setsPerMuscle, trainedDays, weeklySetTarget, weeklyVolume, weekStreak } from "../domain/stats";
-import { formatNumber, toUnit } from "../domain/units";
-import { BarChart, Empty } from "../ui/components";
-import { useApp } from "../ui/context";
-import { formatDate, muscleName } from "../ui/text";
-import { Sticker } from "../ui/stickers";
-import { StrengthOverview } from "../ui/StrengthLevel";
-import { readinessInsights } from "../domain/readiness";
-
-/** How readiness (sleep + energy) relates to performance, once there is enough data. */
-const ReadinessCard = () => {
-  const { t, data, lang } = useApp();
-  const insights = useMemo(() => readinessInsights(data), [data]);
-  if (insights.reduce((n, i) => n + i.workouts, 0) < 3) return null;
-  const label = { low: t("Schwache Tagesform", "Low readiness"), mid: t("Mittlere Tagesform", "Medium readiness"), high: t("Top-Tagesform", "High readiness") };
-  return (
-    <section className="card">
-      <h2 className="card-title with-sticker">
-        <Sticker name="scale" /> {t("Tagesform & Leistung", "Readiness & performance")}
-      </h2>
-      <p className="hint">{t("Durchschnittliche Veränderung deines 1RM gegenüber dem jeweils letzten Mal.", "Average change of your 1RM compared with the previous session.")}</p>
-      <div className="stack tight">
-        {insights.map((i) => (
-          <div key={i.level} className="pr-line">
-            <span>
-              {label[i.level]} <small>· {i.workouts}×</small>
-            </span>
-            <strong className={i.change >= 0 ? "" : "negative"}>
-              {i.change >= 0 ? "+" : ""}
-              {formatNumber(i.change, lang, 1)} %
-            </strong>
-            <span />
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-};
-
-/** One day's summary for the heatmap bubble. */
-const DayInfo = ({ day, column }: { day: string; column: number }) => {
-  const { t, data, lang, open, exerciseName, weight } = useApp();
-  const workouts = data.workouts.filter((w) => w.date === day && w.exercises.some((e) => e.sets.some(hasValue)));
-  // Keep the arrow under the tapped column, but the bubble itself inside the card.
-  const arrow = `${((column + 0.5) / 20) * 100}%`;
-  return (
-    <div className="day-bubble" style={{ "--arrow": arrow } as React.CSSProperties}>
-      <strong>{formatDate(day, lang, "long")}</strong>
-      {workouts.length === 0 ? (
-        <small>{day > today() ? t("Noch nicht da", "Not here yet") : t("Kein Training – Ruhetag", "No workout – rest day")}</small>
-      ) : (
-        workouts.map((w) => {
-          const sets = w.exercises.flatMap((e) => e.sets.filter(hasValue));
-          const volume = sets.reduce((sum, s) => sum + (s.weight ?? 0) * (s.reps ?? 0), 0);
-          const name =
-            data.templates.find((x) => x.id === w.templateId)?.name ??
-            w.exercises.map((e) => exerciseName(getExercise(data, e.exerciseKey))).slice(0, 2).join(", ");
-          return (
-            <button key={w.id} className="day-bubble-row" onClick={() => open({ type: "workout", id: w.id })}>
-              <Sticker name="dumbbell" size={26} />
-              <span className="list-main">
-                <span className="day-bubble-name">{name}</span>
-                <small>
-                  {w.exercises.length} {t("Übungen", "exercises")} · {sets.length} {t("Sätze", "sets")}
-                  {volume > 0 && ` · ${weight(volume)}`}
-                </small>
-              </span>
-              <span className="chev">›</span>
-            </button>
-          );
-        })
-      )}
-    </div>
-  );
-};
-
-/** GitHub-style heatmap of the last 20 weeks; tap a day for details. */
-const Heatmap = ({ days }: { days: ReadonlySet<string> }) => {
-  const { t, lang } = useApp();
-  const start = addDays(weekStart(today()), -7 * 19);
-  const weeks = Array.from({ length: 20 }, (_, w) => Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)));
-  const [selected, setSelected] = useState<{ day: string; column: number } | null>(null);
-  return (
-    <>
-      <div className="heatmap">
-        {weeks.map((week, column) => (
-          <div key={column} className="heatmap-col">
-            {week.map((d) => (
-              <button
-                key={d}
-                className={`heat ${days.has(d) ? "on" : ""} ${d > today() ? "future" : ""} ${selected?.day === d ? "selected" : ""}`}
-                disabled={d > today()}
-                aria-label={formatDate(d, lang, "long")}
-                onClick={() => setSelected(selected?.day === d ? null : { day: d, column })}
-                // With a mouse, hovering previews the day like a tooltip; on touch, tapping does.
-                onPointerEnter={(e) => e.pointerType === "mouse" && d <= today() && setSelected({ day: d, column })}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      {selected ? <DayInfo day={selected.day} column={selected.column} /> : <p className="hint">{t("Tippe auf einen Tag für Details.", "Tap a day for details.")}</p>}
-    </>
-  );
-};
-
-const RatioBar = ({ left, right, leftLabel, rightLabel }: { left: number; right: number; leftLabel: string; rightLabel: string }) => {
-  const total = left + right;
-  const pct = total === 0 ? 50 : (left / total) * 100;
-  const balanced = total === 0 || (left <= right * 1.5 && right <= left * 1.5);
-  return (
-    <div className="ratio">
-      <div className="ratio-labels">
-        <span>
-          {leftLabel} <strong>{Math.round(left)}</strong>
-        </span>
-        <Sticker name={balanced ? "ok" : "warn"} size={22} />
-        <span>
-          <strong>{Math.round(right)}</strong> {rightLabel}
-        </span>
-      </div>
-      <div className="ratio-bar">
-        <div style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
-};
+import { useMemo } from "react";
+import { addDays, today, weekStart } from "../../domain/dates";
+import { getExercise } from "../../domain/model";
+import { exerciseSessions, hasValue, majorMuscles, recentPrs, setsPerMuscle, trainedDays, weeklySetTarget, weeklyVolume, weekStreak } from "../../domain/stats";
+import { formatNumber, toUnit } from "../../domain/units";
+import { BarChart, Empty } from "../../ui/components";
+import { useApp } from "../../ui/context";
+import { formatDate, muscleName } from "../../ui/text";
+import { Sticker } from "../../ui/stickers";
+import { StrengthOverview } from "../../ui/StrengthLevel";
+import { ReadinessCard } from "./ReadinessCard";
+import { Heatmap } from "./Heatmap";
+import { RatioBar } from "./RatioBar";
 
 export const Stats = () => {
   const { t, data, lang, open, exerciseName, weight } = useApp();
