@@ -9,6 +9,7 @@ import { Icon, Segmented, Sheet } from "../ui/components";
 import { useApp } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
 import { InstallCard } from "../ui/InstallCard";
+import { PlanSheet } from "../ui/PlanSheet";
 import { syncState } from "../ui/evoluDeps";
 import { goalShort } from "../ui/text";
 import { Sticker, type StickerName } from "../ui/stickers";
@@ -190,6 +191,7 @@ export const Settings = () => {
   const { t, data, actions, lang, open, exerciseName } = useApp();
   const { toast } = useFeedback();
   const [sheet, setSheet] = useState<"share" | "connect" | null>(null);
+  const [plan, setPlan] = useState(false);
   const [relay, setRelay] = useState(getRelayUrl());
   const fileInput = useRef<HTMLInputElement>(null);
   const s = data.settings;
@@ -334,6 +336,9 @@ export const Settings = () => {
             </div>
           ))}
         </div>
+        <button className="button full" onClick={() => setPlan(true)}>
+          <Sticker name="calendar" size={22} /> {t("Trainingsplan erstellen lassen", "Create a training plan")}
+        </button>
         {!hasEgymTemplate && (
           <button
             className="button full dashed"
@@ -403,6 +408,7 @@ export const Settings = () => {
         )}
       </p>
 
+      {plan && <PlanSheet onClose={() => setPlan(false)} />}
       {sheet === "share" && <ShowCodeSheet onClose={() => setSheet(null)} />}
       {sheet === "connect" && <ConnectSheet onClose={() => setSheet(null)} />}
     </div>

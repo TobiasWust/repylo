@@ -147,6 +147,15 @@ export const createActions = (evolu: AppEvolu) => {
         items: Json50k.orThrow(JSON.stringify(items)),
       }).id,
 
+    /** Saves a whole plan in order; optionally replaces all existing templates. */
+    savePlan: (data: Data, plan: readonly { name: string; items: readonly TemplateItem[] }[], replace: boolean) => {
+      if (replace) for (const t of data.templates) evolu.update("template", { id: TemplateId.orThrow(t.id), isDeleted: sqliteTrue });
+      const start = replace ? 0 : data.templates.reduce((max, t) => Math.max(max, t.position + 1), 0);
+      plan.forEach((p, i) =>
+        evolu.insert("template", { name: name100(p.name), position: int(start + i), items: Json50k.orThrow(JSON.stringify(p.items)) }),
+      );
+    },
+
     createEgymTemplate: (data: Data) =>
       evolu.insert("template", {
         name: name100("EGYM-Zirkel"),

@@ -1657,3 +1657,15 @@ body:has(.overlay-screen) .rest-timer {
 .coach-line.positive {
   background: var(--mint);
 }
+
+.plan-offer {
+  background: var(--mint);
+}
+.plan-day {
+  box-shadow: var(--shadow-sm);
+  padding: 10px 12px;
+  gap: 2px;
+}
+.plan-day small {
+  color: var(--muted);
+}

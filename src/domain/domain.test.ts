@@ -6,6 +6,7 @@ import { addDays, dayToInput, parseDayInput, today, weekStart } from "./dates";
 import { buildData, type Data, type Rows } from "./model";
 import { calculatePlates } from "./plates";
 import { setFeedback, workoutSummary } from "./coach";
+import { generatePlan } from "./planner";
 import { monthlyReview } from "./review";
 import { rate } from "./standards";
 import { suggestProgression } from "./progression";
@@ -360,5 +361,23 @@ describe("prefill", () => {
   it("uses the progression target when chosen", () => {
     const data = build(history, { settings: settings("target") as unknown as Rows["settings"] });
     expect(initialSets(data, "bench_press")[0]).toMatchObject({ weight: 62.5, reps: 8 });
+  });
+});
+
+describe("plan assistant", () => {
+  const data = build([]);
+  it("builds the right split for the number of days", () => {
+    expect(generatePlan(data, 2, "gym", "hypertrophy", "de").map((p) => p.name)).toEqual(["Ganzkörper A", "Ganzkörper B"]);
+    expect(generatePlan(data, 4, "gym", "hypertrophy", "de").map((p) => p.name)).toEqual(["Oberkörper A", "Unterkörper A", "Oberkörper B", "Unterkörper B"]);
+    expect(generatePlan(data, 6, "home", "strength", "en")).toHaveLength(6);
+  });
+
+  it("only uses exercises available at the chosen place, without duplicates", () => {
+    for (const plan of generatePlan(data, 3, "egym", "endurance", "de")) {
+      const keys = plan.items.map((i) => i.exerciseKey);
+      expect(keys.every((k) => k.startsWith("egym_"))).toBe(true);
+      expect(new Set(keys).size).toBe(keys.length);
+      expect(plan.items[0]!.sets[0]!.reps).toBe(20);
+    }
   });
 });

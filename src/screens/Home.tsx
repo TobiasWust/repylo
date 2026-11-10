@@ -6,6 +6,7 @@ import { computeSuggestions, dismissDays, type Suggestion } from "../domain/sugg
 import { hasValue, trainedDays, weekStreak } from "../domain/stats";
 import { BackfillSheet } from "../ui/BackfillSheet";
 import { InstallCard } from "../ui/InstallCard";
+import { PlanSheet } from "../ui/PlanSheet";
 import { Icon } from "../ui/components";
 import { Sticker, type StickerName } from "../ui/stickers";
 import { previousMonth } from "../domain/review";
@@ -192,6 +193,7 @@ export const Home = () => {
     (data.dismissedUntil.get(`review:${lastMonth}`) ?? 0) < Date.now();
 
   const [backfill, setBackfill] = useState(false);
+  const [planSheet, setPlanSheet] = useState(false);
   const startToday = () => open({ type: "workout", id: ensureTodayWorkout(data, actions).id });
   const startTemplate = (templateId: string) => {
     const template = data.templates.find((x) => x.id === templateId);
@@ -257,6 +259,22 @@ export const Home = () => {
           <Sticker name="calendar" size={24} /> {t("Früheres Training nachtragen", "Log a past workout")}
         </button>
       </section>
+
+      {data.templates.length === 0 && (data.dismissedUntil.get("plan-offer") ?? 0) < Date.now() && (
+        <section className="card plan-offer">
+          <div className="suggestion-head">
+            <Sticker name="calendar" size={34} />
+            <h3>{t("Soll ich dir einen Trainingsplan bauen?", "Shall I build you a training plan?")}</h3>
+            <button className="icon-button small" onClick={() => actions.dismiss("plan-offer", 365)} aria-label={t("Ausblenden", "Dismiss")}>
+              <Icon name="close" size={18} />
+            </button>
+          </div>
+          <p>{t("Sag mir, wie oft und wo du trainierst – ich stelle passende Trainingstage zusammen.", "Tell me how often and where you train – I'll put together matching training days.")}</p>
+          <button className="button dark full" onClick={() => setPlanSheet(true)}>
+            {t("Plan erstellen", "Create plan")}
+          </button>
+        </section>
+      )}
 
       <InstallCard />
 
@@ -337,6 +355,7 @@ export const Home = () => {
         )}
       </section>
       {backfill && <BackfillSheet onClose={() => setBackfill(false)} />}
+      {planSheet && <PlanSheet onClose={() => setPlanSheet(false)} />}
     </div>
   );
 };
