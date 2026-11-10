@@ -21,8 +21,8 @@ export const ReadinessCard = () => {
       </h2>
       <p className="hint">
         {t(
-          "Durchschnittliche Veränderung deines 1RM gegenüber dem jeweils letzten Mal.",
-          "Average change of your 1RM compared with the previous session.",
+          "Wie viel stärker oder schwächer du im Schnitt warst als beim letzten Mal (geschätztes 1RM).",
+          "How much stronger or weaker you were on average than last time (estimated 1RM).",
         )}
       </p>
       <div className="stack tight">

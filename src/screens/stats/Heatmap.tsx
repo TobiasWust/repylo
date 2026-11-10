@@ -6,7 +6,7 @@ import { formatNumber } from "../../domain/units";
 import { useApp } from "../../ui/context";
 import { Icon } from "../../ui/components";
 import { Sticker } from "../../ui/stickers";
-import { formatDate } from "../../ui/text";
+import { formatDate, plural } from "../../ui/text";
 
 /** One day's workouts for the heatmap bubble: how it went, not just what was done. */
 const DayInfo = ({ day, column, pinned, onUnpin }: { day: string; column: number; pinned: boolean; onUnpin: () => void }) => {
@@ -52,7 +52,7 @@ const DayInfo = ({ day, column, pinned, onUnpin }: { day: string; column: number
                   )}
                 </span>
                 <small>
-                  {summary.sets} {t("Sätze", "sets")}
+                  {summary.sets} {plural(summary.sets, t("Satz", "set"), t("Sätze", "sets"))}
                   {summary.volume > 0 && ` · ${weight(summary.volume)}`}
                   {summary.minutes !== null && ` · ${summary.minutes} min`}
                 </small>
@@ -65,8 +65,8 @@ const DayInfo = ({ day, column, pinned, onUnpin }: { day: string; column: number
       {workouts.some((w) => workoutSummary(data, w.id)?.averageChange !== null) && (
         <small className="day-bubble-hint">
           {t(
-            "Ø = Veränderung des geschätzten 1RM gegenüber dem jeweils letzten Mal.",
-            "Ø = change of the estimated 1RM vs. each exercise's previous session.",
+            "Ø = wie viel stärker oder schwächer du im Schnitt warst als beim letzten Mal (geschätztes 1RM).",
+            "Ø = how much stronger or weaker you were on average than last time (estimated 1RM).",
           )}
         </small>
       )}

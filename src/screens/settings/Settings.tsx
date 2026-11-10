@@ -8,7 +8,7 @@ import { useFeedback } from "../../ui/feedback";
 import { InstallCard } from "../../ui/InstallCard";
 import { LegalFooter } from "../../ui/Legal";
 import { PlanSheet } from "../../ui/PlanSheet";
-import { goalShort } from "../../ui/text";
+import { goalShort, plural } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
 import { ConnectSheet, ShowCodeSheet } from "./DeviceSheets";
 import { SyncStatus } from "./SyncStatus";
@@ -33,8 +33,8 @@ export const Settings = () => {
         </div>
         <p className="hint">
           {t(
-            "Kein Konto nötig. Deine Daten liegen auf deinen Geräten und werden Ende-zu-Ende-verschlüsselt über ein Relay abgeglichen.",
-            "No account needed. Your data lives on your devices and syncs end-to-end encrypted via a relay.",
+            "Kein Konto nötig. Deine Daten liegen auf deinen Geräten und werden verschlüsselt zwischen ihnen abgeglichen – niemand sonst kann sie lesen.",
+            "No account needed. Your data lives on your devices and syncs between them encrypted – nobody else can read it.",
           )}
         </p>
         <div className="action-grid">
@@ -131,7 +131,7 @@ export const Settings = () => {
                 <strong>{tpl.name}</strong>
                 <small>
                   {" "}
-                  · {tpl.items.length} {t("Übungen", "exercises")}
+                  · {tpl.items.length} {plural(tpl.items.length, t("Übung", "exercise"), t("Übungen", "exercises"))}
                 </small>
               </span>
               <button
@@ -197,7 +197,7 @@ export const Settings = () => {
 
       <section className="card">
         <h2 className="card-title">{t("Backup", "Backup")}</h2>
-        <p className="hint">{t("Zusätzliche Sicherung als lesbare JSON-Datei.", "Extra safety net as a readable JSON file.")}</p>
+        <p className="hint">{t("Zusätzliche Sicherung als Datei zum Aufbewahren.", "An extra copy of your data as a file to keep.")}</p>
         <div className="action-grid">
           <button className="button" onClick={() => downloadJson(`repylo-backup-${today()}.json`, createBackup(data))}>
             <Icon name="download" /> {t("Exportieren", "Export")}
@@ -220,8 +220,8 @@ export const Settings = () => {
             if (
               !confirm(
                 t(
-                  `${backup.workouts.length} Trainings importieren? Sie werden zu den vorhandenen hinzugefügt.`,
-                  `Import ${backup.workouts.length} workouts? They’re added to the existing ones.`,
+                  `${backup.workouts.length} ${plural(backup.workouts.length, "Training", "Trainings")} importieren? Sie kommen zu den vorhandenen dazu.`,
+                  `Import ${backup.workouts.length} ${plural(backup.workouts.length, "workout", "workouts")}? They’re added to the existing ones.`,
                 ),
               )
             )

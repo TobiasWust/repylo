@@ -75,7 +75,10 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
         <label className="check-line">
           <input type="checkbox" checked={replace} onChange={(e) => setReplace(e.target.checked)} />
           <span>
-            {t(`Bisherige ${data.templates.length} Vorlagen ersetzen`, `Replace the ${data.templates.length} existing templates`)}
+            {t(
+              data.templates.length === 1 ? "Bisherige Vorlage ersetzen" : `Die ${data.templates.length} bisherigen Vorlagen ersetzen`,
+              data.templates.length === 1 ? "Replace the existing template" : `Replace the ${data.templates.length} existing templates`,
+            )}
           </span>
         </label>
       )}

@@ -5,7 +5,7 @@ import { formatNumber, toUnit } from "../domain/units";
 import { BackfillSheet } from "../ui/BackfillSheet";
 import { Empty, Icon } from "../ui/components";
 import { useApp } from "../ui/context";
-import { formatDate, formatMonth } from "../ui/text";
+import { formatDate, formatMonth, plural } from "../ui/text";
 import { Sticker } from "../ui/stickers";
 
 export const History = () => {
@@ -55,7 +55,8 @@ export const History = () => {
                           t("Leeres Training", "Empty workout"))}
                     </strong>
                     <small>
-                      {w.exercises.length} {t("Übungen", "exercises")} · {sets.length} {t("Sätze", "sets")}
+                      {w.exercises.length} {plural(w.exercises.length, t("Übung", "exercise"), t("Übungen", "exercises"))} · {sets.length}{" "}
+                      {plural(sets.length, t("Satz", "set"), t("Sätze", "sets"))}
                       {volume > 0 && ` · ${formatNumber(toUnit(volume, unit), lang, 0)} ${unit}`}
                     </small>
                     {w.note && (

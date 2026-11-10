@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getExercise, type TemplateItem, type Workout as WorkoutModel } from "../../domain/model";
 import { Segmented, Sheet } from "../../ui/components";
 import { useApp } from "../../ui/context";
-import { formatDate } from "../../ui/text";
+import { formatDate, plural } from "../../ui/text";
 import { templateItems, workoutToItems } from "../../ui/workoutOps";
 import { describeSets } from "./format";
 
@@ -33,7 +33,7 @@ export const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose
       ? data.templates.map((tpl) => ({
           id: tpl.id,
           title: tpl.name,
-          subtitle: `${tpl.items.length} ${t("Übungen", "exercises")}`,
+          subtitle: `${tpl.items.length} ${plural(tpl.items.length, t("Übung", "exercise"), t("Übungen", "exercises"))}`,
           items: templateItems(data, tpl, workout.id),
           templateId: tpl.id,
         }))
@@ -99,7 +99,10 @@ export const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose
                   </label>
                 ))}
                 <button className="button dark full" disabled={checked.size === 0} onClick={apply}>
-                  {t(`${checked.size} Übungen übernehmen`, `Copy ${checked.size} exercises`)}
+                  {t(
+                    `${checked.size} ${plural(checked.size, "Übung", "Übungen")} übernehmen`,
+                    `Copy ${checked.size} ${plural(checked.size, "exercise", "exercises")}`,
+                  )}
                 </button>
               </>
             )}

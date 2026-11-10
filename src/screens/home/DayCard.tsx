@@ -20,7 +20,10 @@ export const DayCard = () => {
   // The clock is read once per mount; render must stay pure.
   const [now] = useState(Date.now);
   const advice = dailyAdvice(data, now);
-  const names = (list: readonly Muscle[]) => list.map((m) => muscleName(m, lang)).join(", ");
+  const names = (list: readonly Muscle[]) => {
+    const all = list.map((m) => muscleName(m, lang));
+    return all.length > 1 ? `${all.slice(0, -1).join(", ")} ${t("und", "and")} ${all.at(-1)}` : (all[0] ?? "");
+  };
   const fresh = names(advice.fresh.slice(0, 3));
   const tired = names(advice.tired.slice(0, 2).map((r) => r.muscle));
 

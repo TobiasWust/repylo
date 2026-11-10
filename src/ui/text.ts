@@ -21,6 +21,16 @@ const muscleNames: Record<Muscle, [de: string, en: string]> = {
 };
 export const muscleName = (m: Muscle, lang: Language) => muscleNames[m][lang === "de" ? 0 : 1];
 
+/** Picks the singular or plural word for a count. */
+export const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+
+/** Muscle names that take a plural verb ("Waden kommen", "Calves need"). */
+const pluralNames: Record<Language, ReadonlySet<Muscle>> = {
+  de: new Set(["shoulders", "forearms", "hamstrings", "adductors", "calves"]),
+  en: new Set(["lats", "shoulders", "rearDelts", "forearms", "abs", "quads", "hamstrings", "glutes", "adductors", "calves"]),
+};
+export const isPluralMuscle = (m: Muscle, lang: Language) => pluralNames[lang].has(m);
+
 const goalNames: Record<Goal, [string, string]> = {
   strength: ["Kraft", "Strength"],
   hypertrophy: ["Muskelaufbau", "Hypertrophy"],

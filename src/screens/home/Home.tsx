@@ -11,7 +11,7 @@ import { Sticker } from "../../ui/stickers";
 import { previousMonth } from "../../domain/review";
 import { isDeloadWeek } from "../../domain/progression";
 import { useApp } from "../../ui/context";
-import { formatDate, monthName } from "../../ui/text";
+import { formatDate, monthName, plural } from "../../ui/text";
 import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
@@ -226,7 +226,8 @@ export const Home = () => {
                         t("Leeres Training", "Empty workout"))}
                   </strong>
                   <small>
-                    {formatDate(w.date, lang, "long")} · {w.exercises.length} {t("Übungen", "exercises")}
+                    {formatDate(w.date, lang, "long")} · {w.exercises.length}{" "}
+                    {plural(w.exercises.length, t("Übung", "exercise"), t("Übungen", "exercises"))}
                   </small>
                 </span>
               </button>

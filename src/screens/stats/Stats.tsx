@@ -16,7 +16,7 @@ import {
 import { formatNumber, toUnit } from "../../domain/units";
 import { BarChart, Empty, Sparkline } from "../../ui/components";
 import { useApp } from "../../ui/context";
-import { formatDate, muscleName } from "../../ui/text";
+import { formatDate, muscleName, plural } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
 import { StrengthOverview } from "../../ui/StrengthLevel";
 import { ReadinessCard } from "./ReadinessCard";
@@ -188,8 +188,8 @@ export const Stats = () => {
         <h2 className="section-title">{t("Übungen", "Exercises")}</h2>
         <p className="hint list-hint">
           {t(
-            "Kurve und % zeigen die Entwicklung des geschätzten 1RM über deine letzten (bis zu 12) Einheiten.",
-            "Line and % show how your estimated 1RM developed over your last (up to 12) sessions.",
+            "Kurve und %: wie sich dein geschätztes 1RM in den letzten bis zu 12 Einheiten entwickelt hat.",
+            "Line and %: how your estimated 1RM changed over your last 12 sessions at most.",
           )}
         </p>
         <div className="stack">
@@ -198,7 +198,7 @@ export const Stats = () => {
               <span className="list-main">
                 <strong>{exerciseName(getExercise(data, e.key))}</strong>
                 <small>
-                  {e.count} {t("Einheiten", "sessions")}
+                  {e.count} {plural(e.count, t("Einheit", "session"), t("Einheiten", "sessions"))}
                   {e.best > 0 && ` · 1RM ${weight(e.best)}`}
                 </small>
               </span>

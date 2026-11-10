@@ -7,7 +7,7 @@ import { Icon } from "../../ui/components";
 import { Sticker, type StickerName } from "../../ui/stickers";
 import { useApp, type App } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
-import { muscleName } from "../../ui/text";
+import { isPluralMuscle, muscleName } from "../../ui/text";
 import { ensureTodayWorkout, initialSets, templateItems } from "../../ui/workoutOps";
 import type { BalanceKey } from "../../domain/balance";
 import { balanceSides } from "../../ui/balance";
@@ -43,7 +43,10 @@ const suggestionText = (s: Suggestion, app: App): { title: string; text: string 
       };
     case "neglected":
       return {
-        title: t(`${muscleName(p.muscle as Muscle, lang)} kommt zu kurz`, `${muscleName(p.muscle as Muscle, lang)} needs work`),
+        title: t(
+          `${muscleName(p.muscle as Muscle, lang)} ${isPluralMuscle(p.muscle as Muscle, lang) ? "kommen" : "kommt"} zu kurz`,
+          `${muscleName(p.muscle as Muscle, lang)} ${isPluralMuscle(p.muscle as Muscle, lang) ? "need" : "needs"} work`,
+        ),
         text: t(`Nur ~${p.sets} Sätze pro Woche – Ziel: ${p.target}+.`, `Only ~${p.sets} sets per week – target: ${p.target}+.`),
       };
     case "missing":
