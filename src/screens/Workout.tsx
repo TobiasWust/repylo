@@ -5,6 +5,8 @@ import { suggestProgression, type Progression } from "../domain/progression";
 import { detectPrs, hasValue, type Pr } from "../domain/stats";
 import { setFeedback, workoutSummary, type SetFeedback } from "../domain/coach";
 import { readinessOf } from "../domain/readiness";
+import { tipsFor } from "../domain/tips";
+import { TipsList } from "../ui/Tips";
 import { formatDuration, formatNumber, fromUnit, parseDuration, toUnit } from "../domain/units";
 import { Icon, NumberField, Segmented, Sheet } from "../ui/components";
 import { useApp, type App } from "../ui/context";
@@ -196,6 +198,7 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
   const feedback = setFeedback(data, workout.id, entry.exerciseKey, entry.sets);
   const [showNote, setShowNote] = useState(!!entry.note);
   const [menu, setMenu] = useState(false);
+  const [showTips, setShowTips] = useState(false);
   // Values committed on blur aren't in `data` until Evolu's query refreshes.
   // Tapping ✓ right after typing must still see them (for PR detection).
   const pending = useRef(new Map<string, Partial<TemplateSet>>());
@@ -269,6 +272,11 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
           <button className="chip" disabled={index === count - 1} onClick={() => actions.moveExercise(workout, entry.id, 1)}>
             <Icon name="down" size={16} /> {t("Runter", "Down")}
           </button>
+          {tipsFor(entry.exerciseKey, lang) && (
+            <button className={`chip ${showTips ? "selected" : ""}`} onClick={() => setShowTips(!showTips)}>
+              <Sticker name="bulb" size={16} /> {t("Tipps", "Tips")}
+            </button>
+          )}
           <button className="chip" onClick={() => setShowNote(true)}>
             <Icon name="note" size={16} /> {t("Notiz", "Note")}
           </button>
@@ -277,6 +285,8 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
           </button>
         </div>
       )}
+
+      {showTips && <TipsList exerciseKey={entry.exerciseKey} />}
 
       {progression && (
         <div className="progress-hint">

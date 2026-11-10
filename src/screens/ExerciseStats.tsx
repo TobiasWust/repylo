@@ -9,6 +9,7 @@ import { equipmentName, formatDate, goalName, goalShort, muscleName } from "../u
 import { parseDay } from "../domain/dates";
 import { Sticker } from "../ui/stickers";
 import { ExerciseLevelCard } from "../ui/StrengthLevel";
+import { TipsList } from "../ui/Tips";
 
 type ChartMetric = "e1rm" | "top" | "volume" | "reps" | "duration" | "distance";
 
@@ -142,6 +143,7 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
           </div>
 
           <ExerciseLevelCard exerciseKey={exerciseKey} />
+          <TipsList exerciseKey={exerciseKey} card />
 
           <section className="card">
             <div className="section-row">

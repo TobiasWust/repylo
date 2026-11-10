@@ -8,6 +8,7 @@ import { calculatePlates } from "./plates";
 import { setFeedback, workoutSummary } from "./coach";
 import { generatePlan } from "./planner";
 import { readinessOf } from "./readiness";
+import { tipsFor } from "./tips";
 import { monthlyReview } from "./review";
 import { rate } from "./standards";
 import { suggestProgression } from "./progression";
@@ -420,5 +421,13 @@ describe("readiness", () => {
     const lowDay = { ...data, workouts: [today0, ...data.workouts.slice(1)] };
     expect(suggestProgression(lowDay, "squat", today0.id)!.kind).toBe("deload");
     expect(suggestProgression(data, "squat", today0.id)!.kind).toBe("addReps");
+  });
+});
+
+describe("technique tips", () => {
+  it("has tips for common lifts and a generic one for EGYM", () => {
+    expect(tipsFor("squat", "de")).toHaveLength(3);
+    expect(tipsFor("egym_chest_press", "en")?.[0]).toContain("machine");
+    expect(tipsFor("jump_rope", "de")).toBeNull();
   });
 });

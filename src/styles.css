@@ -1676,3 +1676,18 @@ body:has(.overlay-screen) .rest-timer {
 .pr-line strong.negative {
   color: #b3261e;
 }
+
+.tips {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+.tips-box {
+  background: var(--yellow);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
