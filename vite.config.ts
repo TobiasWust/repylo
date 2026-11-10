@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.svg", "apple-touch-icon.png"],
       manifest: {
-        name: "Repylo – Every rep counts",
-        short_name: "Repylo",
+        name: "repylo – Every rep counts",
+        short_name: "repylo",
         description: "Trainingstagebuch ohne Account. Every rep counts.",
         theme_color: "#2ed3b7",
         background_color: "#2ed3b7",

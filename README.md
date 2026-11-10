@@ -29,6 +29,13 @@ Evolus kostenloses **Test-Relay** (kann Daten löschen; die Geräte behalten ihr
 Für den Dauerbetrieb oder wenn andere die App nutzen sollen: eigenes
 [Evolu-Relay](https://www.evolu.dev/docs/relay) hosten und unter Mehr → Eigenes Relay eintragen.
 
+## Statistik
+
+Aufrufe werden anonym mit [GoatCounter](https://www.goatcounter.com) gezählt
+(`index.html`): ohne Cookies, ohne personenbezogene Daten, ohne Trainingsdaten.
+Lokale Aufrufe (localhost) zählen nicht. Eigene Geräte ausschließen: einmal
+`https://<deine-domain>/#toggle-goatcounter` öffnen.
+
 ## Entwicklung
 
 ```bash

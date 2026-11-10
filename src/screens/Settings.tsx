@@ -346,7 +346,7 @@ export const Settings = () => {
             e.target.value = "";
             if (!file) return;
             const backup = parseBackup(await file.text());
-            if (!backup) return toast(t("Keine gültige Repylo-Sicherung", "Not a valid Repylo backup"));
+            if (!backup) return toast(t("Keine gültige repylo-Sicherung", "Not a valid repylo backup"));
             if (!confirm(t(`${backup.workouts.length} Trainings importieren? Sie werden zu den vorhandenen hinzugefügt.`, `Import ${backup.workouts.length} workouts? They’re added to the existing ones.`))) return;
             importBackup(backup, actions, data);
             toast(t("Import abgeschlossen", "Import complete"));
@@ -358,6 +358,11 @@ export const Settings = () => {
         <strong>repylo</strong> · Every rep counts.
         <br />
         {t("Keine Accounts, kein Tracking. Deine Daten gehören dir.", "No accounts, no tracking. Your data is yours.")}
+        <br />
+        {t(
+          "Nur App-Aufrufe werden anonym gezählt (GoatCounter, ohne Cookies, ohne Trainingsdaten).",
+          "Only app opens are counted anonymously (GoatCounter, no cookies, no workout data).",
+        )}
       </p>
 
       {sheet === "share" && <ShowCodeSheet onClose={() => setSheet(null)} />}
