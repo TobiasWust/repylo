@@ -101,6 +101,8 @@ export const Schema = {
     weeklyGoal: nullOr(NonNegativeInt),
     /** "male" | "female": which strength standards to compare against. */
     standards: nullOr(Text40),
+    /** "last" | "target": what new sets are pre-filled with. */
+    prefill: nullOr(Text40),
   },
   exerciseSettings: {
     id: ExerciseSettingsId,
@@ -179,7 +181,7 @@ export const bodyWeightsQuery = createQuery((db) =>
 export const settingsQuery = createQuery((db) =>
   db
     .selectFrom("settings")
-    .select(["id", "goal", "unit", "language", "restSeconds", "barWeight", "weeklyGoal", "standards"])
+    .select(["id", "goal", "unit", "language", "restSeconds", "barWeight", "weeklyGoal", "standards", "prefill"])
     .where("isDeleted", "is not", 1),
 );
 export const exerciseSettingsQuery = createQuery((db) =>

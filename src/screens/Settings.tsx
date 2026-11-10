@@ -252,6 +252,15 @@ export const Settings = () => {
           onChange={(v) => actions.updateSettings({ weeklyGoal: Number(v) })}
           options={["1", "2", "3", "4", "5", "6", "7"].map((v) => ({ value: v, label: v }))}
         />
+        <div className="field-label">{t("Neue Sätze vorbelegen mit", "Pre-fill new sets with")}</div>
+        <Segmented
+          value={s.prefill}
+          onChange={(prefill) => actions.updateSettings({ prefill })}
+          options={[
+            { value: "last", label: t("Letztes Mal", "Last time") },
+            { value: "target", label: t("Ziel (Progression)", "Target (progression)") },
+          ]}
+        />
         <div className="field-label">{t("Kraft-Richtwerte", "Strength standards")}</div>
         <Segmented
           value={s.standards ?? ""}

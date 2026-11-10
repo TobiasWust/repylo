@@ -11,7 +11,7 @@ import {
   sqliteTrue,
 } from "@evolu/common";
 import { egymCircuit } from "../domain/exercises";
-import type { Data, Goal, Language, Standards, TemplateItem, TemplateSet, Unit, Workout } from "../domain/model";
+import type { Data, Goal, Language, Prefill, Standards, TemplateItem, TemplateSet, Unit, Workout } from "../domain/model";
 import { today } from "../domain/dates";
 import {
   BodyWeightId,
@@ -198,6 +198,7 @@ export const createActions = (evolu: AppEvolu) => {
       barWeight?: number;
       weeklyGoal?: number;
       standards?: Standards;
+      prefill?: Prefill;
     }) =>
       evolu.upsert("settings", {
         id: settingsId,
@@ -208,6 +209,7 @@ export const createActions = (evolu: AppEvolu) => {
         ...(values.barWeight !== undefined && { barWeight: num(values.barWeight) }),
         ...(values.weeklyGoal !== undefined && { weeklyGoal: int(values.weeklyGoal) }),
         ...(values.standards && { standards: Text40.orThrow(values.standards) }),
+        ...(values.prefill && { prefill: Text40.orThrow(values.prefill) }),
       }),
 
     setExerciseGoal: (exerciseKey: string, goal: Goal | null) =>

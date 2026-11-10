@@ -2,6 +2,7 @@ import type { Actions } from "../db/actions";
 import { today } from "../domain/dates";
 import type { Data, Template, TemplateItem, TemplateSet, Workout } from "../domain/model";
 import { exerciseSessions } from "../domain/stats";
+import { suggestProgression } from "../domain/progression";
 
 /**
  * Today's workout, or a freshly created one. A new workout isn't in `data`
@@ -21,11 +22,16 @@ export const ensureTodayWorkout = (data: Data, actions: Actions, templateId: str
 const emptySet: TemplateSet = { weight: null, reps: null, duration: null, distance: null };
 
 /**
- * Sets for a newly added exercise: exactly what was done last time. The
- * progression chip in the workout screen then offers the next step, so the
- * user decides whether to go up today.
+ * Sets for a newly added exercise. By default exactly what was done last
+ * time, and the progression chip offers the next step. With the "target"
+ * setting the progression suggestion is filled in directly, so the user only
+ * has to tick sets off.
  */
 export const initialSets = (data: Data, exerciseKey: string, workoutId?: string): TemplateSet[] => {
+  if (data.settings.prefill === "target") {
+    const target = suggestProgression(data, exerciseKey, workoutId);
+    if (target) return [...target.sets];
+  }
   const last = exerciseSessions(data, exerciseKey, workoutId).at(-1);
   return last
     ? last.sets.map((s) => ({ weight: s.weight, reps: s.reps, duration: s.duration, distance: s.distance }))

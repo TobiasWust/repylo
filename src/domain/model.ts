@@ -82,7 +82,11 @@ export interface Settings {
   readonly weeklyGoal: number;
   /** Strength standards to compare against; null until the user picks. */
   readonly standards: Standards | null;
+  /** Pre-fill new sets with last time's values or with the progression target. */
+  readonly prefill: Prefill;
 }
+
+export type Prefill = "last" | "target";
 
 export type Standards = "male" | "female";
 
@@ -138,6 +142,7 @@ export interface Rows {
     barWeight: number;
     weeklyGoal: number;
     standards: string;
+    prefill: string;
   }>[];
   readonly exerciseSettings: readonly Nullable<{ exerciseKey: string; goal: string }>[];
   readonly dismissals: readonly Nullable<{ key: string; until: number }>[];
@@ -246,6 +251,7 @@ export const buildData = (rows: Rows): Data => {
     barWeight: s?.barWeight ?? 20,
     weeklyGoal: Math.min(7, Math.max(1, s?.weeklyGoal ?? 3)),
     standards: s?.standards === "male" || s?.standards === "female" ? s.standards : null,
+    prefill: s?.prefill === "target" ? "target" : "last",
   };
 
   const exerciseGoals = new Map<string, Goal>();

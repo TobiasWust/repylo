@@ -1,6 +1,7 @@
 import { createAppOwner, type OwnerSecret } from "@evolu/common";
 import { describe, expect, it } from "vitest";
 import { parseMnemonic } from "../db/owner";
+import { initialSets } from "../ui/workoutOps";
 import { addDays, dayToInput, parseDayInput, today, weekStart } from "./dates";
 import { buildData, type Data, type Rows } from "./model";
 import { calculatePlates } from "./plates";
@@ -28,7 +29,7 @@ const build = (workouts: WorkoutSpec[], extra: Partial<Rows> = {}): Data => {
     templates: [],
     customExercises: [],
     bodyWeights: [],
-    settings: [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 1, standards: "male" }],
+    settings: [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 1, standards: "male", prefill: "last" }],
     exerciseSettings: [],
     dismissals: [],
     ...extra,
@@ -345,5 +346,19 @@ describe("workout summary", () => {
     expect(s.volume).toBe(105 * 5 * 2 + 60 * 8);
     expect(s.gains.map((g) => g.exerciseKey)).toEqual(["squat"]);
     expect(s.records).toEqual(["squat"]);
+  });
+});
+
+describe("prefill", () => {
+  const history: WorkoutSpec[] = [{ daysAgo: 3, exercises: { bench_press: [[60, 12], [60, 12], [60, 12]] } }];
+  const settings = (prefill: string) => [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 3, standards: null, prefill }];
+
+  it("uses last time's values by default", () => {
+    expect(initialSets(build(history), "bench_press")[0]).toMatchObject({ weight: 60, reps: 12 });
+  });
+
+  it("uses the progression target when chosen", () => {
+    const data = build(history, { settings: settings("target") as unknown as Rows["settings"] });
+    expect(initialSets(data, "bench_press")[0]).toMatchObject({ weight: 62.5, reps: 8 });
   });
 });
