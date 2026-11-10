@@ -6,7 +6,7 @@ Ende-zu-Ende-verschlüsselt zwischen deinen Geräten synchronisiert ([Evolu](htt
 
 ## Funktionen
 
-- **Training erfassen:** „Heute trainiert“ → Übungen (ca. 65 + 19 EGYM-Maschinen) oder eigene Übungen/Maschinen → Sätze mit Gewicht × Wdh., Zeit oder Strecke, Kommentar pro Übung und pro Training
+- **Training erfassen:** „Training starten“ → Übungen (ca. 120 + 19 EGYM-Maschinen, filterbar nach Gerät und Muskel) oder eigene Übungen/Maschinen → Sätze mit Gewicht × Wdh., Zeit oder Strecke, Kommentar pro Übung und pro Training
 - **Übernehmen:** beliebiges früheres Training oder eine Vorlage (Split) übernehmen, einzelne Übungen abwählbar
 - **Vorlagen/Splits:** Training als Vorlage speichern; die Reihenfolge bestimmt den Split-Rhythmus. Fertiger **EGYM-Zirkel** (3 × 20) per Tipp
 - **Progression (lokal, regelbasiert):** Double Progression je nach Ziel (Kraft 3–6, Aufbau 8–12, Ausdauer 15–20 Wdh.); mehr Gewicht erst, wenn alle Sätze oben im Bereich sind; Deload bei Leistungsabfall

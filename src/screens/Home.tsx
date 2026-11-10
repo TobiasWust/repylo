@@ -251,7 +251,7 @@ export const Home = () => {
         </div>
         <button className="button dark big full" onClick={startToday}>
           <Icon name={todays ? "dumbbell" : "bolt"} />
-          {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Heute trainiert", "I trained today")}
+          {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Training starten", "Start workout")}
         </button>
         <button className="button full soft" onClick={() => setBackfill(true)}>
           <Sticker name="calendar" size={24} /> {t("Früheres Training nachtragen", "Log a past workout")}
@@ -299,7 +299,6 @@ export const Home = () => {
               <SuggestionCard key={s.key} suggestion={s} />
             ))}
           </div>
-          <p className="hint">{t("Zum Ausblenden zur Seite wischen.", "Swipe sideways to dismiss.")}</p>
         </section>
       )}
 
