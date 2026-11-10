@@ -1016,6 +1016,12 @@ textarea.text-input {
   aspect-ratio: 1;
   border-radius: 4px;
   background: #ecece6;
+  padding: 0;
+  min-width: 0;
+}
+.heat.selected {
+  outline: 2.5px solid var(--ink);
+  outline-offset: 1px;
 }
 .heat.on {
   background: var(--bg);
@@ -1587,4 +1593,53 @@ body:has(.overlay-screen) .rest-timer {
   font-weight: 800;
   line-height: 1.2;
   overflow-wrap: anywhere;
+}
+
+.install-card {
+  background: var(--sky);
+}
+
+/* Heatmap day details: a speech bubble whose arrow points at the tapped column. */
+.day-bubble {
+  position: relative;
+  margin-top: 6px;
+  background: var(--yellow);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.day-bubble::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: clamp(12px, var(--arrow), calc(100% - 24px));
+  width: 14px;
+  height: 14px;
+  background: var(--yellow);
+  border-left: 2.5px solid var(--ink);
+  border-top: 2.5px solid var(--ink);
+  transform: translateX(-50%) rotate(45deg);
+  border-top-left-radius: 3px;
+}
+.day-bubble small {
+  color: #4b5352;
+}
+.day-bubble-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.day-bubble-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -39,6 +39,7 @@ export const goalShort = (g: Goal, lang: Language) => goalShortNames[g][lang ===
 const equipmentNames: Record<Equipment, [string, string]> = {
   barbell: ["Langhantel", "Barbell"],
   dumbbell: ["Kurzhantel", "Dumbbell"],
+  kettlebell: ["Kettlebell", "Kettlebell"],
   machine: ["Maschine", "Machine"],
   egym: ["EGYM", "EGYM"],
   cable: ["Kabelzug", "Cable"],

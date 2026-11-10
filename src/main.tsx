@@ -8,6 +8,8 @@ import { getTransports, loadOrCreateOwner } from "./db/owner";
 import { EvoluContext, Schema } from "./db/schema";
 import { App } from "./App";
 import { evoluDeps } from "./ui/evoluDeps";
+// Imported early: the browser may offer installation before React renders.
+import "./ui/install";
 import "./styles.css";
 
 const run = createRun(evoluDeps);

@@ -6,7 +6,12 @@ import { useApp } from "./context";
 import { equipmentName, metricName, muscleName, patternName } from "./text";
 import { Sticker } from "./stickers";
 
-type Filter = "all" | "recent" | "egym" | "cardio" | Muscle;
+/** Equipment row: "all", the user's own exercises, or one equipment type. */
+type EquipmentFilter = "all" | "recent" | Equipment;
+/** Muscle row, combinable with the equipment row. */
+type MuscleFilter = "all" | Muscle;
+
+const equipmentOrder: Equipment[] = ["machine", "egym", "cable", "barbell", "dumbbell", "kettlebell", "bodyweight", "cardio", "other"];
 
 const CustomExerciseForm = ({ onCreated, onCancel }: { onCreated: (key: string) => void; onCancel: () => void }) => {
   const { t, lang, actions } = useApp();
@@ -17,7 +22,7 @@ const CustomExerciseForm = ({ onCreated, onCancel }: { onCreated: (key: string) 
   const [primary, setPrimary] = useState<Muscle[]>([]);
   const [secondary, setSecondary] = useState<Muscle[]>([]);
   const toggle = (list: Muscle[], m: Muscle) => (list.includes(m) ? list.filter((x) => x !== m) : [...list, m]);
-  const equipments: Equipment[] = ["machine", "egym", "barbell", "dumbbell", "cable", "bodyweight", "cardio", "other"];
+  const equipments: Equipment[] = ["machine", "egym", "barbell", "dumbbell", "kettlebell", "cable", "bodyweight", "cardio", "other"];
 
   return (
     <div className="form">
@@ -90,7 +95,8 @@ const CustomExerciseForm = ({ onCreated, onCancel }: { onCreated: (key: string) 
 export const ExercisePicker = ({ onPick, onClose, exclude }: { onPick: (key: string) => void; onClose: () => void; exclude: ReadonlySet<string> }) => {
   const { t, lang, data, exerciseName } = useApp();
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<Filter>("all");
+  const [equipment, setEquipment] = useState<EquipmentFilter>("all");
+  const [muscle, setMuscle] = useState<MuscleFilter>("all");
   const [creating, setCreating] = useState(false);
 
   const usage = useMemo(() => {
@@ -104,16 +110,14 @@ export const ExercisePicker = ({ onPick, onClose, exclude }: { onPick: (key: str
     const q = query.trim().toLowerCase();
     const matches = (e: Exercise) => {
       if (q && !e.name.de.toLowerCase().includes(q) && !e.name.en.toLowerCase().includes(q)) return false;
-      if (filter === "all") return true;
-      if (filter === "recent") return usage.has(e.key);
-      if (filter === "egym") return e.equipment === "egym";
-      if (filter === "cardio") return e.pattern === "cardio";
-      return e.primary.includes(filter) || e.secondary.includes(filter);
+      if (equipment === "recent" && !usage.has(e.key)) return false;
+      if (equipment !== "all" && equipment !== "recent" && e.equipment !== equipment) return false;
+      return muscle === "all" || e.primary.includes(muscle) || e.secondary.includes(muscle);
     };
     return [...data.exercises.values()]
       .filter(matches)
       .sort((a, b) => (usage.get(b.key) ?? 0) - (usage.get(a.key) ?? 0) || exerciseName(a).localeCompare(exerciseName(b), lang));
-  }, [data, query, filter, usage, exerciseName, lang]);
+  }, [data, query, equipment, muscle, usage, exerciseName, lang]);
 
   if (creating)
     return (
@@ -122,20 +126,31 @@ export const ExercisePicker = ({ onPick, onClose, exclude }: { onPick: (key: str
       </Sheet>
     );
 
-  const filters: { value: Filter; label: string }[] = [
+  // Only offer equipment types that actually have exercises (e.g. "other" for custom ones).
+  const present = new Set([...data.exercises.values()].map((e) => e.equipment));
+  const equipmentFilters: { value: EquipmentFilter; label: string }[] = [
     { value: "all", label: t("Alle", "All") },
     ...(usage.size > 0 ? [{ value: "recent" as const, label: t("Meine", "Mine") }] : []),
-    { value: "egym", label: "EGYM" },
+    ...equipmentOrder.filter((e) => present.has(e)).map((e) => ({ value: e, label: equipmentName(e, lang) })),
+  ];
+  const muscleFilters: { value: MuscleFilter; label: string }[] = [
+    { value: "all", label: t("Alle Muskeln", "All muscles") },
     ...muscles.map((m) => ({ value: m, label: muscleName(m, lang) })),
-    { value: "cardio", label: "Cardio" },
   ];
 
   return (
     <Sheet title={t("Übung hinzufügen", "Add exercise")} onClose={onClose}>
       <input className="text-input search" placeholder={t("Suchen …", "Search …")} value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
-      <div className="chips scroll-x">
-        {filters.map((f) => (
-          <button key={f.value} className={`chip ${filter === f.value ? "selected" : ""}`} onClick={() => setFilter(f.value)}>
+      <div className="chips scroll-x" role="group" aria-label={t("Gerät", "Equipment")}>
+        {equipmentFilters.map((f) => (
+          <button key={f.value} className={`chip ${equipment === f.value ? "selected" : ""}`} onClick={() => setEquipment(f.value)}>
+            {f.label}
+          </button>
+        ))}
+      </div>
+      <div className="chips scroll-x" role="group" aria-label={t("Muskel", "Muscle")}>
+        {muscleFilters.map((f) => (
+          <button key={f.value} className={`chip ${muscle === f.value ? "selected alt" : ""}`} onClick={() => setMuscle(f.value)}>
             {f.label}
           </button>
         ))}

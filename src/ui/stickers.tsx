@@ -156,6 +156,14 @@ const art = {
       <circle cx={20} cy={13} r={1.4} fill={c.sky} />
     </>
   ),
+  phone: (
+    <>
+      <rect x={8.5} y={2.5} width={15} height={27} rx={3.5} fill={c.mint} />
+      <rect x={11} y={6.5} width={10} height={14} rx={1.6} fill={c.yellow} strokeWidth={1.6} />
+      <path d="M14 25.5h4" />
+      <Face x={16} y={13.6} scale={0.7} />
+    </>
+  ),
 } satisfies Record<string, ReactNode>;
 
 export type StickerName = keyof typeof art;

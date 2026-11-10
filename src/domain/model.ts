@@ -226,7 +226,7 @@ export const buildData = (rows: Rows): Data => {
     exercises.set(r.id, {
       key: r.id,
       name: { de: r.name, en: r.name },
-      equipment: oneOf<Equipment>(r.equipment, ["barbell", "dumbbell", "machine", "egym", "cable", "bodyweight", "cardio", "other"], "other"),
+      equipment: oneOf<Equipment>(r.equipment, ["barbell", "dumbbell", "kettlebell", "machine", "egym", "cable", "bodyweight", "cardio", "other"], "other"),
       metric: oneOf<Metric>(r.metric, ["weight", "bodyweight", "time", "cardio"], "weight"),
       pattern: oneOf<Pattern>(r.pattern, ["push", "pull", "legs", "core", "cardio"], "core"),
       primary: parseMuscles(r.primary),

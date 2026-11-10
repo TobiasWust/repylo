@@ -8,6 +8,7 @@ import { defaultRest, type Goal } from "../domain/model";
 import { Icon, Segmented, Sheet } from "../ui/components";
 import { useApp } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
+import { InstallCard } from "../ui/InstallCard";
 import { syncState } from "../ui/evoluDeps";
 import { goalShort } from "../ui/text";
 import { Sticker, type StickerName } from "../ui/stickers";
@@ -234,6 +235,8 @@ export const Settings = () => {
           </div>
         </details>
       </section>
+
+      <InstallCard always />
 
       <section className="card">
         <h2 className="card-title">{t("Training", "Training")}</h2>

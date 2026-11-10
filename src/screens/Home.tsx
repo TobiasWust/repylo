@@ -5,6 +5,7 @@ import { getExercise } from "../domain/model";
 import { computeSuggestions, dismissDays, type Suggestion } from "../domain/suggestions";
 import { hasValue, trainedDays, weekStreak } from "../domain/stats";
 import { BackfillSheet } from "../ui/BackfillSheet";
+import { InstallCard } from "../ui/InstallCard";
 import { Icon } from "../ui/components";
 import { Sticker, type StickerName } from "../ui/stickers";
 import { previousMonth } from "../domain/review";
@@ -256,6 +257,8 @@ export const Home = () => {
           <Sticker name="calendar" size={24} /> {t("Früheres Training nachtragen", "Log a past workout")}
         </button>
       </section>
+
+      <InstallCard />
 
       {showReview && (
         <section className="card review-teaser">
