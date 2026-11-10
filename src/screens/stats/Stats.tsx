@@ -11,6 +11,7 @@ import {
   weeklySetTarget,
   weeklyVolume,
   weekStreak,
+  workoutsPerWeek,
 } from "../../domain/stats";
 import { formatNumber, toUnit } from "../../domain/units";
 import { BarChart, Empty, Sparkline } from "../../ui/components";
@@ -26,6 +27,7 @@ export const Stats = () => {
   const { t, data, lang, open, exerciseName, weight } = useApp();
   const days = useMemo(() => trainedDays(data), [data]);
   const weeks = useMemo(() => weeklyVolume(data, 12), [data]);
+  const perWeek = useMemo(() => workoutsPerWeek(data), [data]);
   const last7 = useMemo(() => setsPerMuscle(data, addDays(today(), -6)), [data]);
   const last14 = useMemo(() => setsPerMuscle(data, addDays(today(), -13)), [data]);
   const prs = useMemo(() => recentPrs(data, 6), [data]);
@@ -97,8 +99,12 @@ export const Stats = () => {
           <strong>{formatNumber(toUnit(totalVolume, unit) / 1000, lang, 1)} t</strong>
         </div>
         <div className="stat-tile mint">
-          <span>{t("Ø pro Woche (12 Wo.)", "Avg/week (12 wk)")}</span>
-          <strong>{formatNumber(weeks.reduce((n, w) => n + w.workouts, 0) / weeks.length, lang, 1)}</strong>
+          <span>
+            {perWeek && perWeek.weeks > 1
+              ? t(`Ø pro Woche (${perWeek.weeks} Wo.)`, `Avg/week (${perWeek.weeks} wk)`)
+              : t("Ø pro Woche", "Avg/week")}
+          </span>
+          <strong>{formatNumber(perWeek?.average ?? 0, lang, 1)}</strong>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { addDays, today, weekStart } from "./dates";
+import { addDays, today, weekStart, daysBetween } from "./dates";
 import { suggestProgression } from "./progression";
-import { detectPrs, e1rm, exerciseSessions, records, setsPerMuscle, weekStreak } from "./stats";
+import { detectPrs, e1rm, exerciseSessions, records, setsPerMuscle, weekStreak, workoutsPerWeek } from "./stats";
 import { build } from "../test/fixtures";
 
 describe("stats", () => {
@@ -93,5 +93,17 @@ describe("backfilled workouts", () => {
 
   it("judges PRs against the past at that time", () => {
     expect(detectPrs(data, backfilled.id, backfilled.exercises[0]!.sets[0]!)[0]?.kind).toBe("weight");
+  });
+});
+
+describe("workouts per week", () => {
+  it("starts averaging at the first workout and skips the running week", () => {
+    const monday = weekStart(today());
+    const data = build([
+      { daysAgo: daysBetween(addDays(monday, -14), today()), exercises: { squat: [[100, 5]] } },
+      { daysAgo: daysBetween(addDays(monday, -12), today()), exercises: { squat: [[100, 5]] } },
+      { daysAgo: daysBetween(addDays(monday, -7), today()), exercises: { squat: [[100, 5]] } },
+    ]);
+    expect(workoutsPerWeek(data)).toEqual({ average: 1.5, weeks: 2 });
   });
 });

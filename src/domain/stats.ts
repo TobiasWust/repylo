@@ -261,3 +261,23 @@ export const recentPrs = (data: Data, limit: number): { date: string; exerciseKe
   }
   return result.sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
 };
+
+/**
+ * Average workouts per week over the last completed weeks, starting no
+ * earlier than the week of the first workout (a newcomer isn't averaged over
+ * weeks before they started). The running week is left out because it isn't
+ * over yet – unless it is the only week so far.
+ */
+export const workoutsPerWeek = (data: Data, maxWeeks = 12, now: string = today()): { average: number; weeks: number } | null => {
+  const dates = data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).map((w) => w.date);
+  if (dates.length === 0) return null;
+  const first = weekStart(dates.reduce((a, b) => (a < b ? a : b)));
+  const current = weekStart(now);
+  const lastComplete = addDays(current, -7);
+  const end = first > lastComplete ? current : lastComplete;
+  const weeks = Math.min(maxWeeks, Math.round(daysBetween(first, end) / 7) + 1);
+  const from = addDays(end, -7 * (weeks - 1));
+  const until = addDays(end, 6);
+  const count = dates.filter((d) => d >= from && d <= until).length;
+  return { average: count / weeks, weeks };
+};
