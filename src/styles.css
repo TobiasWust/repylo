@@ -548,19 +548,46 @@ small {
 .overlay-title small {
   font-weight: 600;
 }
-.date-pill {
+.date-pill-wrap {
   position: relative;
   align-self: flex-start;
+}
+.date-pill {
   font-weight: 700;
   font-size: 14px;
   text-decoration: underline dashed;
   text-underline-offset: 3px;
 }
-.date-pill input {
+.date-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.date-field .text-input {
+  min-width: 0;
+}
+.date-field .mini-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+.text-input.invalid {
+  border-color: #b3261e;
+}
+/* Invisible native date input: only its calendar popup is used. */
+.picker-proxy {
   position: absolute;
-  inset: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
   opacity: 0;
-  width: 100%;
+  pointer-events: none;
+  border: 0;
+  padding: 0;
 }
 .progress-pill {
   background: var(--ink);
@@ -716,10 +743,7 @@ textarea.text-input {
 .note {
   min-height: 70px;
 }
-.date-input {
-  flex: 1;
-  min-width: 0;
-}
+
 
 /* ---------- Sheets ---------- */
 .sheet-backdrop {

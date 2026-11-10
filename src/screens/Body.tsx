@@ -6,6 +6,7 @@ import { Empty, Icon, LineChart, NumberField } from "../ui/components";
 import { useApp } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
 import { formatDate } from "../ui/text";
+import { DateField } from "../ui/DateField";
 
 export const Body = () => {
   const { t, data, actions, lang, weight } = useApp();
@@ -36,8 +37,8 @@ export const Body = () => {
         <div className="row gap">
           <NumberField label={unit} value={value} onCommit={setValue} className="big-input" placeholder="75" />
           <span className="unit-label">{unit}</span>
-          <input type="date" className="text-input date-input" value={date} max={today()} onChange={(e) => setDate(e.target.value || today())} />
         </div>
+        <DateField label={t("Datum", "Date")} value={date} max={today()} onChange={setDate} />
         <button className="button dark full" onClick={save} disabled={value == null}>
           <Icon name="check" /> {t("Speichern", "Save")}
         </button>

@@ -11,6 +11,7 @@ import { useFeedback } from "../ui/feedback";
 import { equipmentName, formatDate } from "../ui/text";
 import { initialSets, templateItems, workoutToItems } from "../ui/workoutOps";
 import { Sticker } from "../ui/stickers";
+import { DatePill } from "../ui/DateField";
 
 const DurationField = ({ value, onCommit, label }: { value: number | null; onCommit: (v: number | null) => void; label: string }) => {
   const [text, setText] = useState(value == null ? "" : formatDuration(value));
@@ -476,10 +477,9 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
         </button>
         <div className="overlay-title">
           <h1>{t("Training", "Workout")}</h1>
-          <label className="date-pill">
+          <DatePill value={workout.date} onChange={(date) => actions.updateWorkout(workout.id, { date })}>
             {formatDate(workout.date, lang, "long")}
-            <input type="date" value={workout.date} onChange={(e) => e.target.value && actions.updateWorkout(workout.id, { date: e.target.value })} />
-          </label>
+          </DatePill>
         </div>
         {total > 0 && workout.date === today() && (
           <span className="progress-pill">

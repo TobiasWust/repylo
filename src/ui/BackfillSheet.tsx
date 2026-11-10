@@ -4,6 +4,7 @@ import { getExercise } from "../domain/model";
 import { Icon, Sheet } from "./components";
 import { useApp } from "./context";
 import { formatDate } from "./text";
+import { DateField } from "./DateField";
 
 /**
  * Log a workout for an earlier day ("nachtragen"). If that day already has a
@@ -29,10 +30,8 @@ export const BackfillSheet = ({ onClose }: { onClose: () => void }) => {
           "For workouts you haven’t logged yet. Tip: use “Copy from” to start from a similar workout and just adjust the numbers.",
         )}
       </p>
-      <label>
-        {t("Datum", "Date")}
-        <input type="date" className="text-input" value={date} max={today()} onChange={(e) => e.target.value && setDate(e.target.value)} />
-      </label>
+      <div className="field-label">{t("Datum", "Date")}</div>
+      <DateField label={t("Datum", "Date")} value={date} max={today()} onChange={setDate} />
       <div className="chips">
         {[1, 2, 3, 7].map((days) => (
           <button key={days} className={`chip ${date === addDays(today(), -days) ? "selected" : ""}`} onClick={() => setDate(addDays(today(), -days))}>
