@@ -21,6 +21,7 @@ import { Sticker } from "../../ui/stickers";
 import { StrengthOverview } from "../../ui/StrengthLevel";
 import { ReadinessCard } from "./ReadinessCard";
 import { Heatmap } from "./Heatmap";
+import { BodyCard } from "./BodyCard";
 import { RatioBar } from "./RatioBar";
 
 export const Stats = () => {
@@ -124,6 +125,8 @@ export const Stats = () => {
           format={(v) => `${formatNumber(v, lang, 0)} ${unit}`}
         />
       </section>
+
+      <BodyCard />
 
       <section className="card">
         <h2 className="card-title">{t("Sätze pro Muskelgruppe (7 Tage)", "Sets per muscle (7 days)")}</h2>

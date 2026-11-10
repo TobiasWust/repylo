@@ -1752,3 +1752,72 @@ body:has(.overlay-screen) .rest-timer {
   color: var(--ink);
   opacity: 0.75;
 }
+
+/* ---------- Body map ---------- */
+.body-map {
+  width: 100%;
+  max-width: 360px;
+  align-self: center;
+  height: auto;
+}
+.body-muscle {
+  cursor: pointer;
+  transition: stroke-width 0.15s;
+}
+.body-label {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--muted);
+}
+.body-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.body-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.body-legend i {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+}
+.body-detail {
+  min-height: 2.6em;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------- Day card ---------- */
+.day-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+}
+.day-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+}
+.day-card p {
+  font-size: 14px;
+}
+.day-card-sticker {
+  animation: bob 2.4s ease-in-out infinite;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-3px) rotate(-4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .day-card-sticker {
+    animation: none;
+  }
+}

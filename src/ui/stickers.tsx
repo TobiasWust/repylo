@@ -115,11 +115,11 @@ const art = {
   ),
   muscle: (
     <>
-      <path
-        d="M5 27.5c-.5-6 1-11.6 5.4-15.4l2.6-6c.6-1.3 2-1.8 3.3-1.2l2.4 1.2c.9.5 1 1.7.3 2.4L15 12.4c2.8-.6 5.4.4 6.6 2.6 3.6-.4 6.6 2.6 6.4 6.4l-.2 6.1z"
-        fill={c.yellow}
-      />
-      <path d="M17.5 18.5c1.6 1.2 2.4 2.6 2.6 4.4" strokeWidth={1.6} />
+      <path d="M3 28.5V19.5c1.6-1.6 3.4-2.4 5.4-2.6C8.6 9.6 17.4 8.4 18.6 15L18.8 10h8l.4 12.6c0 3.4-2.4 5.9-5.8 5.9z" fill={c.yellow} />
+      <circle cx={22.8} cy={7.4} r={4.6} fill={c.yellow} />
+      <path d="M19.6 8.8c1.6.2 3-.6 3.6-2" strokeWidth={1.5} />
+      <path d="M5.4 11.4 3.8 9.6M9.2 8.6l-.6-2.4" strokeWidth={1.6} />
+      <Face x={13.2} y={22} />
     </>
   ),
   medal: (
@@ -165,6 +165,14 @@ const art = {
       <rect x={11} y={6.5} width={10} height={14} rx={1.6} fill={c.yellow} strokeWidth={1.6} />
       <path d="M14 25.5h4" />
       <Face x={16} y={13.6} scale={0.7} />
+    </>
+  ),
+  sleep: (
+    <>
+      <path d="M17 4.5a11.5 11.5 0 1 0 10.5 16A9.5 9.5 0 0 1 17 4.5z" fill={c.yellow} />
+      <path d="M9.5 17.5q1.4 1.2 2.8 0M15.5 19q1.4 1.2 2.8 0" strokeWidth={1.6} />
+      <path d="M12.5 23q1.2.8 2.4 0" strokeWidth={1.5} />
+      <path d="M21 4h4l-4 4.5h4M26.5 10.5h3l-3 3.5h3" strokeWidth={1.6} />
     </>
   ),
 } satisfies Record<string, ReactNode>;

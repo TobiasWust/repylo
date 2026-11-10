@@ -15,6 +15,7 @@ import { formatDate, monthName } from "../../ui/text";
 import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
+import { DayCard } from "./DayCard";
 
 const tileColors = ["var(--yellow)", "var(--pink)", "var(--mint)", "var(--lavender)", "var(--sky)"];
 
@@ -71,6 +72,8 @@ export const Home = () => {
           <Sticker name="flame" size={26} /> {streak}
         </div>
       </header>
+
+      <DayCard />
 
       <section className="card hero">
         <div className="hero-top">
