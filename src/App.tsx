@@ -1,14 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { importBackup, parseBackup } from "./db/backup";
 import { seedDemo } from "./db/demo";
-import { takePendingImport } from "./db/owner";
+import { parseMnemonic, takeConnectLink, takePendingImport } from "./db/owner";
+import { useEvolu } from "./db/schema";
 import { Body } from "./screens/Body";
 import { ExerciseStats } from "./screens/ExerciseStats";
 import { History } from "./screens/History";
 import { Home } from "./screens/Home";
 import { PlatesSheet } from "./screens/Plates";
 import { ReviewScreen } from "./screens/Review";
-import { Settings } from "./screens/Settings";
+import { ConnectSheet, Settings } from "./screens/Settings";
 import { Stats } from "./screens/Stats";
 import { WorkoutScreen } from "./screens/Workout";
 import { Icon, type IconName } from "./ui/components";
@@ -37,6 +38,21 @@ const PendingImport = () => {
   return null;
 };
 
+/** Opened via a connect link (QR code from another device): offer to connect. */
+const ConnectFromLink = () => {
+  const evolu = useEvolu();
+  const { t } = useApp();
+  const { toast } = useFeedback();
+  const [link, setLink] = useState<string | null>(null);
+  useEffect(() => {
+    const value = takeConnectLink();
+    if (!value) return;
+    if (parseMnemonic(value) === evolu.appOwner.mnemonic) toast(t("Dieses Gerät ist bereits verbunden", "This device is already connected"));
+    else setLink(value);
+  }, [evolu, t, toast]);
+  return link ? <ConnectSheet initialText={link} onClose={() => setLink(null)} /> : null;
+};
+
 const tabs: { tab: Tab; icon: IconName; de: string; en: string }[] = [
   { tab: "home", icon: "home", de: "Start", en: "Home" },
   { tab: "history", icon: "calendar", de: "Verlauf", en: "History" },
@@ -47,6 +63,10 @@ const tabs: { tab: Tab; icon: IconName; de: string; en: string }[] = [
 
 const Shell = () => {
   const { tab, setTab, overlays, t, back } = useApp();
+  // Tells the boot watchdog in index.html that the app rendered.
+  useEffect(() => {
+    document.documentElement.dataset.ready = "1";
+  }, []);
   const top = overlays.at(-1);
   // Full-screen overlays replace the tab content; sheets (plates) float above it.
   const screen = [...overlays].reverse().find((o) => o.type !== "plates");
@@ -54,6 +74,7 @@ const Shell = () => {
   return (
     <>
       <PendingImport />
+      <ConnectFromLink />
       <main className="app">
         {screen?.type === "workout" ? (
           <WorkoutScreen key={screen.id} id={screen.id} />

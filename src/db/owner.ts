@@ -31,8 +31,31 @@ export const loadOrCreateOwner = (): AppOwner => {
   return owner;
 };
 
-/** Normalizes user input (extra spaces, line breaks, capitals) into a valid phrase. */
-export const parseMnemonic = (text: string): Mnemonic | null => {
+const CONNECT_PREFIX = "#connect=";
+
+/**
+ * A link that opens repylo and offers to connect to this device's data. The
+ * phrase lives in the URL fragment (after #), which browsers never send to a
+ * server, so neither the host nor the visit counter sees it.
+ */
+export const connectLink = (mnemonic: string): string =>
+  `${location.origin}${location.pathname}${CONNECT_PREFIX}${mnemonic.split(" ").join("-")}`;
+
+/** Reads a connect link from the address bar once and removes it from the URL and history. */
+export const takeConnectLink = (): string | null => {
+  if (!location.hash.startsWith(CONNECT_PREFIX)) return null;
+  const value = location.hash;
+  history.replaceState(null, "", location.pathname + location.search);
+  return value;
+};
+
+/**
+ * Normalizes user input into a valid phrase: the 24 words with any spacing
+ * or capitals, or a whole connect link (e.g. scanned from the QR code).
+ */
+export const parseMnemonic = (input: string): Mnemonic | null => {
+  const linkIndex = input.indexOf("connect=");
+  const text = linkIndex >= 0 ? decodeURIComponent(input.slice(linkIndex + "connect=".length)).replace(/-/g, " ") : input;
   const normalized = text.trim().toLowerCase().split(/\s+/).join(" ");
   const parsed = Mnemonic.fromUnknown(normalized);
   return parsed.ok ? parsed.value : null;

@@ -1,4 +1,6 @@
+import { createAppOwner, type OwnerSecret } from "@evolu/common";
 import { describe, expect, it } from "vitest";
+import { parseMnemonic } from "../db/owner";
 import { addDays, dayToInput, parseDayInput, today, weekStart } from "./dates";
 import { buildData, type Data, type Rows } from "./model";
 import { calculatePlates } from "./plates";
@@ -292,5 +294,15 @@ describe("date input", () => {
   it("formats for the input in the app's language", () => {
     expect(dayToInput("2026-11-03", "de")).toBe("03.11.2026");
     expect(dayToInput("2026-11-03", "en")).toBe("11/03/2026");
+  });
+});
+
+describe("connect link", () => {
+  const words = createAppOwner(new Uint8Array(32).fill(7) as unknown as OwnerSecret).mnemonic;
+
+  it("reads the phrase from a scanned link, plain words or messy input", () => {
+    expect(parseMnemonic(`https://repylo.example/#connect=${words.split(" ").join("-")}`)).toBe(words);
+    expect(parseMnemonic(`  ${words.toUpperCase().split(" ").join("\n")} `)).toBe(words);
+    expect(parseMnemonic("https://repylo.example/#connect=not-a-phrase")).toBeNull();
   });
 });
