@@ -1742,3 +1742,13 @@ body:has(.overlay-screen) .rest-timer {
 .trend .down {
   color: #b3261e;
 }
+
+.trend-since {
+  font-weight: 600;
+  color: var(--muted);
+}
+.list-hint {
+  margin: -4px 0 10px;
+  color: var(--ink);
+  opacity: 0.75;
+}

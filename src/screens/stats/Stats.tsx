@@ -44,9 +44,10 @@ export const Stats = () => {
         // What "progress" means depends on how the exercise is measured.
         const value = (s: (typeof sessions)[number]) =>
           metric === "time" || metric === "cardio" ? s.maxDuration : s.bestE1rm > 0 ? s.bestE1rm : s.maxReps;
-        const trend = sessions.slice(-12).map(value);
+        const window = sessions.slice(-12);
+        const trend = window.map(value);
         const change = trend.length >= 2 && trend[0]! > 0 ? ((trend.at(-1)! - trend[0]!) / trend[0]!) * 100 : null;
-        return { key, count, best: Math.max(0, ...sessions.map((s) => s.bestE1rm)), trend, change };
+        return { key, count, best: Math.max(0, ...sessions.map((s) => s.bestE1rm)), trend, change, since: window[0]?.date ?? null };
       });
   }, [data]);
 
@@ -196,6 +197,12 @@ export const Stats = () => {
 
       <section>
         <h2 className="section-title">{t("Übungen", "Exercises")}</h2>
+        <p className="hint list-hint">
+          {t(
+            "Kurve und % zeigen die Entwicklung des geschätzten 1RM über deine letzten (bis zu 12) Einheiten.",
+            "Line and % show how your estimated 1RM developed over your last (up to 12) sessions.",
+          )}
+        </p>
         <div className="stack">
           {exercises.map((e) => (
             <button key={e.key} className="card list-card" onClick={() => open({ type: "exercise", key: e.key })}>
@@ -208,10 +215,11 @@ export const Stats = () => {
               </span>
               <span className="trend">
                 <Sparkline values={e.trend} />
-                {e.change !== null && (
+                {e.change !== null && e.since && (
                   <small className={e.change >= 0 ? "up" : "down"}>
                     {e.change >= 0 ? "+" : ""}
-                    {formatNumber(e.change, lang, 0)} %
+                    {formatNumber(e.change, lang, 0)} %{" "}
+                    <span className="trend-since">{t(`seit ${formatDate(e.since, lang)}`, `since ${formatDate(e.since, lang)}`)}</span>
                   </small>
                 )}
               </span>

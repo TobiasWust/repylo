@@ -133,9 +133,9 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
               <span>{t("Einheiten", "Sessions")}</span>
               <strong>{sessions.length}</strong>
             </div>
-            {change !== null && (
+            {change !== null && first && (
               <div className="stat-tile mint">
-                <span>{t("Fortschritt 1RM", "1RM progress")}</span>
+                <span>{t(`1RM seit ${formatDate(first.date, lang)}`, `1RM since ${formatDate(first.date, lang)}`)}</span>
                 <strong>
                   {change >= 0 ? "+" : ""}
                   {formatNumber(change, lang, 1)} %
