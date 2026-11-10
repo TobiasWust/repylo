@@ -15,6 +15,7 @@ import { incrementKg, incrementLb } from "./exercises";
 import { getExercise, goalFor, type Data, type Goal, type TemplateSet } from "./model";
 import { exerciseSessions, type Session } from "./stats";
 import { fromUnit, toUnit } from "./units";
+import { today, weekStart } from "./dates";
 
 export const repRange: Record<Goal, readonly [number, number]> = {
   strength: [3, 6],
@@ -38,6 +39,9 @@ const isDeclining = (sessions: readonly Session[]): boolean => {
   return recent[0]! > recent[1]! && recent[1]! > recent[2]! && recent[2]! > recent[3]!;
 };
 
+/** Is `day` inside the deload week the user started? */
+export const isDeloadWeek = (data: Data, day: string = today()): boolean => data.settings.deloadWeek === weekStart(day);
+
 export const suggestProgression = (data: Data, exerciseKey: string, beforeWorkoutId?: string): Progression | null => {
   const sessions = exerciseSessions(data, exerciseKey, beforeWorkoutId);
   const last = sessions.at(-1);
@@ -57,6 +61,14 @@ export const suggestProgression = (data: Data, exerciseKey: string, beforeWorkou
   const top = last.topWeight;
   const inc = unit === "kg" ? incrementKg[exercise.equipment] : incrementLb[exercise.equipment];
   const step = unit === "kg" ? 0.5 : 1;
+
+  // A planned deload week: ~90 % weight and one set fewer, to recover on purpose.
+  const day = data.workouts.find((w) => w.id === beforeWorkoutId)?.date ?? today();
+  if (isDeloadWeek(data, day) && top > 0) {
+    const weight = fromUnit(roundTo(toUnit(top, unit) * 0.9, step), unit);
+    const sets = last.sets.slice(0, Math.max(2, last.sets.length - 1));
+    return { kind: "deload", last, sets: sets.map((s) => ({ ...copy(s), weight, reps: min })) };
+  }
 
   const belowRange = (session: Session | undefined) => !!session && session.sets.every((s) => (s.reps ?? 0) < min);
   const stuckBelowRange = belowRange(last) && belowRange(sessions.at(-2)) && sessions.at(-2)!.topWeight >= top;

@@ -84,6 +84,8 @@ export interface Settings {
   readonly standards: Standards | null;
   /** Pre-fill new sets with last time's values or with the progression target. */
   readonly prefill: Prefill;
+  /** Monday of the last planned deload week, if any. */
+  readonly deloadWeek: string | null;
 }
 
 export type Prefill = "last" | "target";
@@ -143,6 +145,7 @@ export interface Rows {
     weeklyGoal: number;
     standards: string;
     prefill: string;
+    deloadWeek: string;
   }>[];
   readonly exerciseSettings: readonly Nullable<{ exerciseKey: string; goal: string }>[];
   readonly dismissals: readonly Nullable<{ key: string; until: number }>[];
@@ -252,6 +255,7 @@ export const buildData = (rows: Rows): Data => {
     weeklyGoal: Math.min(7, Math.max(1, s?.weeklyGoal ?? 3)),
     standards: s?.standards === "male" || s?.standards === "female" ? s.standards : null,
     prefill: s?.prefill === "target" ? "target" : "last",
+    deloadWeek: s?.deloadWeek ?? null,
   };
 
   const exerciseGoals = new Map<string, Goal>();

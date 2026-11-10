@@ -3,12 +3,12 @@
  * the user's own history. Each rule produces at most a few cards; the home
  * screen shows the top three by priority.
  */
-import { addDays, daysBetween, today } from "./dates";
+import { addDays, daysBetween, today, weekStart } from "./dates";
 import { builtinExercises, type Exercise, type Muscle } from "./exercises";
 import { getExercise, type Data } from "./model";
-import { exerciseSessions, hasValue, majorMuscles, setsPerMuscle, weeklySetTarget } from "./stats";
+import { exerciseSessions, hasValue, majorMuscles, setsPerMuscle, trainedDays, weeklySetTarget } from "./stats";
 
-export type SuggestionKind = "split" | "neglected" | "missing" | "imbalance" | "plateau";
+export type SuggestionKind = "split" | "neglected" | "missing" | "imbalance" | "plateau" | "deload";
 
 export interface Suggestion {
   /** Stable identity used for dismissing. */
@@ -191,9 +191,34 @@ const plateauRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): 
   return result.sort((a, b) => b.priority - a.priority).slice(0, 1);
 };
 
+/** After this many training weeks in a row, a planned easier week helps recovery. */
+export const deloadAfterWeeks = 6;
+
+/**
+ * Consecutive weeks with training, counted back from last week and stopping
+ * at the last planned deload week.
+ */
+export const weeksSinceDeload = (data: Data, now: string): number => {
+  const perWeek = new Set([...trainedDays(data)].map(weekStart));
+  let week = addDays(weekStart(now), -7);
+  let count = 0;
+  while (perWeek.has(week) && week !== data.settings.deloadWeek) {
+    count++;
+    week = addDays(week, -7);
+  }
+  return count;
+};
+
+const deloadRule = (data: Data, now: string): Suggestion[] => {
+  const weeks = weeksSinceDeload(data, now);
+  if (weeks < deloadAfterWeeks || data.settings.deloadWeek === weekStart(now)) return [];
+  return [{ key: `deload:${weekStart(now)}`, kind: "deload", priority: 93, exerciseKeys: [], params: { weeks } }];
+};
+
 export const computeSuggestions = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion[] => {
   const recovering = recoveringMuscles(data, now);
   return [
+    ...deloadRule(data, now),
     ...splitRule(data, now),
     ...neglectedRule(data, now, recovering),
     ...missingRule(data, now, recovering),

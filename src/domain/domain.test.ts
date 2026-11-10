@@ -11,7 +11,7 @@ import { monthlyReview } from "./review";
 import { rate } from "./standards";
 import { suggestProgression } from "./progression";
 import { detectPrs, e1rm, exerciseSessions, records, setsPerMuscle, weekStreak } from "./stats";
-import { computeSuggestions, recoveringMuscles } from "./suggestions";
+import { computeSuggestions, recoveringMuscles, weeksSinceDeload } from "./suggestions";
 
 // --- Tiny builder for test histories -------------------------------------
 
@@ -30,7 +30,7 @@ const build = (workouts: WorkoutSpec[], extra: Partial<Rows> = {}): Data => {
     templates: [],
     customExercises: [],
     bodyWeights: [],
-    settings: [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 1, standards: "male", prefill: "last" }],
+    settings: [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 1, standards: "male", prefill: "last", deloadWeek: null }],
     exerciseSettings: [],
     dismissals: [],
     ...extra,
@@ -379,5 +379,25 @@ describe("plan assistant", () => {
       expect(new Set(keys).size).toBe(keys.length);
       expect(plan.items[0]!.sets[0]!.reps).toBe(20);
     }
+  });
+});
+
+describe("planned deload", () => {
+  const sevenWeeks: WorkoutSpec[] = Array.from({ length: 7 }, (_, i) => ({ daysAgo: 7 * (i + 1), exercises: { squat: [[100, 8], [100, 8], [100, 8]] } }));
+
+  it("suggests a deload week after six training weeks in a row", () => {
+    const data = build(sevenWeeks);
+    expect(weeksSinceDeload(data, today())).toBeGreaterThanOrEqual(6);
+    expect(computeSuggestions(data).some((s) => s.kind === "deload")).toBe(true);
+  });
+
+  it("makes suggestions lighter during the deload week", () => {
+    const settings = [{ goal: "hypertrophy", unit: "kg", language: "de", restSeconds: 90, barWeight: 20, weeklyGoal: 3, standards: null, prefill: "last", deloadWeek: weekStart(today()) }];
+    const data = build(sevenWeeks, { settings: settings as unknown as Rows["settings"] });
+    const p = suggestProgression(data, "squat")!;
+    expect(p.kind).toBe("deload");
+    expect(p.sets).toHaveLength(2);
+    expect(p.sets[0]!.weight).toBe(90);
+    expect(computeSuggestions(data).some((s) => s.kind === "deload")).toBe(false);
   });
 });

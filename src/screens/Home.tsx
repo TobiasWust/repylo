@@ -10,6 +10,7 @@ import { PlanSheet } from "../ui/PlanSheet";
 import { Icon } from "../ui/components";
 import { Sticker, type StickerName } from "../ui/stickers";
 import { previousMonth } from "../domain/review";
+import { isDeloadWeek } from "../domain/progression";
 import { useApp, type App } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
 import { formatDate, monthName, muscleName } from "../ui/text";
@@ -22,8 +23,9 @@ const cardColors: Record<Suggestion["kind"], string> = {
   missing: "var(--lavender)",
   imbalance: "var(--mint)",
   plateau: "var(--sky)",
+  deload: "var(--lavender)",
 };
-const cardSticker: Record<Suggestion["kind"], StickerName> = { split: "repeat", neglected: "target", missing: "hourglass", imbalance: "balance", plateau: "chartUp" };
+const cardSticker: Record<Suggestion["kind"], StickerName> = { split: "repeat", neglected: "target", missing: "hourglass", imbalance: "balance", plateau: "chartUp", deload: "scale" };
 
 const suggestionText = (s: Suggestion, app: App): { title: string; text: string } => {
   const { t, lang, data, exerciseName } = app;
@@ -59,6 +61,14 @@ const suggestionText = (s: Suggestion, app: App): { title: string; text: string 
         : t("Beinbeuger- vs. Quadrizeps-", "Hamstring vs. quad");
       return { title, text: t(`${what}sätze in 14 Tagen: ${p.more} zu ${p.less}.`, `${what} sets in 14 days: ${p.more} to ${p.less}.`) };
     }
+    case "deload":
+      return {
+        title: t("Zeit für eine leichtere Woche", "Time for an easier week"),
+        text: t(
+          `Du trainierst seit ${p.weeks} Wochen am Stück. Eine Deload-Woche mit etwas weniger Gewicht und einem Satz weniger lässt Muskeln und Gelenke aufholen – danach geht's stärker weiter.`,
+          `You've trained ${p.weeks} weeks in a row. A deload week with a bit less weight and one set fewer lets muscles and joints catch up – you'll come back stronger.`,
+        ),
+      };
     case "plateau":
       return {
         title: t(`Plateau bei ${ex(p.exercise)}`, `Plateau on ${ex(p.exercise)}`),
@@ -83,6 +93,11 @@ const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
   };
 
   const accept = () => {
+    if (suggestion.kind === "deload") {
+      actions.updateSettings({ deloadWeek: weekStart(today()) });
+      toast(t("Deload-Woche gestartet – die Vorschläge sind diese Woche leichter", "Deload week started – suggestions are lighter this week"));
+      return;
+    }
     const template = data.templates.find((x) => x.id === suggestion.templateId);
     const workout = ensureTodayWorkout(data, actions, template?.id ?? null);
     const already = new Set(workout.exercises.map((e) => e.exerciseKey));
@@ -127,7 +142,7 @@ const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
         </button>
       </div>
       <p>{text}</p>
-      <div className="chips">
+      <div className="chips" hidden={suggestion.exerciseKeys.length === 0}>
         {suggestion.exerciseKeys.slice(0, 4).map((k) => (
           <span key={k} className="chip static">
             {exerciseName(getExercise(data, k))}
@@ -136,7 +151,13 @@ const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
         {suggestion.exerciseKeys.length > 4 && <span className="chip static">+{suggestion.exerciseKeys.length - 4}</span>}
       </div>
       <button className="button dark full" onClick={accept}>
-        <Icon name="plus" size={18} /> {t("Ins heutige Training übernehmen", "Add to today’s workout")}
+        {suggestion.kind === "deload" ? (
+          t("Deload-Woche starten", "Start deload week")
+        ) : (
+          <>
+            <Icon name="plus" size={18} /> {t("Ins heutige Training übernehmen", "Add to today’s workout")}
+          </>
+        )}
       </button>
     </div>
   );
@@ -226,6 +247,7 @@ export const Home = () => {
               <small> / {goal}</small>
             </div>
             <div className="hero-label">
+              {isDeloadWeek(data) && <strong>{t("Deload-Woche · ", "Deload week · ")}</strong>}
               {daysThisWeek >= goal
                 ? t("Wochenziel geschafft!", "Weekly goal reached!")
                 : t(`Noch ${goal - daysThisWeek} ${goal - daysThisWeek === 1 ? "Trainingstag" : "Trainingstage"}`, `${goal - daysThisWeek} more training ${goal - daysThisWeek === 1 ? "day" : "days"} to go`)}

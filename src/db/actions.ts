@@ -208,6 +208,7 @@ export const createActions = (evolu: AppEvolu) => {
       weeklyGoal?: number;
       standards?: Standards;
       prefill?: Prefill;
+      deloadWeek?: string;
     }) =>
       evolu.upsert("settings", {
         id: settingsId,
@@ -219,6 +220,7 @@ export const createActions = (evolu: AppEvolu) => {
         ...(values.weeklyGoal !== undefined && { weeklyGoal: int(values.weeklyGoal) }),
         ...(values.standards && { standards: Text40.orThrow(values.standards) }),
         ...(values.prefill && { prefill: Text40.orThrow(values.prefill) }),
+        ...(values.deloadWeek && { deloadWeek: Text40.orThrow(values.deloadWeek) }),
       }),
 
     setExerciseGoal: (exerciseKey: string, goal: Goal | null) =>
