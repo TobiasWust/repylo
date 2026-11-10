@@ -9,6 +9,8 @@ import { useApp, type App } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
 import { muscleName } from "../../ui/text";
 import { ensureTodayWorkout, initialSets, templateItems } from "../../ui/workoutOps";
+import type { BalanceKey } from "../../domain/balance";
+import { balanceSides } from "../../ui/balance";
 
 const cardColors: Record<Suggestion["kind"], string> = {
   split: "var(--yellow)",
@@ -50,24 +52,15 @@ const suggestionText = (s: Suggestion, app: App): { title: string; text: string 
         text: t(`${ex(p.exercise)} seit ${p.days} Tagen nicht mehr.`, `${ex(p.exercise)}: ${p.days} days ago.`),
       };
     case "imbalance": {
-      const side = String(p.side);
-      const title =
-        side === "pull"
-          ? t("Mehr ziehen", "More pulling")
-          : side === "push"
-            ? t("Mehr drücken", "More pushing")
-            : side === "hamstrings"
-              ? t("Beinbeuger ausgleichen", "Balance your hamstrings")
-              : t("Quadrizeps ausgleichen", "Balance your quads");
-      const what =
-        side === "pull"
-          ? t("Drück- vs. Zug", "Push vs. pull")
-          : side === "push"
-            ? t("Zug- vs. Drück", "Pull vs. push")
-            : side === "hamstrings"
-              ? t("Quadrizeps- vs. Beinbeuger-", "Quad vs. hamstring")
-              : t("Beinbeuger- vs. Quadrizeps-", "Hamstring vs. quad");
-      return { title, text: t(`${what}sätze in 14 Tagen: ${p.more} zu ${p.less}.`, `${what} sets in 14 days: ${p.more} to ${p.less}.`) };
+      const [l, r] = balanceSides[p.pair as BalanceKey];
+      const weak = p.side === "left" ? l : r;
+      return {
+        title: t(`Mehr ${weak.de}`, `More ${weak.en.toLowerCase()}`),
+        text: t(
+          `${l.de} vs. ${r.de} in 14 Tagen: ${p.left} zu ${p.right} Sätze.`,
+          `${l.en} vs. ${r.en.toLowerCase()} in 14 days: ${p.left} to ${p.right} sets.`,
+        ),
+      };
     }
     case "deload":
       return {

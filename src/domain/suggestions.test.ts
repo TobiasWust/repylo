@@ -152,4 +152,15 @@ describe("planned deload", () => {
     expect(p.sets[0]!.weight).toBe(90);
     expect(computeSuggestions(data).some((s) => s.kind === "deload")).toBe(false);
   });
+
+  it("suggests the weaker side of any balance pair, e.g. rear delts", () => {
+    const sets = (n: number): [number, number][] => Array.from({ length: n }, () => [30, 10]);
+    const data = build([
+      { daysAgo: 4, exercises: { overhead_press: sets(5), lat_pulldown: sets(5) } },
+      { daysAgo: 8, exercises: { overhead_press: sets(5), lat_pulldown: sets(5), face_pull: sets(1) } },
+    ]);
+    const s = computeSuggestions(data).find((x) => x.key === "imbalance:frontRearDelts:right");
+    expect(s?.params).toMatchObject({ pair: "frontRearDelts", side: "right" });
+    expect(s?.exerciseKeys).toContain("face_pull");
+  });
 });

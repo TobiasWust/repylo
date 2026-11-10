@@ -3,7 +3,7 @@
  * …) over the last two weeks and reports only the pairs that are off.
  */
 import { addDays, today } from "./dates";
-import type { Muscle } from "./exercises";
+import type { Exercise, Muscle } from "./exercises";
 import { getExercise, type Data } from "./model";
 import { hasValue, setsPerMuscle } from "./stats";
 
@@ -73,6 +73,13 @@ export const balanceChecks = (data: Data, days = 14, to: string = today()): Bala
     const weaker = factor > pair.tolerance ? (ratio > 1 ? "right" : "left") : null;
     return [{ key: pair.key, left, right, ideal: pair.ideal, factor, weaker }];
   });
+};
+
+/** Whether an exercise mainly trains the given side of a pair. */
+export const trainsSide = (key: BalanceKey, side: "left" | "right"): ((e: Exercise) => boolean) => {
+  const pair = pairs.find((x) => x.key === key)!;
+  const target = side === "left" ? pair.left : pair.right;
+  return typeof target === "string" ? (e) => e.pattern === target : (e) => e.primary.some((m) => target.includes(m));
 };
 
 /** Only the pairs that are off, worst first. */

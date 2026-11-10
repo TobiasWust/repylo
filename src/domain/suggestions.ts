@@ -3,6 +3,7 @@
  * the user's own history. Each rule produces at most a few cards; the home
  * screen shows the top three by priority.
  */
+import { balanceChecks, imbalances, trainsSide } from "./balance";
 import { addDays, daysBetween, today, weekStart } from "./dates";
 import { builtinExercises, type Exercise, type Muscle } from "./exercises";
 import { getExercise, type Data } from "./model";
@@ -135,47 +136,21 @@ const missingRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): 
   ];
 };
 
-const imbalanceRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): Suggestion[] => {
-  const from = addDays(now, -13);
-  let push = 0,
-    pull = 0;
-  for (const w of data.workouts) {
-    if (w.date < from) continue;
-    for (const e of w.exercises) {
-      const n = e.sets.filter(hasValue).length;
-      const pattern = getExercise(data, e.exerciseKey).pattern;
-      if (pattern === "push") push += n;
-      if (pattern === "pull") pull += n;
-    }
-  }
-  const result: Suggestion[] = [];
-  const ratioCard = (
-    key: string,
-    more: number,
-    less: number,
-    target: (e: Exercise) => boolean,
-    params: Record<string, string | number>,
-  ) => {
-    if (more < 6 || more <= less * 1.5) return;
-    const exerciseKeys = pickExercises(data, target, recovering, 2);
-    if (exerciseKeys.length === 0) return;
-    result.push({
-      key,
-      kind: "imbalance",
-      priority: 65 + Math.min(more / Math.max(less, 1), 4) * 3,
-      exerciseKeys,
-      params: { ...params, more: Math.round(more), less: Math.round(less) },
-    });
-  };
-  ratioCard("imbalance:pull", push, pull, (e) => e.pattern === "pull", { side: "pull" });
-  ratioCard("imbalance:push", pull, push, (e) => e.pattern === "push", { side: "push" });
-  const muscles = setsPerMuscle(data, from, now);
-  const quads = muscles.get("quads") ?? 0,
-    hams = muscles.get("hamstrings") ?? 0;
-  ratioCard("imbalance:hamstrings", quads, hams, (e) => e.primary.includes("hamstrings"), { side: "hamstrings" });
-  ratioCard("imbalance:quads", hams, quads, (e) => e.primary.includes("quads"), { side: "quads" });
-  return result;
-};
+const imbalanceRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): Suggestion[] =>
+  imbalances(balanceChecks(data, 14, now)).flatMap((c) => {
+    const side = c.weaker!;
+    const exerciseKeys = pickExercises(data, trainsSide(c.key, side), recovering, 2);
+    if (exerciseKeys.length === 0) return [];
+    return [
+      {
+        key: `imbalance:${c.key}:${side}`,
+        kind: "imbalance" as const,
+        priority: 65 + Math.min(c.factor, 4) * 3,
+        exerciseKeys,
+        params: { pair: c.key, side, left: Math.round(c.left), right: Math.round(c.right) },
+      },
+    ];
+  });
 
 const plateauRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>): Suggestion[] => {
   const result: Suggestion[] = [];
