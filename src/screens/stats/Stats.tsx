@@ -22,7 +22,7 @@ import { StrengthOverview } from "../../ui/StrengthLevel";
 import { ReadinessCard } from "./ReadinessCard";
 import { Heatmap } from "./Heatmap";
 import { BodyCard } from "./BodyCard";
-import { RatioBar } from "./RatioBar";
+import { BalanceCard } from "./BalanceCard";
 
 export const Stats = () => {
   const { t, data, lang, open, exerciseName, weight } = useApp();
@@ -30,7 +30,6 @@ export const Stats = () => {
   const weeks = useMemo(() => weeklyVolume(data, 12), [data]);
   const perWeek = useMemo(() => workoutsPerWeek(data), [data]);
   const last7 = useMemo(() => setsPerMuscle(data, addDays(today(), -6)), [data]);
-  const last14 = useMemo(() => setsPerMuscle(data, addDays(today(), -13)), [data]);
   const prs = useMemo(() => recentPrs(data, 6), [data]);
   const unit = data.settings.unit;
   const [target, upper] = weeklySetTarget[data.settings.goal];
@@ -64,16 +63,6 @@ export const Stats = () => {
       </div>
     );
 
-  const pushPull = { push: 0, pull: 0 };
-  for (const w of data.workouts) {
-    if (w.date < addDays(today(), -13)) continue;
-    for (const e of w.exercises) {
-      const n = e.sets.filter(hasValue).length;
-      const p = getExercise(data, e.exerciseKey).pattern;
-      if (p === "push") pushPull.push += n;
-      if (p === "pull") pushPull.pull += n;
-    }
-  }
   const totalWorkouts = data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).length;
   const totalVolume = data.workouts.reduce(
     (sum, w) => sum + w.exercises.reduce((s, e) => s + e.sets.reduce((v, x) => v + (x.weight ?? 0) * (x.reps ?? 0), 0), 0),
@@ -154,16 +143,7 @@ export const Stats = () => {
         </div>
       </section>
 
-      <section className="card">
-        <h2 className="card-title">{t("Balance (14 Tage)", "Balance (14 days)")}</h2>
-        <RatioBar left={pushPull.push} right={pushPull.pull} leftLabel={t("Drücken", "Push")} rightLabel={t("Ziehen", "Pull")} />
-        <RatioBar
-          left={last14.get("quads") ?? 0}
-          right={last14.get("hamstrings") ?? 0}
-          leftLabel={t("Quadrizeps", "Quads")}
-          rightLabel={t("Beinbeuger", "Hamstrings")}
-        />
-      </section>
+      <BalanceCard />
 
       <ReadinessCard />
 

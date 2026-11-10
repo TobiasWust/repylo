@@ -1093,6 +1093,7 @@ textarea.text-input {
   color: #b3261e;
 }
 .ratio-bar {
+  position: relative;
   height: 18px;
   border: 2px solid var(--ink);
   border-radius: 999px;
@@ -1103,6 +1104,28 @@ textarea.text-input {
   height: 100%;
   background: var(--pink);
   border-right: 2px solid var(--ink);
+}
+/* Where the bar would split if the pair were perfectly balanced. */
+.ratio-ideal {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: 0;
+  border-left: 2px dashed var(--ink);
+  opacity: 0.45;
+}
+.balance-pair + .balance-pair {
+  margin-top: 10px;
+}
+.balance-pair .hint {
+  margin: 2px 0 0;
+}
+.balance-ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-weight: 700;
 }
 .pr-line {
   display: grid;
