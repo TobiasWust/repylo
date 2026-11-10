@@ -18,7 +18,6 @@ import {
 } from "@evolu/common";
 
 const MNEMONIC_KEY = "repylo.mnemonic";
-const RELAY_KEY = "repylo.relay";
 const PENDING_IMPORT_KEY = "repylo.pendingImport";
 
 export const loadOrCreateOwner = (): AppOwner => {
@@ -77,16 +76,17 @@ export const takePendingImport = (): string | null => {
   return value;
 };
 
-export const getRelayUrl = (): string => localStorage.getItem(RELAY_KEY) ?? "";
-
-export const setRelayUrl = (url: string): void => {
-  if (url.trim()) localStorage.setItem(RELAY_KEY, url.trim());
-  else localStorage.removeItem(RELAY_KEY);
-  location.reload();
-};
-
-/** Undefined means Evolu's default relay. */
+/**
+ * Sync relays are chosen by whoever deploys repylo, not by users: set
+ * VITE_RELAY_URL (one or more wss:// URLs, comma-separated) at build time.
+ * Undefined means Evolu's default relay.
+ */
 export const getTransports = (): ReadonlyArray<OwnerTransport> | undefined => {
-  const url = WebSocketUrl.fromUnknown(getRelayUrl());
-  return url.ok ? [{ type: "WebSocket", url: url.value }] : undefined;
+  const configured = (import.meta.env.VITE_RELAY_URL ?? "").split(",").map((u: string) => u.trim()).filter(Boolean);
+  const transports: OwnerTransport[] = [];
+  for (const raw of configured) {
+    const url = WebSocketUrl.fromUnknown(raw);
+    if (url.ok) transports.push({ type: "WebSocket", url: url.value });
+  }
+  return transports.length > 0 ? transports : undefined;
 };

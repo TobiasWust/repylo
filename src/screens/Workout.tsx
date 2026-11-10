@@ -456,7 +456,7 @@ const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose: () =>
       {sources.length === 0 && (
         <p className="hint">
           {source === "templates"
-            ? t("Noch keine Vorlagen. Speichere ein Training als Vorlage oder lege in den Einstellungen den EGYM-Zirkel an.", "No templates yet. Save a workout as a template, or create the EGYM circuit in settings.")
+            ? t("Noch keine Vorlagen. Speichere ein Training als Vorlage oder lass dir unter Mehr → Vorlagen einen Trainingsplan erstellen.", "No templates yet. Save a workout as a template, or create a training plan under More → Templates.")
             : t("Noch keine früheren Trainings.", "No past workouts yet.")}
         </p>
       )}

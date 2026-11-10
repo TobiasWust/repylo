@@ -4,6 +4,7 @@
  * horizontal push, …); each place maps a slot to two exercise options, so
  * A and B days get variety without extra rules.
  */
+import { egymCircuit } from "./exercises";
 import { getExercise, type Data, type Goal, type Language, type TemplateItem } from "./model";
 
 export type Place = "gym" | "egym" | "home";
@@ -144,4 +145,32 @@ export const generatePlan = (data: Data, days: number, place: Place, goal: Goal,
       }),
     };
   });
+};
+
+/** Order of a full-body circuit: alternate upper and lower body so muscles recover while you move on. */
+const circuitSlots: readonly Slot[] = ["squat", "hpush", "vpull", "hinge", "vpush", "hpull", "quads", "chestIso", "hams", "biceps", "glutes", "triceps", "core"];
+
+/**
+ * Circuit training: one full-body round, exercises back to back with short
+ * rests, repeated for three rounds. Works anywhere; on EGYM it follows the
+ * usual 12-machine order.
+ */
+export const generateCircuit = (data: Data, place: Place, goal: Goal, lang: Language): PlannedTemplate => {
+  const keys =
+    place === "egym"
+      ? egymCircuit.filter((k) => data.exercises.has(k))
+      : circuitSlots.map((slot) => options[place][slot]?.[0]).filter((k): k is string => !!k && data.exercises.has(k));
+  const unique = [...new Set(keys)];
+  // Circuits use lighter weights and more reps; EGYM's standard is 3 × 20.
+  const reps = place === "egym" ? 20 : goal === "strength" ? 10 : 15;
+  return {
+    name: lang === "de" ? "Zirkeltraining" : "Circuit",
+    items: unique.map((exerciseKey) => {
+      const timed = getExercise(data, exerciseKey).metric === "time";
+      return {
+        exerciseKey,
+        sets: Array.from({ length: 3 }, () => ({ weight: null, reps: timed ? null : reps, duration: timed ? 30 : null, distance: null })),
+      };
+    }),
+  };
 };

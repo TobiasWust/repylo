@@ -8,7 +8,7 @@ Ende-zu-Ende-verschlüsselt zwischen deinen Geräten synchronisiert ([Evolu](htt
 
 - **Training erfassen:** „Training starten“ → Übungen (ca. 120 + 19 EGYM-Maschinen, filterbar nach Gerät und Muskel) oder eigene Übungen/Maschinen → Sätze mit Gewicht × Wdh., Zeit oder Strecke, Kommentar pro Übung und pro Training
 - **Übernehmen:** beliebiges früheres Training oder eine Vorlage (Split) übernehmen, einzelne Übungen abwählbar
-- **Vorlagen/Splits:** Training als Vorlage speichern; die Reihenfolge bestimmt den Split-Rhythmus. Fertiger **EGYM-Zirkel** (3 × 20) per Tipp
+- **Vorlagen/Splits:** Training als Vorlage speichern; die Reihenfolge bestimmt den Split-Rhythmus. Trainingsplan-Assistent: Split (2–6 Tage) oder Zirkeltraining, jeweils für Studio, EGYM oder Zuhause
 - **Progression (lokal, regelbasiert):** Double Progression je nach Ziel (Kraft 3–6, Aufbau 8–12, Ausdauer 15–20 Wdh.); mehr Gewicht erst, wenn alle Sätze oben im Bereich sind; Deload bei Leistungsabfall
 - **Vorschlagskarten auf dem Startbildschirm** (wegwischbar, kommen 4 Tage nicht wieder):
   Split-Rhythmus · vernachlässigte Muskelgruppen · lange nicht gemacht · Erholung (48 h) · Drücken/Ziehen- und Quad/Beinbeuger-Balance · Plateau → Variante
@@ -27,7 +27,8 @@ Schlüssel zu allen Daten — gut aufbewahren, niemandem zeigen.
 Synchronisiert wird über ein Relay, das nur verschlüsselte Daten sieht. Standard ist
 Evolus kostenloses **Test-Relay** (kann Daten löschen; die Geräte behalten ihre Kopie).
 Für den Dauerbetrieb oder wenn andere die App nutzen sollen: eigenes
-[Evolu-Relay](https://www.evolu.dev/docs/relay) hosten und unter Mehr → Eigenes Relay eintragen.
+[Evolu-Relay](https://www.evolu.dev/docs/relay) hosten und beim Build die Umgebungsvariable
+`VITE_RELAY_URL` setzen (z. B. in Netlify; mehrere Relays mit Komma getrennt).
 
 ## Statistik
 

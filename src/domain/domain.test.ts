@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import { parseMnemonic } from "../db/owner";
 import { initialSets } from "../ui/workoutOps";
 import { addDays, dayToInput, parseDayInput, today, weekStart } from "./dates";
-import { buildData, type Data, type Rows } from "./model";
+import { buildData, getExercise, type Data, type Rows } from "./model";
 import { calculatePlates } from "./plates";
 import { setFeedback, workoutSummary } from "./coach";
-import { generatePlan } from "./planner";
+import { generateCircuit, generatePlan } from "./planner";
+import { egymCircuit } from "./exercises";
 import { readinessOf } from "./readiness";
 import { tipsFor } from "./tips";
 import { estimateStart } from "./estimate";
@@ -451,5 +452,19 @@ describe("start estimates", () => {
 
   it("pre-fills new exercises with the estimate", () => {
     expect(initialSets(build([]), "lat_pulldown")[0]!.weight).toBeGreaterThan(0);
+  });
+});
+
+describe("circuit plans", () => {
+  const data = build([]);
+  it("builds a full-body circuit for every place", () => {
+    const gym = generateCircuit(data, "gym", "hypertrophy", "de");
+    expect(gym.name).toBe("Zirkeltraining");
+    expect(gym.items.length).toBeGreaterThanOrEqual(10);
+    expect(gym.items[0]!.sets[0]!.reps).toBe(15);
+    expect(generateCircuit(data, "home", "hypertrophy", "de").items.every((i) => !getExercise(data, i.exerciseKey).equipment.match(/machine|cable|egym/))).toBe(true);
+    const egym = generateCircuit(data, "egym", "hypertrophy", "en");
+    expect(egym.items.map((i) => i.exerciseKey)).toEqual(egymCircuit);
+    expect(egym.items[0]!.sets[0]!.reps).toBe(20);
   });
 });

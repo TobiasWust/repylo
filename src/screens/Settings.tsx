@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { createBackup, downloadJson, hasContent, importBackup, parseBackup } from "../db/backup";
-import { connectLink, getRelayUrl, parseMnemonic, setRelayUrl, switchOwner } from "../db/owner";
+import { connectLink, parseMnemonic, switchOwner } from "../db/owner";
 import { useEvolu, useOwnerSyncStatus } from "../db/schema";
 import { today } from "../domain/dates";
 import { defaultRest, type Goal } from "../domain/model";
@@ -192,11 +192,9 @@ export const Settings = () => {
   const { toast } = useFeedback();
   const [sheet, setSheet] = useState<"share" | "connect" | null>(null);
   const [plan, setPlan] = useState(false);
-  const [relay, setRelay] = useState(getRelayUrl());
   const fileInput = useRef<HTMLInputElement>(null);
   const s = data.settings;
   const customExercises = [...data.exercises.values()].filter((e) => e.custom);
-  const hasEgymTemplate = data.templates.some((x) => x.name === "EGYM-Zirkel");
 
   return (
     <div className="screen">
@@ -221,21 +219,6 @@ export const Settings = () => {
             <Icon name="camera" /> {t("Gerät verbinden", "Connect device")}
           </button>
         </div>
-        <details>
-          <summary>{t("Eigenes Relay", "Custom relay")}</summary>
-          <p className="hint">
-            {t(
-              "Standard ist das kostenlose Test-Relay von Evolu. Für dauerhaften Betrieb kannst du ein eigenes Evolu-Relay hosten und hier eintragen.",
-              "The default is Evolu’s free test relay. For long-term use, host your own Evolu relay and enter it here.",
-            )}
-          </p>
-          <div className="row gap">
-            <input className="text-input grow" placeholder="wss://relay.example.com" value={relay} onChange={(e) => setRelay(e.target.value)} />
-            <button className="button small" onClick={() => setRelayUrl(relay)}>
-              {t("Speichern", "Save")}
-            </button>
-          </div>
-        </details>
       </section>
 
       <InstallCard always />
@@ -337,19 +320,8 @@ export const Settings = () => {
           ))}
         </div>
         <button className="button full" onClick={() => setPlan(true)}>
-          <Sticker name="calendar" size={22} /> {t("Trainingsplan erstellen lassen", "Create a training plan")}
+          <Sticker name="calendar" size={22} /> {t("Trainingsplan oder Zirkel erstellen lassen", "Create a training plan or circuit")}
         </button>
-        {!hasEgymTemplate && (
-          <button
-            className="button full dashed"
-            onClick={() => {
-              actions.createEgymTemplate(data);
-              toast(t("EGYM-Zirkel angelegt", "EGYM circuit created"));
-            }}
-          >
-            <Icon name="plus" size={18} /> {t("EGYM-Zirkel als Vorlage anlegen", "Create EGYM circuit template")}
-          </button>
-        )}
       </section>
 
       {customExercises.length > 0 && (

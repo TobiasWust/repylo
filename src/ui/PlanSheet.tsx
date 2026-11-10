@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getExercise } from "../domain/model";
-import { generatePlan, type Place } from "../domain/planner";
+import { generateCircuit, generatePlan, type Place } from "../domain/planner";
 import { Icon, Segmented, Sheet } from "./components";
 import { useApp } from "./context";
 import { useFeedback } from "./feedback";
@@ -13,7 +13,9 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
   const [days, setDays] = useState(String(Math.min(6, Math.max(2, data.settings.weeklyGoal))));
   const [place, setPlace] = useState<Place>("gym");
   const [replace, setReplace] = useState(true);
-  const plan = generatePlan(data, Number(days), place, data.settings.goal, lang);
+  const [style, setStyle] = useState<"split" | "circuit">("split");
+  const plan =
+    style === "circuit" ? [generateCircuit(data, place, data.settings.goal, lang)] : generatePlan(data, Number(days), place, data.settings.goal, lang);
 
   return (
     <Sheet title={t("Trainingsplan erstellen", "Create a training plan")} onClose={onClose}>
@@ -22,6 +24,27 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
           `Für dein Ziel „${goalName(data.settings.goal, lang)}“ (änderbar unter Mehr → Training). Der Plan wird als Vorlagen gespeichert, „Als Nächstes dran“ führt dich dann durch.`,
           `For your goal “${goalName(data.settings.goal, lang)}” (change it under More → Training). The plan is saved as templates; “Up next” then guides you through.`,
         )}
+      </p>
+      <div className="field-label">{t("Art", "Type")}</div>
+      <Segmented
+        value={style}
+        onChange={(next) => {
+          setStyle(next);
+          // A circuit is usually added next to an existing split, a new split replaces the old one.
+          setReplace(next === "split");
+        }}
+        options={[
+          { value: "split", label: t("Split", "Split") },
+          { value: "circuit", label: t("Zirkel", "Circuit") },
+        ]}
+      />
+      <p className="hint">
+        {style === "split"
+          ? t("Verschiedene Trainingstage im Wechsel, z. B. Oberkörper und Unterkörper.", "Different training days in rotation, e.g. upper and lower body.")
+          : t(
+              "Ein Ganzkörper-Durchgang: alle Übungen direkt nacheinander mit kurzen Pausen, insgesamt 3 Runden. Gut bei wenig Zeit und für Gerätezirkel.",
+              "One full-body round: all exercises back to back with short rests, 3 rounds in total. Great when short on time and for machine circuits.",
+            )}
       </p>
       <div className="field-label">{t("Trainingstage pro Woche", "Training days per week")}</div>
       <Segmented value={days} onChange={setDays} options={["2", "3", "4", "5", "6"].map((v) => ({ value: v, label: v }))} />

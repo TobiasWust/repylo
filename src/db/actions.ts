@@ -10,7 +10,6 @@ import {
   sqliteFalse,
   sqliteTrue,
 } from "@evolu/common";
-import { egymCircuit } from "../domain/exercises";
 import type { Data, Goal, Language, Prefill, Standards, TemplateItem, TemplateSet, Unit, Workout } from "../domain/model";
 import { today } from "../domain/dates";
 import {
@@ -160,20 +159,6 @@ export const createActions = (evolu: AppEvolu) => {
         evolu.insert("template", { name: name100(p.name), position: int(start + i), items: Json50k.orThrow(JSON.stringify(p.items)) }),
       );
     },
-
-    createEgymTemplate: (data: Data) =>
-      evolu.insert("template", {
-        name: name100("EGYM-Zirkel"),
-        position: int(data.templates.reduce((max, t) => Math.max(max, t.position + 1), 0)),
-        items: Json50k.orThrow(
-          JSON.stringify(
-            egymCircuit.map((exerciseKey) => ({
-              exerciseKey,
-              sets: Array.from({ length: 3 }, () => ({ weight: null, reps: 20, duration: null, distance: null })),
-            })),
-          ),
-        ),
-      }).id,
 
     renameTemplate: (id: string, nameText: string) => evolu.update("template", { id: TemplateId.orThrow(id), name: name100(nameText) }),
 
