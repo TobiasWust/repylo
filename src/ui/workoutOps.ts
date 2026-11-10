@@ -3,6 +3,7 @@ import { today } from "../domain/dates";
 import type { Data, Template, TemplateItem, TemplateSet, Workout } from "../domain/model";
 import { exerciseSessions } from "../domain/stats";
 import { suggestProgression } from "../domain/progression";
+import { estimateStart } from "../domain/estimate";
 
 /**
  * Today's workout, or a freshly created one. A new workout isn't in `data`
@@ -33,17 +34,23 @@ export const initialSets = (data: Data, exerciseKey: string, workoutId?: string)
     if (target) return [...target.sets];
   }
   const last = exerciseSessions(data, exerciseKey, workoutId).at(-1);
-  return last
-    ? last.sets.map((s) => ({ weight: s.weight, reps: s.reps, duration: s.duration, distance: s.distance }))
-    : [emptySet, emptySet, emptySet];
+  if (last) return last.sets.map((s) => ({ weight: s.weight, reps: s.reps, duration: s.duration, distance: s.distance }));
+  // Never done before: an estimated starting point instead of empty sets.
+  return [...(estimateStart(data, exerciseKey)?.sets ?? [emptySet, emptySet, emptySet])];
 };
 
 /** Template exercises, pre-filled with the latest values where there is history. */
 export const templateItems = (data: Data, template: Template, workoutId?: string): TemplateItem[] =>
   template.items.map((item) => ({
     exerciseKey: item.exerciseKey,
-    sets: exerciseSessions(data, item.exerciseKey, workoutId).length > 0 ? initialSets(data, item.exerciseKey, workoutId) : item.sets,
+    sets: exerciseSessions(data, item.exerciseKey, workoutId).length > 0 ? initialSets(data, item.exerciseKey, workoutId) : withEstimate(data, item),
   }));
+
+/** Keeps a template's sets and reps but fills in an estimated weight where none is set. */
+const withEstimate = (data: Data, item: TemplateItem): readonly TemplateSet[] => {
+  const estimate = estimateStart(data, item.exerciseKey)?.sets[0];
+  return item.sets.map((s) => (s.weight == null && estimate?.weight != null ? { ...s, weight: estimate.weight } : s));
+};
 
 export const workoutToItems = (workout: Workout): TemplateItem[] =>
   workout.exercises.map((e) => ({

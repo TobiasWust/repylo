@@ -6,6 +6,7 @@ import { detectPrs, hasValue, type Pr } from "../domain/stats";
 import { setFeedback, workoutSummary, type SetFeedback } from "../domain/coach";
 import { readinessOf } from "../domain/readiness";
 import { tipsFor } from "../domain/tips";
+import { estimateStart } from "../domain/estimate";
 import { TipsList } from "../ui/Tips";
 import { formatDuration, formatNumber, fromUnit, parseDuration, toUnit } from "../domain/units";
 import { Icon, NumberField, Segmented, Sheet } from "../ui/components";
@@ -196,6 +197,7 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
   const unit = data.settings.unit;
   const progression = suggestProgression(data, entry.exerciseKey, workout.id);
   const feedback = setFeedback(data, workout.id, entry.exerciseKey, entry.sets);
+  const estimate = progression ? null : estimateStart(data, entry.exerciseKey);
   const [showNote, setShowNote] = useState(!!entry.note);
   const [menu, setMenu] = useState(false);
   const [showTips, setShowTips] = useState(false);
@@ -287,6 +289,31 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
       )}
 
       {showTips && <TipsList exerciseKey={entry.exerciseKey} />}
+
+      {!progression && estimate && (
+        <div className="progress-hint">
+          <div>
+            <small>{t("Neu für dich", "New for you")}</small>
+            <div>
+              {estimate.basedOn.length > 0
+                ? t(
+                    `Startwerte geschätzt aus deiner Kraft bei ${estimate.basedOn.map((k) => exerciseName(getExercise(data, k))).join(" und ")}.`,
+                    `Starting values estimated from your strength on ${estimate.basedOn.map((k) => exerciseName(getExercise(data, k))).join(" and ")}.`,
+                  )
+                : t("Startwerte geschätzt aus Durchschnittswerten.", "Starting values estimated from average values.")}{" "}
+              {t("Lieber etwas leichter anfangen und dann steigern.", "Better start a bit lighter and build up.")}
+            </div>
+          </div>
+          {entry.sets.every((s) => s.weight == null && !s.done) && estimate.sets[0]?.weight != null && (
+            <button className="suggest-chip" onClick={() => estimate.sets.forEach((values, i) => entry.sets[i] && commit(entry.sets[i]!, values))}>
+              <span className="with-sticker">
+                <Sticker name="bulb" size={22} /> {t("Schätzung übernehmen", "Use estimate")}
+              </span>
+              <small>{describeSets(app, estimate.sets, exercise.metric)}</small>
+            </button>
+          )}
+        </div>
+      )}
 
       {progression && (
         <div className="progress-hint">
