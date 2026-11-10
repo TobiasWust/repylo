@@ -13,7 +13,7 @@ import {
   weekStreak,
 } from "../../domain/stats";
 import { formatNumber, toUnit } from "../../domain/units";
-import { BarChart, Empty } from "../../ui/components";
+import { BarChart, Empty, Sparkline } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { formatDate, muscleName } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
@@ -40,7 +40,13 @@ export const Stats = () => {
       .sort((a, b) => b[1] - a[1])
       .map(([key, count]) => {
         const sessions = exerciseSessions(data, key);
-        return { key, count, best: Math.max(0, ...sessions.map((s) => s.bestE1rm)) };
+        const metric = getExercise(data, key).metric;
+        // What "progress" means depends on how the exercise is measured.
+        const value = (s: (typeof sessions)[number]) =>
+          metric === "time" || metric === "cardio" ? s.maxDuration : s.bestE1rm > 0 ? s.bestE1rm : s.maxReps;
+        const trend = sessions.slice(-12).map(value);
+        const change = trend.length >= 2 && trend[0]! > 0 ? ((trend.at(-1)! - trend[0]!) / trend[0]!) * 100 : null;
+        return { key, count, best: Math.max(0, ...sessions.map((s) => s.bestE1rm)), trend, change };
       });
   }, [data]);
 
@@ -200,7 +206,15 @@ export const Stats = () => {
                   {e.best > 0 && ` · 1RM ${weight(e.best)}`}
                 </small>
               </span>
-              <span className="chev">›</span>
+              <span className="trend">
+                <Sparkline values={e.trend} />
+                {e.change !== null && (
+                  <small className={e.change >= 0 ? "up" : "down"}>
+                    {e.change >= 0 ? "+" : ""}
+                    {formatNumber(e.change, lang, 0)} %
+                  </small>
+                )}
+              </span>
             </button>
           ))}
         </div>

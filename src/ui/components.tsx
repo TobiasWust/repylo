@@ -272,3 +272,30 @@ export const Empty = ({ sticker, children }: { sticker: StickerName; children: R
     <div>{children}</div>
   </div>
 );
+
+/**
+ * Tiny trend line for lists. Rising trends are mint, falling ones pink; the
+ * last point is marked so "now" is easy to spot.
+ */
+export const Sparkline = ({ values, width = 84, height = 32 }: { values: readonly number[]; width?: number; height?: number }) => {
+  if (values.length < 2) return null;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const pad = 4;
+  const points = values.map((v, i) => [
+    pad + (i / (values.length - 1)) * (width - 2 * pad),
+    pad + (1 - (v - min) / span) * (height - 2 * pad),
+  ]);
+  const line = points.map(([x, y], i) => `${i ? "L" : "M"}${x!.toFixed(1)},${y!.toFixed(1)}`).join("");
+  const area = `${line}L${points.at(-1)![0]!.toFixed(1)},${height}L${points[0]![0]!.toFixed(1)},${height}Z`;
+  const rising = values.at(-1)! >= values[0]!;
+  const [lastX, lastY] = points.at(-1)!;
+  return (
+    <svg className="sparkline" width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden>
+      <path d={area} fill={rising ? "var(--mint)" : "var(--pink)"} opacity={0.6} />
+      <path d={line} fill="none" stroke="var(--ink)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx={lastX} cy={lastY} r={3.5} fill="var(--yellow)" stroke="var(--ink)" strokeWidth={2} />
+    </svg>
+  );
+};
