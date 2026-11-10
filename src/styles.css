@@ -1643,3 +1643,17 @@ body:has(.overlay-screen) .rest-timer {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ---------- Coach ---------- */
+.coach-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  background: #f4f4ef;
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.coach-line.positive {
+  background: var(--mint);
+}

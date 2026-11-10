@@ -4,6 +4,7 @@ import { parseMnemonic } from "../db/owner";
 import { addDays, dayToInput, parseDayInput, today, weekStart } from "./dates";
 import { buildData, type Data, type Rows } from "./model";
 import { calculatePlates } from "./plates";
+import { setFeedback } from "./coach";
 import { monthlyReview } from "./review";
 import { rate } from "./standards";
 import { suggestProgression } from "./progression";
@@ -304,5 +305,31 @@ describe("connect link", () => {
     expect(parseMnemonic(`https://repylo.example/#connect=${words.split(" ").join("-")}`)).toBe(words);
     expect(parseMnemonic(`  ${words.toUpperCase().split(" ").join("\n")} `)).toBe(words);
     expect(parseMnemonic("https://repylo.example/#connect=not-a-phrase")).toBeNull();
+  });
+});
+
+describe("coach feedback", () => {
+  const doneData = (today: SetSpec[]) => {
+    const data = build([
+      { daysAgo: 0, exercises: { bench_press: today } },
+      { daysAgo: 7, exercises: { bench_press: [[60, 10], [60, 9], [60, 8]] } },
+    ]);
+    const w = data.workouts[0]!;
+    return { data, w, sets: w.exercises[0]!.sets };
+  };
+
+  it("praises more reps at the same weight and sets a target for the next set", () => {
+    const { data, w, sets } = doneData([[60, 11], [60, 9], [60, 8]]);
+    const onlyFirstDone = sets.map((s, i) => ({ ...s, done: i === 0 }));
+    const fb = setFeedback(data, w.id, "bench_press", onlyFirstDone)!;
+    expect(fb.kind).toBe("moreReps");
+    expect(fb.delta).toBe(1);
+    expect(fb.next?.reps).toBe(10);
+  });
+
+  it("notices heavier and fewer-rep sets", () => {
+    const { data, w, sets } = doneData([[62.5, 8], [60, 7], [60, 8]]);
+    expect(setFeedback(data, w.id, "bench_press", sets.slice(0, 1))!.kind).toBe("heavier");
+    expect(setFeedback(data, w.id, "bench_press", sets.slice(0, 2))!.kind).toBe("fewerReps");
   });
 });
