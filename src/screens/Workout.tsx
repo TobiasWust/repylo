@@ -89,14 +89,18 @@ const prMessage = (app: App, pr: Pr, exerciseName: string): string => {
   }
 };
 
-/** Big −/+ buttons around a field: easier than the keyboard with sweaty hands. */
+/**
+ * Big −/+ buttons around a field: easier than the keyboard with sweaty hands.
+ * They're left out of the tab order so Tab jumps from field to field on a
+ * computer, where typing is faster anyway.
+ */
 const Stepper = ({ label, onStep, children }: { label: string; onStep: (direction: -1 | 1) => void; children: React.ReactNode }) => (
   <span className="stepper">
-    <button className="step" onClick={() => onStep(-1)} aria-label={`${label} −`}>
+    <button className="step" tabIndex={-1} onClick={() => onStep(-1)} aria-label={`${label} −`}>
       −
     </button>
     {children}
-    <button className="step" onClick={() => onStep(1)} aria-label={`${label} +`}>
+    <button className="step" tabIndex={-1} onClick={() => onStep(1)} aria-label={`${label} +`}>
       +
     </button>
   </span>
@@ -188,6 +192,9 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
     });
   };
 
+  // Ticking sets off only matters live (rest timer, PRs, progress).
+  // For backfilled workouts the column is just noise, so it's hidden.
+  const live = workout.date === today();
   const weightLabel = exercise.metric === "bodyweight" ? `+${unit}` : unit;
   const showPlates = exercise.equipment === "barbell";
 
@@ -248,7 +255,7 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
       )}
 
       <div className="set-table">
-        <div className="set-row set-header">
+        <div className={`set-row set-header ${live ? "" : "no-check"}`}>
           <span>#</span>
           {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
             <>
@@ -263,11 +270,11 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
               <span>km</span>
             </>
           )}
-          <span />
+          {live && <span />}
           <span />
         </div>
         {entry.sets.map((set, i) => (
-          <div key={set.id} className={`set-row ${set.done ? "done" : ""}`}>
+          <div key={set.id} className={`set-row ${set.done && live ? "done" : ""} ${live ? "" : "no-check"}`}>
             <span className="set-index">{i + 1}</span>
             {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
               <>
@@ -297,10 +304,12 @@ const ExerciseBlock = ({ workout, entry, index, count }: { workout: WorkoutModel
                 <NumberField label="km" value={set.distance == null ? null : set.distance / 1000} placeholder="–" onCommit={(v) => commit(set, { distance: v == null ? null : v * 1000 })} />
               </>
             )}
-            <button className={`check ${set.done ? "on" : ""}`} onClick={() => toggleDone(set)} aria-label={t("Satz erledigt", "Set done")}>
-              <Icon name="check" size={18} />
-            </button>
-            <button className="mini-button ghost" onClick={() => actions.removeSet(set.id)} aria-label={t("Satz löschen", "Delete set")}>
+            {live && (
+              <button className={`check ${set.done ? "on" : ""}`} onClick={() => toggleDone(set)} aria-label={t("Satz erledigt", "Set done")}>
+                <Icon name="check" size={18} />
+              </button>
+            )}
+            <button className="mini-button ghost" tabIndex={-1} onClick={() => actions.removeSet(set.id)} aria-label={t("Satz löschen", "Delete set")}>
               <Icon name="close" size={16} />
             </button>
           </div>
@@ -472,7 +481,7 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
             <input type="date" value={workout.date} onChange={(e) => e.target.value && actions.updateWorkout(workout.id, { date: e.target.value })} />
           </label>
         </div>
-        {total > 0 && (
+        {total > 0 && workout.date === today() && (
           <span className="progress-pill">
             {done}/{total}
           </span>
