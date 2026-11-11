@@ -5,7 +5,7 @@
  */
 import type { Muscle } from "../domain/exercises";
 
-const ink = "var(--ink)";
+const ink = "var(--edge)";
 
 type Shape = { readonly kind: "ellipse"; cx: number; cy: number; rx: number; ry: number } | { readonly kind: "path"; d: string };
 
