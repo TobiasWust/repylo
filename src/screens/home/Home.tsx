@@ -16,6 +16,7 @@ import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
 import { DayCard } from "./DayCard";
+import { useLastSeen } from "../../ui/motion";
 
 const tileColors = ["var(--yellow)", "var(--pink)", "var(--mint)", "var(--lavender)", "var(--sky)"];
 
@@ -36,6 +37,11 @@ export const Home = () => {
   const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 5);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
   const daysThisWeek = weekDays.filter((d) => days.has(d)).length;
+  // Since this screen was last shown: days ticked off get stamped, a grown streak flickers.
+  const seenDays = useLastSeen("home.week", weekDays.filter((d) => days.has(d)).join(","));
+  const seenStreak = useLastSeen("home.streak", streak);
+  const stamped = (d: string) => seenDays !== undefined && days.has(d) && !seenDays.split(",").includes(d);
+  const streakGrew = seenStreak !== undefined && streak > seenStreak;
   // First week of a month: offer last month's review (once, dismissable).
   const lastMonth = previousMonth(today().slice(0, 7));
   const showReview =
@@ -66,7 +72,7 @@ export const Home = () => {
           <div className="tagline">Every rep counts.</div>
         </div>
         <div
-          className="streak-badge"
+          className={`streak-badge ${streakGrew ? "grew" : ""}`}
           title={t("Wochen in Folge mit erreichtem Wochenziel", "Weeks in a row with your weekly goal reached")}
         >
           <Sticker name="flame" size={26} /> {streak}
@@ -97,7 +103,7 @@ export const Home = () => {
         </div>
         <div className="week-dots">
           {weekDays.map((d) => (
-            <span key={d} className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""}`}>
+            <span key={d} className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""} ${stamped(d) ? "stamped" : ""}`}>
               {new Date(`${d}T12:00`).toLocaleDateString(lang, { weekday: "narrow" })}
             </span>
           ))}

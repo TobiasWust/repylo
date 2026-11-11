@@ -45,7 +45,7 @@ const DayInfo = ({ day, column, pinned, onUnpin }: { day: string; column: number
                     </span>
                   )}
                   {summary.records.length > 0 && (
-                    <span className="up">
+                    <span className="up shine">
                       {summary.records.length}{" "}
                       {t(summary.records.length === 1 ? "Bestwert" : "Bestwerte", summary.records.length === 1 ? "best" : "bests")}
                     </span>
@@ -109,7 +109,13 @@ export const Heatmap = ({ days }: { days: ReadonlySet<string> }) => {
         ))}
       </div>
       {selected ? (
-        <DayInfo day={selected.day} column={selected.column} pinned={selected.pinned} onUnpin={() => setSelected(null)} />
+        <DayInfo
+          key={selected.day}
+          day={selected.day}
+          column={selected.column}
+          pinned={selected.pinned}
+          onUnpin={() => setSelected(null)}
+        />
       ) : (
         <p className="hint">{t("Tippe auf einen Tag für Details.", "Tap a day for details.")}</p>
       )}

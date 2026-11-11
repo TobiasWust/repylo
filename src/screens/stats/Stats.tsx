@@ -14,7 +14,7 @@ import {
   workoutsPerWeek,
 } from "../../domain/stats";
 import { formatNumber, toUnit } from "../../domain/units";
-import { BarChart, Empty, Sparkline } from "../../ui/components";
+import { BarChart, CountUp, Empty, Sparkline } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { formatDate, muscleName, plural } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
@@ -76,17 +76,22 @@ export const Stats = () => {
       <div className="stat-grid">
         <div className="stat-tile yellow">
           <span>{t("Trainings", "Workouts")}</span>
-          <strong>{totalWorkouts}</strong>
+          <strong>
+            <CountUp value={totalWorkouts} format={(n) => String(Math.round(n))} />
+          </strong>
         </div>
         <div className="stat-tile pink">
           <span>{t("Serie", "Streak")}</span>
           <strong className="with-sticker">
-            <Sticker name="flame" size={26} /> {weekStreak(days, data.settings.weeklyGoal)} {t("Wo.", "wk")}
+            <Sticker name="flame" size={26} />{" "}
+            <CountUp value={weekStreak(days, data.settings.weeklyGoal)} format={(n) => String(Math.round(n))} /> {t("Wo.", "wk")}
           </strong>
         </div>
         <div className="stat-tile lavender">
           <span>{t("Bewegt gesamt", "Total lifted")}</span>
-          <strong>{formatNumber(toUnit(totalVolume, unit) / 1000, lang, 1)} t</strong>
+          <strong>
+            <CountUp value={toUnit(totalVolume, unit) / 1000} format={(n) => `${formatNumber(n, lang, 1)} t`} />
+          </strong>
         </div>
         <div className="stat-tile mint">
           <span>
@@ -94,7 +99,9 @@ export const Stats = () => {
               ? t(`Ø pro Woche (${perWeek.weeks} Wo.)`, `Avg/week (${perWeek.weeks} wk)`)
               : t("Ø pro Woche", "Avg/week")}
           </span>
-          <strong>{formatNumber(perWeek?.average ?? 0, lang, 1)}</strong>
+          <strong>
+            <CountUp value={perWeek?.average ?? 0} format={(n) => formatNumber(n, lang, 1)} />
+          </strong>
         </div>
       </div>
 
@@ -126,14 +133,17 @@ export const Stats = () => {
           )}
         </p>
         <div className="muscle-bars">
-          {majorMuscles.map((m) => {
+          {majorMuscles.map((m, i) => {
             const value = last7.get(m) ?? 0;
             const status = value >= target ? (value > upper ? "over" : "good") : value >= target / 2 ? "low" : "none";
             return (
               <div key={m} className="muscle-row">
                 <span className="muscle-name">{muscleName(m, lang)}</span>
                 <div className="muscle-track">
-                  <div className={`muscle-fill ${status}`} style={{ width: `${Math.min(100, (value / upper) * 100)}%` }} />
+                  <div
+                    className={`muscle-fill ${status}`}
+                    style={{ width: `${Math.min(100, (value / upper) * 100)}%`, "--i": i } as React.CSSProperties}
+                  />
                   <div className="muscle-target" style={{ left: `${(target / upper) * 100}%` }} />
                 </div>
                 <span className="muscle-value">{formatNumber(value, lang, 1)}</span>

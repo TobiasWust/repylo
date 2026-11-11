@@ -42,7 +42,7 @@ export const SummarySheet = ({ workoutId, onClose }: { workoutId: string; onClos
         </div>
       </div>
       {summary.records.length > 0 && (
-        <div className="coach-line positive">
+        <div className="coach-line positive shine">
           <Sticker name="trophy" size={28} />
           <span>
             {t("Neue Bestwerte: ", "New bests: ")}

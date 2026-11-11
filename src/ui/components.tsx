@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { reducedMotion } from "./motion";
 import { Sticker, type StickerName } from "./stickers";
 
 const paths = {
@@ -220,6 +221,57 @@ export const LineChart = ({
   );
 };
 
+/**
+ * A number that counts up from zero when it first appears. React renders the
+ * final text; the animation only rewrites that same text node, so later
+ * updates from React still land.
+ */
+export const CountUp = ({
+  value,
+  format = String,
+  duration = 700,
+}: {
+  value: number;
+  format?: (n: number) => string;
+  duration?: number;
+}) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [initial] = useState(value);
+  useLayoutEffect(() => {
+    const node = ref.current?.firstChild;
+    if (!node || reducedMotion() || initial === 0) return;
+    const final = format(initial);
+    const start = performance.now();
+    let frame = 0;
+    let written = final;
+    const write = (text: string) => {
+      // React changed the value meanwhile: its text wins, stop animating.
+      if (node.nodeValue !== written) return false;
+      node.nodeValue = written = text;
+      return true;
+    };
+    const step = (now: number) => {
+      // A frame's timestamp can be a hair earlier than `start`.
+      const p = Math.min(1, Math.max(0, (now - start) / duration));
+      if (write(p < 1 ? format(initial * (1 - (1 - p) ** 3)) : final) && p < 1) frame = requestAnimationFrame(step);
+    };
+    step(start);
+    // Frames pause in hidden tabs; never leave the number stuck halfway.
+    const finish = setTimeout(() => {
+      cancelAnimationFrame(frame);
+      write(final);
+    }, duration + 100);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(finish);
+      write(final);
+    };
+    // Only the first appearance counts up; later changes just show the new value.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return <span ref={ref}>{format(value)}</span>;
+};
+
 export const BarChart = ({
   bars,
   format,
@@ -234,7 +286,10 @@ export const BarChart = ({
     <div className="bar-chart" style={{ height }}>
       {bars.map((b, i) => (
         <div key={i} className="bar-col" title={`${b.label}: ${format(b.value)}`}>
-          <div className={`bar ${b.highlight ? "bar-highlight" : ""}`} style={{ height: `${(b.value / max) * 100}%` }} />
+          <div
+            className={`bar ${b.highlight ? "bar-highlight" : ""}`}
+            style={{ height: `${(b.value / max) * 100}%`, "--i": i } as React.CSSProperties}
+          />
           <span className="bar-label">{b.label}</span>
         </div>
       ))}
@@ -250,21 +305,50 @@ export const Segmented = <T extends string>({
   value: T;
   options: readonly { value: T; label: string }[];
   onChange: (v: T) => void;
-}) => (
-  <div className="segmented" role="radiogroup">
-    {options.map((o) => (
-      <button
-        key={o.value}
-        role="radio"
-        aria-checked={o.value === value}
-        className={o.value === value ? "active" : ""}
-        onClick={() => onChange(o.value)}
-      >
-        {o.label}
-      </button>
-    ))}
-  </div>
-);
+}) => {
+  const box = useRef<HTMLDivElement>(null);
+  const pill = useRef<HTMLSpanElement>(null);
+  const index = options.findIndex((o) => o.value === value);
+  // The dark marker is one element that slides to the chosen option. It is
+  // positioned straight on the DOM (no re-render) and follows size changes.
+  useLayoutEffect(() => {
+    const el = box.current;
+    const marker = pill.current;
+    if (!el || !marker) return;
+    const place = () => {
+      const button = el.querySelectorAll("button")[index];
+      marker.style.opacity = button ? "1" : "0";
+      if (!button) return;
+      marker.style.transform = `translateX(${button.offsetLeft}px)`;
+      marker.style.width = `${button.offsetWidth}px`;
+    };
+    place();
+    // Only animate moves, not the first placement.
+    const frame = requestAnimationFrame(() => marker.classList.add("ready"));
+    const observer = new ResizeObserver(place);
+    observer.observe(el);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [index, options.length]);
+  return (
+    <div className="segmented" role="radiogroup" ref={box}>
+      <span className="segmented-pill" ref={pill} aria-hidden />
+      {options.map((o) => (
+        <button
+          key={o.value}
+          role="radio"
+          aria-checked={o.value === value}
+          className={o.value === value ? "active" : ""}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 export const Empty = ({ sticker, children }: { sticker: StickerName; children: ReactNode }) => (
   <div className="empty">

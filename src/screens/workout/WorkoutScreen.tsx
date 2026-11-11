@@ -19,6 +19,11 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
   const [sheet, setSheet] = useState<"add" | "copy" | "template" | "summary" | null>(null);
   const workout = data.workouts.find((w) => w.id === id);
   useWakeLock(workout?.date === today());
+  // Exercises there when the screen opened (null while still loading); later ones slide in.
+  const [initialExercises] = useState(() => (workout ? new Set(workout.exercises.map((e) => e.id)) : null));
+  // The progress counter bumps when it changes, not when the screen opens.
+  const doneCount = workout?.exercises.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0) ?? 0;
+  const [openedWith] = useState(doneCount);
 
   if (!workout)
     return (
@@ -49,7 +54,10 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
           </DatePill>
         </div>
         {total > 0 && (
-          <span className="progress-pill">
+          <span
+            key={done}
+            className={["progress-pill", done !== openedWith && "bump", done === total && "complete"].filter(Boolean).join(" ")}
+          >
             {done}/{total}
           </span>
         )}
@@ -85,7 +93,14 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
 
       <div className="stack">
         {workout.exercises.map((e, i) => (
-          <ExerciseBlock key={e.id} workout={workout} entry={e} index={i} count={workout.exercises.length} />
+          <ExerciseBlock
+            key={e.id}
+            workout={workout}
+            entry={e}
+            index={i}
+            count={workout.exercises.length}
+            added={initialExercises !== null && !initialExercises.has(e.id)}
+          />
         ))}
       </div>
 

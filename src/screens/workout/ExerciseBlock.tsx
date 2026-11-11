@@ -24,17 +24,21 @@ import { describeSets, prMessage, progressionLabel } from "./format";
 import { DurationField, Stepper } from "./SetInputs";
 import { weightStep } from "./weightStep";
 import { CoachLine } from "./CoachLine";
+import { useInitialIds } from "../../ui/motion";
 
 export const ExerciseBlock = ({
   workout,
   entry,
   index,
   count,
+  added = false,
 }: {
   workout: WorkoutModel;
   entry: WorkoutExercise;
   index: number;
   count: number;
+  /** Added after the workout was opened: slides in. */
+  added?: boolean;
 }) => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName } = app;
@@ -50,6 +54,17 @@ export const ExerciseBlock = ({
   // Values committed on blur aren't in `data` until Evolu's query refreshes.
   // Tapping ✓ right after typing must still see them (for PR detection).
   const pending = useRef(new Map<string, Partial<TemplateSet>>());
+  // Small animations: the set just ticked off, sets on their way out, and
+  // sets added since the workout was opened.
+  const [justDone, setJustDone] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set());
+  const initialSets = useInitialIds(entry.sets.map((x) => x.id));
+
+  const removeSet = (id: string) => {
+    setLeaving((current) => new Set(current).add(id));
+    // Let the row fold away before it's gone.
+    setTimeout(() => actions.removeSet(id), 220);
+  };
 
   const commit = (set: SetEntry, values: Partial<TemplateSet>) => {
     pending.current.set(set.id, { ...pending.current.get(set.id), ...values });
@@ -71,6 +86,7 @@ export const ExerciseBlock = ({
   const toggleDone = (set: SetEntry) => {
     const merged = current(set);
     actions.updateSet(set.id, { done: !set.done });
+    setJustDone(set.done ? null : set.id);
     // Rest timer and confetti only make sense live, not when backfilling.
     if (set.done || !hasValue(merged) || workout.date !== today()) return;
     const goal = data.exerciseGoals.get(entry.exerciseKey);
@@ -92,7 +108,7 @@ export const ExerciseBlock = ({
   const showPlates = exercise.equipment === "barbell";
 
   return (
-    <section className="card exercise-card">
+    <section className={`card exercise-card ${added ? "entering" : ""}`}>
       <div className="exercise-head">
         <button className="exercise-title" onClick={() => open({ type: "exercise", key: entry.exerciseKey })}>
           <strong>{exerciseName(exercise)}</strong>
@@ -210,7 +226,18 @@ export const ExerciseBlock = ({
           <span />
         </div>
         {entry.sets.map((set, i) => (
-          <div key={set.id} className={`set-row ${set.done ? "done" : ""}`}>
+          <div
+            key={set.id}
+            className={[
+              "set-row",
+              set.done && "done",
+              justDone === set.id && set.done && "just-done",
+              !initialSets.has(set.id) && "entering",
+              leaving.has(set.id) && "leaving",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             <span className="set-index">{i + 1}</span>
             {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
               <>
@@ -257,7 +284,7 @@ export const ExerciseBlock = ({
             <button
               className="mini-button ghost"
               tabIndex={-1}
-              onClick={() => actions.removeSet(set.id)}
+              onClick={() => removeSet(set.id)}
               aria-label={t("Satz löschen", "Delete set")}
             >
               <Icon name="close" size={16} />
