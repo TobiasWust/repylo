@@ -12,7 +12,7 @@ import { formatDate, muscleName } from "../../ui/text";
 
 type Mode = "volume" | "recovery";
 
-const colors = { none: "#ecece6", low: "var(--pink)", some: "var(--yellow)", good: "var(--bg)", high: "var(--lavender)" };
+const colors = { none: "var(--track)", low: "var(--pink)", some: "var(--yellow)", good: "var(--brand)", high: "var(--lavender)" };
 
 /**
  * Body map with two views: weekly volume per muscle over the last four

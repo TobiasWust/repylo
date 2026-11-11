@@ -18,7 +18,7 @@ const beep = () => {
   }
 };
 
-const confettiColors = ["#ffd96a", "#ff7b7b", "#c9c3ff", "#2ed3b7", "#111111", "#7cc4ff"];
+const confettiColors = ["var(--yellow)", "var(--pink)", "var(--lavender)", "var(--brand)", "var(--ink)", "var(--sky)"];
 
 const Confetti = () => {
   // Random layout is created once; the provider re-renders while the timer ticks.

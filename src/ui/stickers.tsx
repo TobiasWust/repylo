@@ -4,8 +4,16 @@
  */
 import type { ReactNode } from "react";
 
-const ink = "#141414";
-const c = { yellow: "#ffd96a", pink: "#ff8a8a", mint: "#a5f0dc", lavender: "#cfc8ff", sky: "#9fd5ff", white: "#ffffff", orange: "#ffb066" };
+const ink = "var(--ink)";
+const c = {
+  yellow: "var(--yellow)",
+  pink: "var(--pink)",
+  mint: "var(--mint)",
+  lavender: "var(--lavender)",
+  sky: "var(--sky)",
+  white: "var(--paper)",
+  orange: "var(--orange)",
+};
 
 /** Two dot eyes and a smile, centred at (x, y). */
 const Face = ({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) => (

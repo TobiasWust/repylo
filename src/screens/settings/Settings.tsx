@@ -7,7 +7,7 @@ import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
 import { InstallCard } from "../../ui/InstallCard";
 import { LegalFooter } from "../../ui/Legal";
-import { applyLook, getLook } from "../../ui/look";
+import { applyLook, applyTheme, getLook, getTheme } from "../../ui/look";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { goalShort, plural } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
@@ -20,6 +20,7 @@ export const Settings = () => {
   const [sheet, setSheet] = useState<"share" | "connect" | null>(null);
   const [plan, setPlan] = useState(false);
   const [look, setLook] = useState(getLook);
+  const [theme, setTheme] = useState(getTheme);
   const fileInput = useRef<HTMLInputElement>(null);
   const s = data.settings;
   const customExercises = [...data.exercises.values()].filter((e) => e.custom);
@@ -97,40 +98,6 @@ export const Settings = () => {
       </section>
 
       <section className="card">
-        <h2 className="card-title">{t("Darstellung", "Display")}</h2>
-        <div className="field-label">{t("Sprache", "Language")}</div>
-        <Segmented
-          value={lang}
-          onChange={(language) => actions.updateSettings({ language })}
-          options={[
-            { value: "de", label: "Deutsch" },
-            { value: "en", label: "English" },
-          ]}
-        />
-        <div className="field-label">{t("Einheit", "Unit")}</div>
-        <Segmented
-          value={s.unit}
-          onChange={(unit) => actions.updateSettings({ unit, barWeight: unit === "kg" ? 20 : 20.41 })}
-          options={[
-            { value: "kg", label: "kg" },
-            { value: "lb", label: "lbs" },
-          ]}
-        />
-        <div className="field-label">{t("Stil", "Style")}</div>
-        <Segmented
-          value={look}
-          onChange={(next) => {
-            applyLook(next);
-            setLook(next);
-          }}
-          options={[
-            { value: "classic", label: t("Klassisch", "Classic") },
-            { value: "sketch", label: t("Notizblock", "Notepad") },
-          ]}
-        />
-      </section>
-
-      <section className="card">
         <h2 className="card-title">{t("Vorlagen / Splits", "Templates / splits")}</h2>
         <p className="hint">
           {t("Die Reihenfolge bestimmt den Split-Rhythmus („Als Nächstes dran“).", "The order defines your split rotation (“Up next”).")}
@@ -182,6 +149,53 @@ export const Settings = () => {
         <button className="button full" onClick={() => setPlan(true)}>
           <Sticker name="calendar" size={22} /> {t("Trainingsplan oder Zirkel erstellen lassen", "Create a training plan or circuit")}
         </button>
+      </section>
+
+      <section className="card">
+        <h2 className="card-title">{t("Darstellung", "Display")}</h2>
+        <div className="field-label">{t("Sprache", "Language")}</div>
+        <Segmented
+          value={lang}
+          onChange={(language) => actions.updateSettings({ language })}
+          options={[
+            { value: "de", label: "Deutsch" },
+            { value: "en", label: "English" },
+          ]}
+        />
+        <div className="field-label">{t("Einheit", "Unit")}</div>
+        <Segmented
+          value={s.unit}
+          onChange={(unit) => actions.updateSettings({ unit, barWeight: unit === "kg" ? 20 : 20.41 })}
+          options={[
+            { value: "kg", label: "kg" },
+            { value: "lb", label: "lbs" },
+          ]}
+        />
+        <div className="field-label">{t("Stil", "Style")}</div>
+        <Segmented
+          value={look}
+          onChange={(next) => {
+            applyLook(next);
+            setLook(next);
+          }}
+          options={[
+            { value: "classic", label: t("Klassisch", "Classic") },
+            { value: "sketch", label: t("Notizblock", "Notepad") },
+          ]}
+        />
+        <div className="field-label">{t("Farben", "Colours")}</div>
+        <Segmented
+          value={theme}
+          onChange={(next) => {
+            applyTheme(next);
+            setTheme(next);
+          }}
+          options={[
+            { value: "fjord", label: "Fjord" },
+            { value: "lagune", label: t("Lagune", "Lagoon") },
+            { value: "nacht", label: t("Nacht", "Night") },
+          ]}
+        />
       </section>
 
       {customExercises.length > 0 && (

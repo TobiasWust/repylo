@@ -5,6 +5,7 @@ import { formatNumber, toUnit } from "../domain/units";
 import { Icon } from "../ui/components";
 import { useApp, type App } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
+import { cssVar, resolveVars } from "../ui/look";
 import { Sticker, type StickerName } from "../ui/stickers";
 import { monthName } from "../ui/text";
 
@@ -19,19 +20,19 @@ const tilesFor = (app: App, review: MonthlyReview): Tile[] => {
   const { t, lang, data, exerciseName } = app;
   const unit = data.settings.unit;
   const tiles: Tile[] = [
-    { sticker: "dumbbell", label: t("Trainings", "Workouts"), value: String(review.workouts), color: "#ffd96a" },
+    { sticker: "dumbbell", label: t("Trainings", "Workouts"), value: String(review.workouts), color: "var(--yellow)" },
     {
       sticker: "flame",
       label: t("Wochenziel geschafft", "Weekly goal reached"),
       value: `${review.goalWeeks} / ${review.weeks}`,
-      color: "#ff8a8a",
+      color: "var(--pink)",
     },
-    { sticker: "chartUp", label: t("Sätze", "Sets"), value: String(review.sets), color: "#cfc8ff" },
+    { sticker: "chartUp", label: t("Sätze", "Sets"), value: String(review.sets), color: "var(--lavender)" },
     {
       sticker: "muscle",
       label: t("Bewegt", "Lifted"),
       value: `${formatNumber(toUnit(review.volume, unit) / 1000, lang, 1)} t`,
-      color: "#a5f0dc",
+      color: "var(--mint)",
     },
   ];
   if (review.favorite)
@@ -39,23 +40,23 @@ const tilesFor = (app: App, review: MonthlyReview): Tile[] => {
       sticker: "medal",
       label: t("Lieblingsübung", "Favourite"),
       value: exerciseName(getExercise(data, review.favorite.exerciseKey)),
-      color: "#9fd5ff",
+      color: "var(--sky)",
     });
   if (review.biggestGain)
     tiles.push({
       sticker: "trophy",
       label: t("Größter Fortschritt", "Biggest gain"),
       value: `${exerciseName(getExercise(data, review.biggestGain.exerciseKey))} +${formatNumber(review.biggestGain.percent, lang, 1)} %`,
-      color: "#ffd96a",
+      color: "var(--yellow)",
     });
   if (review.records > 0)
-    tiles.push({ sticker: "party", label: t("Neue Bestwerte", "New bests"), value: String(review.records), color: "#ff8a8a" });
+    tiles.push({ sticker: "party", label: t("Neue Bestwerte", "New bests"), value: String(review.records), color: "var(--pink)" });
   if (review.bodyWeightChange !== null)
     tiles.push({
       sticker: "scale",
       label: t("Körpergewicht", "Body weight"),
       value: `${review.bodyWeightChange >= 0 ? "+" : ""}${formatNumber(toUnit(review.bodyWeightChange, unit), lang, 1)} ${unit}`,
-      color: "#cfc8ff",
+      color: "var(--lavender)",
     });
   return tiles;
 };
@@ -66,17 +67,17 @@ const loadSvg = (svg: SVGSVGElement): Promise<HTMLImageElement> =>
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = reject;
-    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(svg))}`;
+    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(resolveVars(new XMLSerializer().serializeToString(svg)))}`;
   });
 
 const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number, fill: string) => {
-  ctx.fillStyle = "#141414";
+  ctx.fillStyle = cssVar("--shade");
   ctx.beginPath();
   ctx.roundRect(x + 10, y + 10, w, h, r);
   ctx.fill();
-  ctx.fillStyle = fill;
+  ctx.fillStyle = resolveVars(fill);
   ctx.lineWidth = 6;
-  ctx.strokeStyle = "#141414";
+  ctx.strokeStyle = cssVar("--ink");
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, r);
   ctx.fill();
@@ -104,12 +105,12 @@ const renderImage = async (title: string, tiles: readonly Tile[], stickers: HTML
   canvas.width = 1080;
   canvas.height = 1350;
   const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#2ed3b7";
+  ctx.fillStyle = cssVar("--bg");
   ctx.fillRect(0, 0, 1080, 1350);
-  ctx.fillStyle = "rgba(255,255,255,0.35)";
+  ctx.fillStyle = cssVar("--dots");
   for (let x = 16; x < 1080; x += 32) for (let y = 16; y < 1350; y += 32) ctx.fillRect(x, y, 3, 3);
 
-  ctx.fillStyle = "#141414";
+  ctx.fillStyle = cssVar("--ink");
   ctx.font = '800 92px "Lexend Variable", sans-serif';
   ctx.fillText("repylo", 70, 150);
   ctx.font = '600 36px "Lexend Variable", sans-serif';
@@ -130,7 +131,7 @@ const renderImage = async (title: string, tiles: readonly Tile[], stickers: HTML
     roundRect(ctx, x, y, w, h, 34, tile.color);
     const svg = svgs[i];
     if (svg) ctx.drawImage(await loadSvg(svg), x + 28, y + 22, 64, 64);
-    ctx.fillStyle = "#141414";
+    ctx.fillStyle = cssVar("--ink");
     fitText(ctx, tile.label, x + 28, y + h - 78, w - 56, 700, 28);
     fitText(ctx, tile.value, x + 28, y + h - 30, w - 56, 800, 44);
   }

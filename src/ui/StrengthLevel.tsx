@@ -24,7 +24,7 @@ const LevelBar = ({ rating }: { rating: Rating }) => {
     <div className="level">
       <div className="level-bar">
         {levels.map((l, i) => (
-          <span key={l} style={{ background: i <= index ? levelColors[i] : "#f4f4ef" }} />
+          <span key={l} style={{ background: i <= index ? levelColors[i] : "var(--soft)" }} />
         ))}
         <i className="level-marker" style={{ left: `${Math.min(97, Math.max(3, position))}%` }} />
       </div>

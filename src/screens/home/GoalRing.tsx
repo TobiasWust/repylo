@@ -7,14 +7,14 @@ export const GoalRing = ({ done, goal }: { done: number; goal: number }) => {
   const share = Math.min(1, done / goal);
   return (
     <svg className="goal-ring" width={84} height={84} viewBox="0 0 84 84" aria-hidden>
-      <circle cx={42} cy={42} r={r} fill="#fff" stroke="var(--ink)" strokeWidth={3} />
-      <circle cx={42} cy={42} r={r} fill="none" stroke="#fff" strokeWidth={11} />
+      <circle cx={42} cy={42} r={r} fill="var(--paper)" stroke="var(--ink)" strokeWidth={3} />
+      <circle cx={42} cy={42} r={r} fill="none" stroke="var(--paper)" strokeWidth={11} />
       <circle
         cx={42}
         cy={42}
         r={r}
         fill="none"
-        stroke={share >= 1 ? "var(--bg)" : "var(--pink)"}
+        stroke={share >= 1 ? "var(--brand)" : "var(--rose)"}
         strokeWidth={11}
         strokeDasharray={`${share * circumference} ${circumference}`}
         transform="rotate(-90 42 42)"

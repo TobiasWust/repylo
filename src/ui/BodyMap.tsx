@@ -5,7 +5,7 @@
  */
 import type { Muscle } from "../domain/exercises";
 
-const ink = "#141414";
+const ink = "var(--ink)";
 
 type Shape = { readonly kind: "ellipse"; cx: number; cy: number; rx: number; ry: number } | { readonly kind: "path"; d: string };
 
@@ -56,7 +56,7 @@ const Silhouette = ({ cx, face }: { cx: number; face: boolean }) => {
   );
   const torso = `M${cx - 5} 29C${cx - 5} 34 ${cx - 9} 36 ${cx - 20} 39C${cx - 27} 41 ${cx - 28} 48 ${cx - 27} 56C${cx - 26} 66 ${cx - 23} 72 ${cx - 23} 80C${cx - 23} 90 ${cx - 23} 98 ${cx - 22} 104C${cx - 16} 109 ${cx - 6} 111 ${cx} 111C${cx + 6} 111 ${cx + 16} 109 ${cx + 22} 104C${cx + 23} 98 ${cx + 23} 90 ${cx + 23} 80C${cx + 23} 72 ${cx + 26} 66 ${cx + 27} 56C${cx + 28} 48 ${cx + 27} 41 ${cx + 20} 39C${cx + 9} 36 ${cx + 5} 34 ${cx + 5} 29Z`;
   return (
-    <g fill="#fbfaf5" stroke={ink} strokeWidth={2} strokeLinejoin="round">
+    <g fill="var(--paper)" stroke={ink} strokeWidth={2} strokeLinejoin="round">
       {legs.map((d) => (
         <path key={d} d={d} />
       ))}
