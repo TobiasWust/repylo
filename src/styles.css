@@ -1899,7 +1899,7 @@ body:has(.overlay-screen) .rest-timer {
 /* ---------- Sketchbook look ----------
    A colourful notepad: graph paper, hand-drawn pencil outlines, hatched
    shadows, handwritten headings with a marker swipe and watercolour fills.
-   The pencil filters live in index.html. Only active with the "sketch" look
+   Only active with the "sketch" look
    (<html data-look="sketch">, switched in the settings); otherwise the app
    keeps its original look with crisp boxes. */
 :root {
@@ -1949,7 +1949,28 @@ body:has(.overlay-screen) .rest-timer {
   background-image:
     linear-gradient(rgba(20, 20, 20, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 20, 20, 0.045) 1px, transparent 1px);
   background-size: 18px 18px;
-} /* The outline as a single wobbly pencil line. */
+}
+
+/* The outline as one hand-drawn line. Uneven elliptical corner radii make the
+   edges bow slightly, like a quick pencil sketch. Plain CSS on purpose: live
+   SVG filters made scrolling stutter on phones. */
+[data-look="sketch"]
+  :is(
+    .card,
+    .stat-tile,
+    .tile-icon,
+    .pick-card,
+    .plan-day,
+    .button:not(.dashed),
+    .rep-record,
+    .empty,
+    .tips-box,
+    .review-tile,
+    .tabbar,
+    .celebration
+  ) {
+  border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+}
 
 [data-look="sketch"]
   :is(
@@ -1982,10 +2003,10 @@ body:has(.overlay-screen) .rest-timer {
   inset: -2.5px;
   border: var(--line);
   border-radius: inherit;
-  filter: url(#pencil);
   pointer-events: none;
-} /* Hatched shadow: an L-shaped strip below and right of the element. */
+}
 
+/* Hatched shadow: an L-shaped strip below and right of the element. */
 [data-look="sketch"]
   :is(
     .card,
@@ -2013,7 +2034,6 @@ body:has(.overlay-screen) .rest-timer {
     0 calc(100% - var(--drop)),
     calc(100% - var(--drop)) calc(100% - var(--drop))
   );
-  filter: url(#pencil-2);
   pointer-events: none;
 }
 [data-look="sketch"] :is(.button, .icon-button, .list-card, .suggest-chip):active::before {
