@@ -120,7 +120,11 @@ const Shell = () => {
 
 const Feedback = ({ children }: { children: React.ReactNode }) => {
   const { t } = useApp();
-  return <FeedbackProvider labels={{ rest: t("Pause", "Rest"), skip: t("Weiter", "Skip") }}>{children}</FeedbackProvider>;
+  return (
+    <FeedbackProvider labels={{ rest: t("Pause", "Rest"), skip: t("Weiter", "Skip"), cancel: t("Abbrechen", "Cancel") }}>
+      {children}
+    </FeedbackProvider>
+  );
 };
 
 export const App = () => (

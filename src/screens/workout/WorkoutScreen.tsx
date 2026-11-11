@@ -3,6 +3,7 @@ import { today } from "../../domain/dates";
 import { hasValue } from "../../domain/stats";
 import { Icon } from "../../ui/components";
 import { useApp } from "../../ui/context";
+import { useFeedback } from "../../ui/feedback";
 import { ExercisePicker } from "../../ui/ExercisePicker";
 import { formatDate } from "../../ui/text";
 import { initialSets } from "../../ui/workoutOps";
@@ -16,6 +17,7 @@ import { SummarySheet } from "./SummarySheet";
 
 export const WorkoutScreen = ({ id }: { id: string }) => {
   const { t, data, actions, back, lang } = useApp();
+  const { confirm } = useFeedback();
   const [sheet, setSheet] = useState<"add" | "copy" | "template" | "summary" | null>(null);
   const workout = data.workouts.find((w) => w.id === id);
   useWakeLock(workout?.date === today());
@@ -138,8 +140,14 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
       </div>
       <button
         className="link danger center"
-        onClick={() => {
-          if (!confirm(t("Dieses Training wirklich löschen?", "Delete this workout?"))) return;
+        onClick={async () => {
+          const ok = await confirm({
+            title: t("Dieses Training löschen?", "Delete this workout?"),
+            message: t("Alle Sätze darin sind dann weg.", "All its sets will be gone."),
+            confirmLabel: t("Löschen", "Delete"),
+            danger: true,
+          });
+          if (!ok) return;
           actions.deleteWorkout(workout);
           back();
         }}

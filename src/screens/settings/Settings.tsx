@@ -16,7 +16,7 @@ import { SyncStatus } from "./SyncStatus";
 
 export const Settings = () => {
   const { t, data, actions, lang, exerciseName } = useApp();
-  const { toast } = useFeedback();
+  const { toast, confirm, prompt } = useFeedback();
   const [sheet, setSheet] = useState<"share" | "connect" | null>(null);
   const [plan, setPlan] = useState(false);
   const [look, setLook] = useState(getLook);
@@ -126,9 +126,13 @@ export const Settings = () => {
               </button>
               <button
                 className="mini-button"
-                onClick={() => {
-                  const name = prompt(t("Neuer Name", "New name"), tpl.name);
-                  if (name?.trim()) actions.renameTemplate(tpl.id, name);
+                onClick={async () => {
+                  const name = await prompt({
+                    title: t("Vorlage umbenennen", "Rename template"),
+                    initial: tpl.name,
+                    confirmLabel: t("Speichern", "Save"),
+                  });
+                  if (name && name !== tpl.name) actions.renameTemplate(tpl.id, name);
                 }}
                 aria-label={t("Umbenennen", "Rename")}
               >
@@ -136,9 +140,14 @@ export const Settings = () => {
               </button>
               <button
                 className="mini-button ghost"
-                onClick={() =>
-                  confirm(t(`Vorlage „${tpl.name}“ löschen?`, `Delete template “${tpl.name}”?`)) && actions.deleteTemplate(tpl.id)
-                }
+                onClick={async () => {
+                  const ok = await confirm({
+                    title: t(`Vorlage „${tpl.name}“ löschen?`, `Delete template “${tpl.name}”?`),
+                    confirmLabel: t("Löschen", "Delete"),
+                    danger: true,
+                  });
+                  if (ok) actions.deleteTemplate(tpl.id);
+                }}
                 aria-label={t("Löschen", "Delete")}
               >
                 <Icon name="trash" size={16} />
@@ -207,10 +216,16 @@ export const Settings = () => {
                 <span className="grow">{exerciseName(e)}</span>
                 <button
                   className="mini-button ghost"
-                  onClick={() =>
-                    confirm(t("Übung löschen? Bisherige Einträge bleiben erhalten.", "Delete exercise? Logged sets are kept.")) &&
-                    actions.deleteCustomExercise(e.key)
-                  }
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: t(`„${exerciseName(e)}“ löschen?`, `Delete “${exerciseName(e)}”?`),
+                      message: t("Bisherige Einträge bleiben erhalten.", "Logged sets are kept."),
+                      confirmLabel: t("Löschen", "Delete"),
+                      danger: true,
+                    });
+                    if (ok) actions.deleteCustomExercise(e.key);
+                  }}
+                  aria-label={t("Löschen", "Delete")}
                 >
                   <Icon name="trash" size={16} />
                 </button>
@@ -242,15 +257,16 @@ export const Settings = () => {
             if (!file) return;
             const backup = parseBackup(await file.text());
             if (!backup) return toast(t("Keine gültige repylo-Sicherung", "Not a valid repylo backup"));
-            if (
-              !confirm(
-                t(
-                  `${backup.workouts.length} ${plural(backup.workouts.length, "Training", "Trainings")} importieren? Sie kommen zu den vorhandenen dazu.`,
-                  `Import ${backup.workouts.length} ${plural(backup.workouts.length, "workout", "workouts")}? They’re added to the existing ones.`,
-                ),
-              )
-            )
-              return;
+            const ok = await confirm({
+              title: t(
+                `${backup.workouts.length} ${plural(backup.workouts.length, "Training", "Trainings")} importieren?`,
+                `Import ${backup.workouts.length} ${plural(backup.workouts.length, "workout", "workouts")}?`,
+              ),
+              message: t("Sie kommen zu den vorhandenen dazu.", "They’re added to the existing ones."),
+              confirmLabel: t("Importieren", "Import"),
+              sticker: "repeat",
+            });
+            if (!ok) return;
             importBackup(backup, actions, data);
             toast(t("Import abgeschlossen", "Import complete"));
           }}

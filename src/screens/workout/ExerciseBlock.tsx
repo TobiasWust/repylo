@@ -42,7 +42,7 @@ export const ExerciseBlock = ({
 }) => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName } = app;
-  const { startRest, celebrate } = useFeedback();
+  const { startRest, celebrate, confirm } = useFeedback();
   const exercise = getExercise(data, entry.exerciseKey);
   const unit = data.settings.unit;
   const progression = suggestProgression(data, entry.exerciseKey, workout.id);
@@ -147,10 +147,14 @@ export const ExerciseBlock = ({
           </button>
           <button
             className="chip danger"
-            onClick={() =>
-              confirm(t("Übung aus diesem Training entfernen?", "Remove exercise from this workout?")) &&
-              actions.removeExercise(workout, entry.id)
-            }
+            onClick={async () => {
+              const ok = await confirm({
+                title: t("Übung aus diesem Training entfernen?", "Remove exercise from this workout?"),
+                confirmLabel: t("Entfernen", "Remove"),
+                danger: true,
+              });
+              if (ok) actions.removeExercise(workout, entry.id);
+            }}
           >
             <Icon name="trash" size={16} /> {t("Entfernen", "Remove")}
           </button>

@@ -427,6 +427,10 @@ small {
 .button.full {
   width: 100%;
 }
+.button.danger {
+  background: var(--danger);
+  color: var(--paper);
+}
 .button.dashed {
   border-style: dashed;
   box-shadow: none;
@@ -886,6 +890,64 @@ textarea.text-input {
     opacity: 0;
   }
 }
+/* ---------- Confirm / prompt dialog ---------- */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--backdrop);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fade 0.15s;
+}
+.dialog {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: var(--paper);
+  border: var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 22px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  animation: dialog-in 0.22s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.dialog h2 {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.dialog-message {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.dialog-sticker {
+  margin-top: -44px;
+  transform: rotate(-6deg);
+}
+.dialog .text-input {
+  margin-top: 4px;
+}
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+@keyframes dialog-in {
+  from {
+    transform: scale(0.85) translateY(12px);
+    opacity: 0;
+  }
+}
+
 /* Flex children would otherwise shrink (e.g. the chip row) when the list is long. */
 .sheet-body > * {
   flex-shrink: 0;
@@ -2020,7 +2082,7 @@ body:has(.overlay-screen) .rest-timer {
   position: relative;
   border-color: transparent;
 }
-[data-look="sketch"] :is(.tabbar, .celebration) {
+[data-look="sketch"] :is(.tabbar, .celebration, .dialog) {
   border-color: transparent;
   box-shadow: none;
 }
@@ -2031,7 +2093,7 @@ body:has(.overlay-screen) .rest-timer {
   border-color: transparent;
   box-shadow: none;
 }
-[data-look="sketch"] :is(.card, .stat-tile, .tabbar, .celebration, .pick-card) {
+[data-look="sketch"] :is(.card, .stat-tile, .tabbar, .celebration, .dialog, .pick-card) {
   --drop: 7px;
 } /* Faint squares on the paper itself. */
 
@@ -2066,7 +2128,8 @@ body:has(.overlay-screen) .rest-timer {
     .tips-box,
     .review-tile,
     .tabbar,
-    .celebration
+    .celebration,
+    .dialog
   )::after {
   content: "";
   position: absolute;
@@ -2089,7 +2152,8 @@ body:has(.overlay-screen) .rest-timer {
     .streak-badge,
     .suggest-chip,
     .tabbar,
-    .celebration
+    .celebration,
+    .dialog
   )::before {
   content: "";
   position: absolute;
