@@ -2112,3 +2112,24 @@ body:has(.overlay-screen) .rest-timer {
 [data-look="sketch"] :is(.button:not(.dashed), .tile-icon, .stat-tile, .rep-record, .plan-day)::after {
   border-image-source: url("./assets/pencil-frame-small.png");
 }
+/* Three variants of the same frame (as is, mirrored, flipped), so neighbouring
+   boxes don't wobble identically. Costs no extra image. */
+[data-look="sketch"]
+  :is(.card, .stat-tile, .tile-icon, .pick-card, .plan-day, .button:not(.dashed), .rep-record, .empty, .tips-box, .review-tile):nth-child(
+    3n + 2
+  )::after {
+  scale: -1 1;
+}
+[data-look="sketch"]
+  :is(.card, .stat-tile, .tile-icon, .pick-card, .plan-day, .button:not(.dashed), .rep-record, .empty, .tips-box, .review-tile):nth-child(
+    3n
+  )::after {
+  scale: 1 -1;
+}
+/* Quick-start icons sit alone in their tile, so vary by the tile's position. */
+[data-look="sketch"] .tile:nth-child(3n + 2) .tile-icon::after {
+  scale: -1 1;
+}
+[data-look="sketch"] .tile:nth-child(3n) .tile-icon::after {
+  scale: 1 -1;
+}
