@@ -107,6 +107,54 @@ const tips: Record<string, Tips> = {
     de: ["Unten volle Dehnung", "Oben eine Sekunde halten", "Knie gestreckt, nicht wippen"],
     en: ["Full stretch at the bottom", "Hold a second at the top", "Knees straight, no bouncing"],
   },
+  bw_squat: {
+    de: ["Füße schulterbreit, Fußspitzen leicht nach außen", "Hüfte nach hinten, so tief wie sauber möglich", "Fersen bleiben am Boden"],
+    en: ["Feet shoulder-width, toes slightly out", "Hips back, as deep as you can with good form", "Heels stay on the floor"],
+  },
+  bw_lunge: {
+    de: ["Großer Schritt, Oberkörper aufrecht", "Hinteres Knie Richtung Boden", "Wiederholungen pro Bein eintragen"],
+    en: ["Long step, upright torso", "Back knee towards the floor", "Log reps per leg"],
+  },
+  bw_split_squat: {
+    de: ["Hinterer Fuß auf Bank oder Sofa", "Senkrecht nach unten sinken", "Wiederholungen pro Bein eintragen"],
+    en: ["Back foot on a bench or sofa", "Sink straight down", "Log reps per leg"],
+  },
+  wall_sit: {
+    de: ["Rücken flach an der Wand", "Knie etwa im rechten Winkel", "Knie über den Füßen, nicht nach innen"],
+    en: ["Back flat against the wall", "Knees at about a right angle", "Knees over your feet, not caving in"],
+  },
+  pike_push_up: {
+    de: ["Hüfte hoch, Körper bildet ein umgedrehtes V", "Kopf zwischen den Händen Richtung Boden", "Schwerer: Füße erhöht aufstellen"],
+    en: ["Hips high, body forms an upside-down V", "Lower your head between your hands", "Harder: put your feet up on something"],
+  },
+  single_leg_glute_bridge: {
+    de: ["Ein Fuß am Boden, das andere Bein gestreckt", "Hüfte bleibt gerade, kippt nicht ab", "Wiederholungen pro Bein eintragen"],
+    en: ["One foot down, the other leg straight", "Keep your hips level", "Log reps per leg"],
+  },
+  copenhagen_plank: {
+    de: ["Seitstütz, oberes Bein auf einer Bank", "Hüfte hoch, Körper in einer Linie", "Leichter: Knie statt Fuß auf der Bank"],
+    en: ["Side plank, top leg on a bench", "Hips up, body in one line", "Easier: knee instead of foot on the bench"],
+  },
+  superman: {
+    de: ["Bauchlage, Arme nach vorne gestreckt", "Arme und Beine gleichzeitig leicht anheben", "Oben kurz halten, Blick zum Boden"],
+    en: ["Lie face down, arms stretched forward", "Lift arms and legs together, just a little", "Hold briefly, eyes on the floor"],
+  },
+  bird_dog: {
+    de: ["Vierfüßlerstand, Rücken gerade", "Gegenüberliegenden Arm und Bein strecken", "Langsam, Hüfte dreht nicht mit"],
+    en: ["On all fours, flat back", "Extend the opposite arm and leg", "Slowly, hips don't rotate"],
+  },
+  dead_hang: {
+    de: ["Schulterbreit an die Stange greifen", "Schultern aktiv, nicht ganz in die Gelenke sacken", "Füße frei, ruhig atmen"],
+    en: ["Grip the bar shoulder-width", "Keep shoulders engaged, don't sag fully", "Feet off the floor, breathe calmly"],
+  },
+  calf_raise_bodyweight: {
+    de: ["Fußballen auf einer Stufe, Ferse frei", "Langsam ganz nach unten, oben kurz halten", "Zu leicht? Einbeinig weitermachen"],
+    en: ["Balls of the feet on a step, heels free", "Slowly all the way down, brief hold at the top", "Too easy? Move on to single-leg"],
+  },
+  calf_raise_single_leg: {
+    de: ["Fußballen auf einer Stufe, Ferse frei", "Unten volle Dehnung, oben kurz halten", "Wiederholungen pro Bein eintragen"],
+    en: ["Ball of the foot on a step, heel free", "Full stretch at the bottom, brief hold at the top", "Log reps per leg"],
+  },
   pull_up: {
     de: ["Aus dem Hang Schulterblätter zuerst runterziehen", "Brust zur Stange, Ellbogen nach unten", "Unten ganz strecken"],
     en: ["From the hang, pull shoulder blades down first", "Chest to the bar, elbows down", "Fully extend at the bottom"],
