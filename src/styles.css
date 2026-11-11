@@ -1,36 +1,36 @@
 /* repylo — playful, bold, high-contrast. Thick ink outlines + hard shadows. */
 
 /* ---------- Colour themes ----------
-   Every colour in the app comes from these tokens. Fjord is the default;
+   Every colour in the app comes from these tokens. Lagune is the default;
    the others switch in via <html data-theme="…"> (settings → Display).
    The accent names (yellow, pink, …) are roles, not exact hues. */
 :root {
-  /* Fjord: steel blue, lemon, coral, lime. */
-  --bg: #789fbd;
+  /* Lagune: turquoise, sunny yellow, salmon, lavender. */
+  --bg: #2ed3b7;
   --brand: var(--bg);
-  --ink: #21161f;
-  --ink-rgb: 33 22 31;
-  --paper: #fdfff8;
-  --yellow: #ede47c;
-  --pink: #d36b60;
-  --rose: #7e3554;
-  --mint: #cdf3f4;
-  --lavender: #b2d36d;
-  --sky: #aecae0;
-  --orange: #e5ae5c;
-  --muted: #33546c;
-  --muted-strong: #3e5368;
-  --danger: #b8433a;
-  --success: #2f7a4a;
+  --ink: #141414;
+  --ink-rgb: 20 20 20;
+  --paper: #ffffff;
+  --yellow: #ffd96a;
+  --pink: #ff8a8a;
+  --rose: #ff8a8a;
+  --mint: #a5f0dc;
+  --lavender: #cfc8ff;
+  --sky: #9fd5ff;
+  --orange: #ffb066;
+  --muted: #5d6766;
+  --muted-strong: #4b5352;
+  --danger: #b3261e;
+  --success: #127a64;
   /* Quiet surfaces and lines on paper. */
-  --soft: #eef2ee;
-  --track: #e6ebe6;
-  --hairline: #dfe5e0;
-  --highlight: #fbf7e0;
-  --faint: #bec6c1;
+  --soft: #f4f4ef;
+  --track: #ecece6;
+  --hairline: #e6e6e0;
+  --highlight: #fffbea;
+  --faint: #c9c9c9;
   /* Translucent wash over coloured cards, as "r g b" for rgb(var(--glass) / a). */
-  --glass: 255 255 250;
-  --backdrop: rgba(33, 22, 31, 0.45);
+  --glass: 255 255 255;
+  --backdrop: rgba(20, 20, 20, 0.45);
   /* Dots and squares on the page background. */
   --dots: rgba(255, 255, 255, 0.35);
   --bg-grid: rgba(255, 255, 255, 0.3);
@@ -47,30 +47,30 @@
   color-scheme: light;
 }
 
-/* Lagune: the original turquoise look. */
-[data-theme="lagune"] {
-  --bg: #2ed3b7;
-  --ink: #141414;
-  --ink-rgb: 20 20 20;
-  --paper: #ffffff;
-  --yellow: #ffd96a;
-  --pink: #ff8a8a;
-  --rose: #ff8a8a;
-  --mint: #a5f0dc;
-  --lavender: #cfc8ff;
-  --sky: #9fd5ff;
-  --orange: #ffb066;
-  --muted: #5d6766;
-  --muted-strong: #4b5352;
-  --danger: #b3261e;
-  --success: #127a64;
-  --soft: #f4f4ef;
-  --track: #ecece6;
-  --hairline: #e6e6e0;
-  --highlight: #fffbea;
-  --faint: #c9c9c9;
-  --glass: 255 255 255;
-  --backdrop: rgba(20, 20, 20, 0.45);
+/* Fjord: steel blue, lemon, coral, lime. */
+[data-theme="fjord"] {
+  --bg: #789fbd;
+  --ink: #21161f;
+  --ink-rgb: 33 22 31;
+  --paper: #fdfff8;
+  --yellow: #ede47c;
+  --pink: #d36b60;
+  --rose: #7e3554;
+  --mint: #cdf3f4;
+  --lavender: #b2d36d;
+  --sky: #aecae0;
+  --orange: #e5ae5c;
+  --muted: #33546c;
+  --muted-strong: #3e5368;
+  --danger: #b8433a;
+  --success: #2f7a4a;
+  --soft: #eef2ee;
+  --track: #e6ebe6;
+  --hairline: #dfe5e0;
+  --highlight: #fbf7e0;
+  --faint: #bec6c1;
+  --glass: 255 255 250;
+  --backdrop: rgba(33, 22, 31, 0.45);
 }
 
 /* Nacht: a dark notebook. Chalk-white ink on slate paper, deep muted

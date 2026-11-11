@@ -53,15 +53,15 @@
     var b = document.createElement("button");
     b.textContent = label;
     b.style.cssText =
-      "padding:12px 16px;border:2.5px solid #21161f;border-radius:14px;font:700 15px system-ui,sans-serif;background:" +
-      (dark ? "#21161f;color:#fdfff8" : "#fdfff8;color:#21161f");
+      "padding:12px 16px;border:2.5px solid #141414;border-radius:14px;font:700 15px system-ui,sans-serif;background:" +
+      (dark ? "#141414;color:#fff" : "#fff;color:#141414");
     b.onclick = onClick;
     return b;
   }
   function show() {
     var box = document.createElement("div");
     box.style.cssText =
-      "position:fixed;inset:auto 12px 12px 12px;z-index:9999;background:#ede47c;border:2.5px solid #21161f;border-radius:18px;box-shadow:4px 4px 0 #21161f;padding:16px;display:flex;flex-direction:column;gap:10px;font:15px system-ui,sans-serif;color:#21161f";
+      "position:fixed;inset:auto 12px 12px 12px;z-index:9999;background:#ffd96a;border:2.5px solid #141414;border-radius:18px;box-shadow:4px 4px 0 #141414;padding:16px;display:flex;flex-direction:column;gap:10px;font:15px system-ui,sans-serif;color:#141414";
     var title = document.createElement("strong");
     title.textContent = txt("repylo startet gerade nicht.", "repylo isn't starting.");
     var hint = document.createElement("div");
@@ -72,7 +72,7 @@
     var pre = document.createElement("textarea");
     pre.readOnly = true;
     pre.value = info();
-    pre.style.cssText = "height:160px;font:12px ui-monospace,monospace;border:2px solid #21161f;border-radius:10px;padding:8px";
+    pre.style.cssText = "height:160px;font:12px ui-monospace,monospace;border:2px solid #141414;border-radius:10px;padding:8px";
     var row = document.createElement("div");
     row.style.cssText = "display:flex;flex-wrap:wrap;gap:8px";
     row.appendChild(

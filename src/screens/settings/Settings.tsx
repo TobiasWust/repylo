@@ -175,7 +175,7 @@ export const Settings = () => {
         <Segmented
           value={look}
           onChange={(next) => {
-            applyLook(next);
+            applyLook(next, true);
             setLook(next);
           }}
           options={[
@@ -187,12 +187,12 @@ export const Settings = () => {
         <Segmented
           value={theme}
           onChange={(next) => {
-            applyTheme(next);
+            applyTheme(next, true);
             setTheme(next);
           }}
           options={[
-            { value: "fjord", label: "Fjord" },
             { value: "lagune", label: t("Lagune", "Lagoon") },
+            { value: "fjord", label: "Fjord" },
             { value: "nacht", label: t("Nacht", "Night") },
           ]}
         />
