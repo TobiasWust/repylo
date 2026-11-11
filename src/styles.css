@@ -1897,81 +1897,86 @@ body:has(.overlay-screen) .rest-timer {
 }
 
 /* ---------- Sketchbook look ----------
-   A colourful notepad: graph paper, hand-drawn pencil outlines with a faint
-   second stroke, hatched shadows, handwritten headings with a marker swipe.
-   The pencil filters live in index.html. */
+   A colourful notepad: graph paper, hand-drawn pencil outlines, hatched
+   shadows, handwritten headings with a marker swipe and watercolour fills.
+   The pencil filters live in index.html. Only active with the "sketch" look
+   (<html data-look="sketch">, switched in the settings); otherwise the app
+   keeps its original look with crisp boxes. */
 :root {
   --hand: "Shantell Sans Variable", "Shantell Sans", var(--font);
   --hatch: repeating-linear-gradient(-45deg, var(--ink) 0 1.3px, transparent 1.3px 4px);
 }
-body {
+[data-look="sketch"] body {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 
-:is(
-  .week-dot,
-  .list-icon,
-  .date-block,
-  .mini-button:not(.ghost),
-  .chip,
-  .check,
-  .bar,
-  .rep-record,
-  .empty,
-  .status-pill,
-  .tips-box,
-  .review-tile
-) {
+[data-look="sketch"]
+  :is(
+    .week-dot,
+    .list-icon,
+    .date-block,
+    .mini-button:not(.ghost),
+    .chip,
+    .check,
+    .bar,
+    .rep-record,
+    .empty,
+    .status-pill,
+    .tips-box,
+    .review-tile
+  ) {
   position: relative;
   border-color: transparent;
 }
-:is(.tabbar, .celebration) {
+[data-look="sketch"] :is(.tabbar, .celebration) {
   border-color: transparent;
   box-shadow: none;
 }
-:is(.card, .stat-tile, .button:not(.dashed), .icon-button, .tile-icon, .pick-card, .plan-day, .streak-badge, .suggest-chip) {
+[data-look="sketch"]
+  :is(.card, .stat-tile, .button:not(.dashed), .icon-button, .tile-icon, .pick-card, .plan-day, .streak-badge, .suggest-chip) {
   --drop: 3.5px;
   position: relative;
   border-color: transparent;
   box-shadow: none;
 }
-:is(.card, .stat-tile, .tabbar, .celebration, .pick-card) {
+[data-look="sketch"] :is(.card, .stat-tile, .tabbar, .celebration, .pick-card) {
   --drop: 7px;
-}
-/* Faint squares on the paper itself. */
-.card {
+} /* Faint squares on the paper itself. */
+
+[data-look="sketch"] .card {
   background-image:
     linear-gradient(rgba(20, 20, 20, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 20, 20, 0.045) 1px, transparent 1px);
   background-size: 18px 18px;
-}
-/* The outline as a single wobbly pencil line. */
-:is(
-  .card,
-  .stat-tile,
-  .button:not(.dashed),
-  .icon-button,
-  .tile-icon,
-  .pick-card,
-  .plan-day,
-  .streak-badge,
-  .suggest-chip,
-  .week-dot,
-  .list-icon,
-  .date-block,
-  .mini-button:not(.ghost),
-  .chip,
-  .check,
-  .bar,
-  .rep-record,
-  .empty,
-  .status-pill,
-  .tips-box,
-  .review-tile,
-  .tabbar,
-  .celebration
-)::after {
+} /* The outline as a single wobbly pencil line. */
+
+[data-look="sketch"]
+  :is(
+    .card,
+    .stat-tile,
+    .button:not(.dashed),
+    .icon-button,
+    .tile-icon,
+    .pick-card,
+    .plan-day,
+    .streak-badge,
+    .suggest-chip,
+    .week-dot,
+    .list-icon,
+    .date-block,
+    .mini-button:not(.ghost),
+    .chip,
+    .check,
+    .bar,
+    .rep-record,
+    .empty,
+    .status-pill,
+    .tips-box,
+    .review-tile,
+    .tabbar,
+    .celebration
+  )::after {
   content: "";
   position: absolute;
   inset: -2.5px;
@@ -1979,21 +1984,22 @@ body {
   border-radius: inherit;
   filter: url(#pencil);
   pointer-events: none;
-}
-/* Hatched shadow: an L-shaped strip below and right of the element. */
-:is(
-  .card,
-  .stat-tile,
-  .button:not(.dashed),
-  .icon-button,
-  .tile-icon,
-  .pick-card,
-  .plan-day,
-  .streak-badge,
-  .suggest-chip,
-  .tabbar,
-  .celebration
-)::before {
+} /* Hatched shadow: an L-shaped strip below and right of the element. */
+
+[data-look="sketch"]
+  :is(
+    .card,
+    .stat-tile,
+    .button:not(.dashed),
+    .icon-button,
+    .tile-icon,
+    .pick-card,
+    .plan-day,
+    .streak-badge,
+    .suggest-chip,
+    .tabbar,
+    .celebration
+  )::before {
   content: "";
   position: absolute;
   inset: calc(var(--drop) - 2.5px) calc(-2.5px - var(--drop)) calc(-2.5px - var(--drop)) calc(var(--drop) - 2.5px);
@@ -2010,31 +2016,71 @@ body {
   filter: url(#pencil-2);
   pointer-events: none;
 }
-:is(.button, .icon-button, .list-card, .suggest-chip):active::before {
+[data-look="sketch"] :is(.button, .icon-button, .list-card, .suggest-chip):active::before {
   opacity: 0;
-}
+} /* Handwritten headings; page and section titles get a marker swipe. */
 
-/* Handwritten headings; page and section titles get a marker swipe. */
-:is(.logo, .page-title, .section-title, .card-title, .day-card h3, .overlay-title h1, .stat-tile strong, .streak-badge) {
+[data-look="sketch"]
+  :is(.logo, .page-title, .section-title, .card-title, .day-card h3, .overlay-title h1, .stat-tile strong, .streak-badge) {
   font-family: var(--hand);
   letter-spacing: -0.01em;
 }
-:is(.page-title, .section-title) {
+[data-look="sketch"] :is(.page-title, .section-title) {
   width: fit-content;
   padding: 0 6px;
   margin-left: -6px;
   background: linear-gradient(176deg, transparent 52%, var(--yellow) 52% 86%, transparent 86%);
-}
+} /* Stuck-in-a-notebook tilt for the small tiles. */
 
-/* Stuck-in-a-notebook tilt for the small tiles. */
-.stat-grid > :nth-child(odd),
-.tile:nth-child(odd) .tile-icon {
+[data-look="sketch"] .stat-grid > :nth-child(odd),
+[data-look="sketch"] .tile:nth-child(odd) .tile-icon {
   rotate: -0.7deg;
 }
-.stat-grid > :nth-child(even),
-.tile:nth-child(even) .tile-icon {
+[data-look="sketch"] .stat-grid > :nth-child(even),
+[data-look="sketch"] .tile:nth-child(even) .tile-icon {
   rotate: 0.6deg;
 }
-.day-card {
+[data-look="sketch"] .day-card {
   rotate: -0.5deg;
+} /* ---------- Watercolour ----------
+   Fills look like a Japanese watercolour wash: the white paper shows through
+   unevenly, with fine grain and a slightly darker rim where the paint pooled.
+   Part of the notepad look. */
+
+:root {
+  --wash: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.009' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.3 0 0 0 -0.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.5 0 0 0 -0.15'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+[data-look="sketch"] :is(.stat-tile, .tile-icon, .button.yellow, .button.pink, .icon-button, .suggest-chip, .chip, .bar) {
+  background-image: var(--wash), var(--grain);
+  background-size:
+    640px 640px,
+    160px 160px;
+}
+[data-look="sketch"] .card {
+  background-image:
+    linear-gradient(rgba(20, 20, 20, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 20, 20, 0.045) 1px, transparent 1px),
+    var(--wash), var(--grain);
+  background-size:
+    18px 18px,
+    18px 18px,
+    640px 640px,
+    160px 160px;
+} /* Pigment pooled at the edge. */
+
+[data-look="sketch"] :is(.card, .stat-tile, .tile-icon) {
+  box-shadow:
+    inset 0 0 0 1.5px rgba(0, 0, 0, 0.06),
+    inset 0 0 6px rgba(0, 0, 0, 0.05);
+} /* The page itself: a soft, uneven wash. */
+
+[data-look="sketch"] body {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+    var(--wash), var(--grain);
+  background-size:
+    22px 22px,
+    22px 22px,
+    640px 640px,
+    160px 160px;
 }

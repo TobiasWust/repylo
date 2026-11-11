@@ -7,6 +7,7 @@ import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
 import { InstallCard } from "../../ui/InstallCard";
 import { LegalFooter } from "../../ui/Legal";
+import { applyLook, getLook } from "../../ui/look";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { goalShort, plural } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
@@ -18,6 +19,7 @@ export const Settings = () => {
   const { toast } = useFeedback();
   const [sheet, setSheet] = useState<"share" | "connect" | null>(null);
   const [plan, setPlan] = useState(false);
+  const [look, setLook] = useState(getLook);
   const fileInput = useRef<HTMLInputElement>(null);
   const s = data.settings;
   const customExercises = [...data.exercises.values()].filter((e) => e.custom);
@@ -115,6 +117,18 @@ export const Settings = () => {
           options={[
             { value: "kg", label: "kg" },
             { value: "lb", label: "lbs" },
+          ]}
+        />
+        <div className="field-label">{t("Stil", "Style")}</div>
+        <Segmented
+          value={look}
+          onChange={(next) => {
+            applyLook(next);
+            setLook(next);
+          }}
+          options={[
+            { value: "classic", label: t("Klassisch", "Classic") },
+            { value: "sketch", label: t("Notizblock", "Notepad") },
           ]}
         />
       </section>
