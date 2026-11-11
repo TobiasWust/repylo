@@ -125,6 +125,16 @@ export const ExerciseBlock = ({
             <Sticker name="plate" size={26} />
           </button>
         )}
+        {tipsFor(entry.exerciseKey, lang) && (
+          <button
+            className={`icon-button ${showTips ? "selected" : ""}`}
+            onClick={() => setShowTips(!showTips)}
+            aria-label={t("Technik-Tipps", "Technique tips")}
+            aria-pressed={showTips}
+          >
+            <Sticker name="bulb" size={26} />
+          </button>
+        )}
         <button className="icon-button" onClick={() => setMenu(!menu)} aria-label={t("Mehr", "More")}>
           <Icon name="more" />
         </button>
@@ -137,11 +147,6 @@ export const ExerciseBlock = ({
           <button className="chip" disabled={index === count - 1} onClick={() => actions.moveExercise(workout, entry.id, 1)}>
             <Icon name="down" size={16} /> {t("Runter", "Down")}
           </button>
-          {tipsFor(entry.exerciseKey, lang) && (
-            <button className={`chip ${showTips ? "selected" : ""}`} onClick={() => setShowTips(!showTips)}>
-              <Sticker name="bulb" size={16} /> {t("Tipps", "Tips")}
-            </button>
-          )}
           <button className="chip" onClick={() => setShowNote(true)}>
             <Icon name="note" size={16} /> {t("Notiz", "Note")}
           </button>

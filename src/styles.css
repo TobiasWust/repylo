@@ -34,12 +34,20 @@
   /* Dots and squares on the page background. */
   --dots: rgba(255, 255, 255, 0.35);
   --bg-grid: rgba(255, 255, 255, 0.3);
+  /* Ink has three jobs that only a dark theme needs to tell apart: text
+     (--ink), outlines (--edge) and solid emphasis fills such as the main
+     button or a chosen option (--solid, with --on-solid text on it). */
+  --edge: var(--ink);
+  --solid: var(--ink);
+  --on-solid: var(--paper);
+  --on-solid-warm: var(--yellow);
+  --on-solid-cool: var(--brand);
   /* Hard shadows and pencil hatching. */
   --shade: var(--ink);
   --hatch-ink: var(--ink);
   --frame-filter: none;
 
-  --line: 2.5px solid var(--ink);
+  --line: 2.5px solid var(--edge);
   --shadow: 4px 4px 0 var(--shade);
   --shadow-sm: 2px 2px 0 var(--shade);
   --radius: 18px;
@@ -78,8 +86,8 @@
 [data-theme="nacht"] {
   --bg: #1b2430;
   --brand: #6f9cc4;
-  --ink: #ece6d8;
-  --ink-rgb: 236 230 216;
+  --ink: #e3ddd0;
+  --ink-rgb: 227 221 208;
   --paper: #29323f;
   --yellow: #7a6b2b;
   --pink: #8e4640;
@@ -102,9 +110,16 @@
   --dots: rgba(255, 255, 255, 0.08);
   --bg-grid: rgba(255, 255, 255, 0.05);
   --shade: #0b0f15;
-  --hatch-ink: rgba(236, 230, 216, 0.4);
-  /* The pencil frames are dark PNGs; flip them to chalk. */
-  --frame-filter: invert(0.92);
+  /* Calm grey-blue outlines and a deep blue for solid fills, so the cream
+     ink is left for text only. */
+  --edge: #7a8697;
+  --solid: #2f5d8a;
+  --on-solid: #f3eee4;
+  --on-solid-warm: #f0cd62;
+  --on-solid-cool: #a8e6c8;
+  --hatch-ink: rgba(227, 221, 208, 0.2);
+  /* The pencil frames are dark PNGs: flip them to soft chalk lines. */
+  --frame-filter: invert(0.92) opacity(0.4);
   color-scheme: dark;
 }
 
@@ -265,7 +280,7 @@ small {
   flex-direction: column;
 }
 .hero-stats div + div {
-  border-left: 2px solid var(--ink);
+  border-left: 2px solid var(--edge);
   padding-left: 20px;
 }
 .hero-stats span {
@@ -292,8 +307,8 @@ small {
   background: rgb(var(--glass) / 0.6);
 }
 .week-dot.on {
-  background: var(--ink);
-  color: var(--yellow);
+  background: var(--solid);
+  color: var(--on-solid-warm);
 }
 .week-dot.today {
   outline: 3px dashed var(--ink);
@@ -405,8 +420,8 @@ small {
   box-shadow: none;
 }
 .button.dark {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--solid);
+  color: var(--on-solid);
 }
 .button.yellow {
   background: var(--yellow);
@@ -450,6 +465,9 @@ small {
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
 }
+.icon-button.selected {
+  background: var(--lavender);
+}
 .icon-button.small {
   width: 32px;
   height: 32px;
@@ -461,7 +479,7 @@ small {
   height: 34px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 10px;
   background: var(--paper);
   font-size: 15px;
@@ -508,14 +526,14 @@ small {
   padding: 2px 2px 6px;
   margin: 0 -2px;
   /* Visible, so a mouse can tell (and use) that the row scrolls. */
-  scrollbar-color: var(--ink) transparent;
+  scrollbar-color: var(--edge) transparent;
 }
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 999px;
   background: var(--paper);
   font-weight: 600;
@@ -526,8 +544,8 @@ small {
   background: rgb(var(--glass) / 0.75);
 }
 .chip.selected {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--solid);
+  color: var(--on-solid);
 }
 .chip.selected.alt {
   background: var(--lavender);
@@ -537,8 +555,8 @@ small {
   color: var(--danger);
 }
 .chip-dark {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--solid);
+  color: var(--on-solid);
 }
 .badge {
   font-weight: 800;
@@ -693,8 +711,8 @@ small {
   padding: 0;
 }
 .progress-pill {
-  background: var(--ink);
-  color: var(--yellow);
+  background: var(--solid);
+  color: var(--on-solid-warm);
   font-weight: 800;
   border-radius: 999px;
   padding: 6px 12px;
@@ -742,7 +760,7 @@ small {
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   background: var(--yellow);
   border-radius: 12px;
   padding: 8px 12px;
@@ -793,7 +811,7 @@ small {
   width: 100%;
   min-width: 0;
   height: 44px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 10px;
   text-align: center;
   font-weight: 700;
@@ -817,18 +835,18 @@ small {
   height: 42px;
   display: grid;
   place-items: center;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 12px;
   background: var(--paper);
   color: var(--faint);
 }
 .check.on {
-  background: var(--ink);
-  color: var(--brand);
+  background: var(--solid);
+  color: var(--on-solid-cool);
 }
 .text-input {
   width: 100%;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 12px;
   padding: 12px;
   background: var(--paper);
@@ -1020,7 +1038,7 @@ textarea.text-input {
 .check-line input {
   width: 20px;
   height: 20px;
-  accent-color: var(--ink);
+  accent-color: var(--edge);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -1054,7 +1072,7 @@ textarea.text-input {
 /* ---------- Segmented ---------- */
 .segmented {
   display: flex;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 12px;
   overflow: hidden;
   background: var(--paper);
@@ -1077,10 +1095,10 @@ textarea.text-input {
   transition: color 0.2s;
 }
 .segmented label + label {
-  border-left: 2px solid var(--ink);
+  border-left: 2px solid var(--edge);
 }
 .segmented label.active {
-  color: var(--paper);
+  color: var(--on-solid);
 }
 /* The radio itself is invisible; the label is the control. */
 .segmented input {
@@ -1161,14 +1179,14 @@ textarea.text-input {
 }
 .chart-dot {
   fill: var(--yellow);
-  stroke: var(--ink);
+  stroke: var(--edge);
   stroke-width: 2;
   cursor: pointer;
 }
 .chart-tooltip {
   font-size: 14px;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--solid);
+  color: var(--on-solid);
   padding: 6px 10px;
   border-radius: 10px;
   align-self: flex-start;
@@ -1191,7 +1209,7 @@ textarea.text-input {
 }
 .bar {
   background: var(--lavender);
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 6px 6px 2px 2px;
   min-height: 3px;
 }
@@ -1235,7 +1253,7 @@ textarea.text-input {
 }
 .heat.on {
   background: var(--brand);
-  box-shadow: inset 0 0 0 1.5px var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--edge);
 }
 .heat.future {
   background: transparent;
@@ -1256,7 +1274,7 @@ textarea.text-input {
 .muscle-track {
   position: relative;
   height: 16px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 999px;
   background: var(--soft);
   overflow: hidden;
@@ -1279,7 +1297,7 @@ textarea.text-input {
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--ink);
+  background: var(--edge);
 }
 .muscle-value {
   text-align: right;
@@ -1302,7 +1320,7 @@ textarea.text-input {
 .ratio-bar {
   position: relative;
   height: 18px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 999px;
   background: var(--lavender);
   overflow: hidden;
@@ -1310,7 +1328,7 @@ textarea.text-input {
 .ratio-bar div {
   height: 100%;
   background: var(--pink);
-  border-right: 2px solid var(--ink);
+  border-right: 2px solid var(--edge);
 }
 /* Where the bar would split if the pair were perfectly balanced. */
 .ratio-ideal {
@@ -1318,7 +1336,7 @@ textarea.text-input {
   top: 3px;
   bottom: 3px;
   width: 0;
-  border-left: 2px dashed var(--ink);
+  border-left: 2px dashed var(--edge);
   opacity: 0.45;
 }
 .balance-pair + .balance-pair {
@@ -1352,7 +1370,7 @@ textarea.text-input {
   gap: 8px;
 }
 .rep-record {
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 12px;
   padding: 6px 8px;
   display: flex;
@@ -1402,14 +1420,14 @@ details[open] {
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   background: var(--paper);
   white-space: nowrap;
   margin-bottom: 10px;
 }
 .status-pill.ok {
-  background: var(--ink);
-  color: var(--brand);
+  background: var(--solid);
+  color: var(--on-solid-cool);
 }
 .status-pill.error {
   background: var(--pink);
@@ -1510,17 +1528,17 @@ details[open] {
   width: 18px;
   height: 14px;
   background: #bbb;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
 }
 .bar-center {
   width: 90px;
   height: 12px;
   background: #ccc;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
 }
 .plate {
   width: 24px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 5px;
   display: grid;
   place-items: center;
@@ -1569,7 +1587,7 @@ details[open] {
 }
 .tabbar button.active .tab-icon {
   background: var(--yellow);
-  border-color: var(--ink);
+  border-color: var(--edge);
 }
 
 /* ---------- Rest timer, celebrations, toast ---------- */
@@ -1640,7 +1658,7 @@ body:has(.overlay-screen) .rest-timer {
   top: -20px;
   width: 9px;
   height: 14px;
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--edge);
   border-radius: 2px;
   animation-name: fall;
   animation-timing-function: cubic-bezier(0.3, 0.6, 0.6, 1);
@@ -1700,8 +1718,8 @@ body:has(.overlay-screen) .rest-timer {
   top: calc(env(safe-area-inset-top) + 18px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--solid);
+  color: var(--on-solid);
   padding: 10px 16px;
   border-radius: 999px;
   font-weight: 700;
@@ -1772,7 +1790,7 @@ body:has(.overlay-screen) .rest-timer {
   display: flex;
   align-items: stretch;
   min-width: 0;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 12px;
   overflow: hidden;
   background: var(--paper);
@@ -1794,10 +1812,10 @@ body:has(.overlay-screen) .rest-timer {
   touch-action: manipulation;
 }
 .step:first-child {
-  border-right: 2px solid var(--ink);
+  border-right: 2px solid var(--edge);
 }
 .step:last-child {
-  border-left: 2px solid var(--ink);
+  border-left: 2px solid var(--edge);
 }
 .step:active {
   background: var(--yellow);
@@ -1818,7 +1836,7 @@ body:has(.overlay-screen) .rest-timer {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   height: 18px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 999px;
   overflow: visible;
 }
@@ -1829,7 +1847,7 @@ body:has(.overlay-screen) .rest-timer {
   border-radius: 0 999px 999px 0;
 }
 .level-bar span + span {
-  border-left: 1.5px solid var(--ink);
+  border-left: 1.5px solid var(--edge);
 }
 .level-marker {
   position: absolute;
@@ -1837,7 +1855,7 @@ body:has(.overlay-screen) .rest-timer {
   width: 8px;
   height: 26px;
   margin-left: -4px;
-  background: var(--ink);
+  background: var(--solid);
   border: 2px solid var(--paper);
   border-radius: 4px;
 }
@@ -1909,7 +1927,7 @@ body:has(.overlay-screen) .rest-timer {
   position: relative;
   margin-top: 6px;
   background: var(--yellow);
-  border: 2.5px solid var(--ink);
+  border: 2.5px solid var(--edge);
   border-radius: 14px;
   padding: 10px 12px;
   display: flex;
@@ -1924,8 +1942,8 @@ body:has(.overlay-screen) .rest-timer {
   width: 14px;
   height: 14px;
   background: var(--yellow);
-  border-left: 2.5px solid var(--ink);
-  border-top: 2.5px solid var(--ink);
+  border-left: 2.5px solid var(--edge);
+  border-top: 2.5px solid var(--edge);
   transform: translateX(-50%) rotate(45deg);
   border-top-left-radius: 3px;
 }
@@ -1938,7 +1956,7 @@ body:has(.overlay-screen) .rest-timer {
   gap: 10px;
   text-align: left;
   background: rgb(var(--glass) / 0.7);
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 12px;
   padding: 8px 10px;
 }
@@ -1992,7 +2010,7 @@ body:has(.overlay-screen) .rest-timer {
 }
 .tips-box {
   background: var(--yellow);
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 12px;
   padding: 10px 12px;
 }
@@ -2014,7 +2032,7 @@ body:has(.overlay-screen) .rest-timer {
   font-weight: 800;
 }
 .day-bubble-stats span {
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 999px;
   padding: 1px 8px;
   background: var(--paper);
@@ -2089,7 +2107,7 @@ body:has(.overlay-screen) .rest-timer {
 .body-legend i {
   width: 14px;
   height: 14px;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--edge);
   border-radius: 4px;
 }
 .body-detail {
@@ -2475,7 +2493,7 @@ body:has(.overlay-screen) .rest-timer {
 .progress-pill.complete {
   background: var(--yellow);
   color: var(--ink);
-  box-shadow: inset 0 0 0 2.5px var(--ink);
+  box-shadow: inset 0 0 0 2.5px var(--edge);
 }
 @keyframes bump {
   50% {
@@ -2613,7 +2631,7 @@ body:has(.overlay-screen) .rest-timer {
   bottom: 0;
   left: 0;
   width: 0;
-  background: var(--ink);
+  background: var(--solid);
   pointer-events: none;
   opacity: 0;
 }
