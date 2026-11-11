@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useModal } from "./modal";
 import { reducedMotion } from "./motion";
 import { Sticker, type StickerName } from "./stickers";
 
@@ -48,29 +49,24 @@ export const Icon = ({ name, size = 22 }: { name: IconName; size?: number }) => 
   </svg>
 );
 
-/** Bottom sheet modal. Closes on backdrop tap. */
+const closeLabel = () => (document.documentElement.lang === "de" ? "Schließen" : "Close");
+
+/** Bottom sheet modal. Closes on Escape, the back gesture or a tap beside it. */
 export const Sheet = ({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) => {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    document.body.classList.add("no-scroll");
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.classList.remove("no-scroll");
-    };
-  }, [onClose]);
+  const modal = useModal(onClose);
+  const titleId = useId();
   return (
-    <div className="sheet-backdrop" onClick={onClose}>
-      <div className="sheet" role="dialog" aria-label={title} onClick={(e) => e.stopPropagation()}>
+    <dialog className="modal-shell sheet-shell" aria-labelledby={titleId} {...modal}>
+      <div className="sheet">
         <div className="sheet-header">
-          <h2>{title}</h2>
-          <button className="icon-button" onClick={onClose} aria-label="close">
+          <h2 id={titleId}>{title}</h2>
+          <button className="icon-button" onClick={onClose} aria-label={closeLabel()}>
             <Icon name="close" />
           </button>
         </div>
         <div className="sheet-body">{children}</div>
       </div>
-    </div>
+    </dialog>
   );
 };
 
@@ -297,15 +293,23 @@ export const BarChart = ({
   );
 };
 
+/**
+ * A row of mutually exclusive options. Real radio buttons underneath, so the
+ * group is one Tab stop and arrow keys move the choice; `label` names the
+ * group for screen readers.
+ */
 export const Segmented = <T extends string>({
   value,
   options,
   onChange,
+  label,
 }: {
   value: T;
   options: readonly { value: T; label: string }[];
   onChange: (v: T) => void;
+  label: string;
 }) => {
+  const name = useId();
   const box = useRef<HTMLDivElement>(null);
   const pill = useRef<HTMLSpanElement>(null);
   const index = options.findIndex((o) => o.value === value);
@@ -316,11 +320,11 @@ export const Segmented = <T extends string>({
     const marker = pill.current;
     if (!el || !marker) return;
     const place = () => {
-      const button = el.querySelectorAll("button")[index];
-      marker.style.opacity = button ? "1" : "0";
-      if (!button) return;
-      marker.style.transform = `translateX(${button.offsetLeft}px)`;
-      marker.style.width = `${button.offsetWidth}px`;
+      const option = el.querySelectorAll("label")[index];
+      marker.style.opacity = option ? "1" : "0";
+      if (!option) return;
+      marker.style.transform = `translateX(${option.offsetLeft}px)`;
+      marker.style.width = `${option.offsetWidth}px`;
     };
     place();
     // Only animate moves, not the first placement.
@@ -333,18 +337,13 @@ export const Segmented = <T extends string>({
     };
   }, [index, options.length]);
   return (
-    <div className="segmented" role="radiogroup" ref={box}>
+    <div className="segmented" role="radiogroup" aria-label={label} ref={box}>
       <span className="segmented-pill" ref={pill} aria-hidden />
       {options.map((o) => (
-        <button
-          key={o.value}
-          role="radio"
-          aria-checked={o.value === value}
-          className={o.value === value ? "active" : ""}
-          onClick={() => onChange(o.value)}
-        >
-          {o.label}
-        </button>
+        <label key={o.value} className={o.value === value ? "active" : ""}>
+          <input type="radio" name={name} value={o.value} checked={o.value === value} onChange={() => onChange(o.value)} />
+          <span>{o.label}</span>
+        </label>
       ))}
     </div>
   );

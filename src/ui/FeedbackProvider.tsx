@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { FeedbackContext, type ConfirmOptions, type PromptOptions } from "./feedback";
+import { useModal } from "./modal";
 import { Sticker } from "./stickers";
 
 const beep = () => {
@@ -40,6 +41,27 @@ const Confetti = () => {
   );
 };
 
+/**
+ * The toast is a manual popover so it shows above an open sheet or dialog
+ * (those sit in the browser's top layer). Without popover support it stays
+ * a plain fixed element.
+ */
+const Toast = ({ message }: { message: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    try {
+      ref.current?.showPopover?.();
+    } catch {
+      // Already shown, or popovers unsupported: it is visible either way.
+    }
+  }, []);
+  return (
+    <div ref={ref} popover="manual" className="toast">
+      {message}
+    </div>
+  );
+};
+
 type DialogRequest =
   | { kind: "confirm"; options: ConfirmOptions; resolve: (ok: boolean) => void }
   | { kind: "prompt"; options: PromptOptions; resolve: (text: string | null) => void };
@@ -59,34 +81,26 @@ const Dialog = ({ request, cancelLabel, onDone }: { request: DialogRequest; canc
     onDone();
   };
 
+  // Escape, the back gesture and a tap beside the card all cancel. As the
+  // newest modal it sits above an open sheet and only it closes.
+  const modal = useModal(() => finish(false));
+
   useEffect(() => {
     // Destructive actions start on "cancel" so a stray Enter can't delete anything.
     if (inputRef.current) inputRef.current.select();
     else (danger ? cancelRef : confirmRef).current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      e.stopPropagation();
-      cancelRef.current?.click();
-    };
-    // Capture so an open sheet underneath doesn't also close on the same Escape.
-    document.addEventListener("keydown", onKey, true);
-    document.body.classList.add("no-scroll");
-    return () => {
-      document.removeEventListener("keydown", onKey, true);
-      // A sheet below may still want the body locked.
-      if (!document.querySelector(".sheet-backdrop")) document.body.classList.remove("no-scroll");
-    };
   }, [danger]);
 
   return (
-    <div className="dialog-backdrop" onClick={() => finish(false)}>
+    <dialog
+      className="modal-shell dialog-shell"
+      role={request.kind === "confirm" ? "alertdialog" : undefined}
+      aria-labelledby="dialog-title"
+      aria-describedby={request.kind === "confirm" && request.options.message ? "dialog-message" : undefined}
+      {...modal}
+    >
       <form
         className="dialog"
-        role={request.kind === "confirm" ? "alertdialog" : "dialog"}
-        aria-modal="true"
-        aria-labelledby="dialog-title"
-        aria-describedby={request.kind === "confirm" && request.options.message ? "dialog-message" : undefined}
-        onClick={(e) => e.stopPropagation()}
         onSubmit={(e) => {
           e.preventDefault();
           finish(true);
@@ -125,7 +139,7 @@ const Dialog = ({ request, cancelLabel, onDone }: { request: DialogRequest; canc
           </button>
         </div>
       </form>
-    </div>
+    </dialog>
   );
 };
 
@@ -164,17 +178,37 @@ export const FeedbackProvider = ({ children, labels }: { children: ReactNode; la
     setRestEnd(Date.now() + seconds * 1000);
   }, []);
 
-  const celebrate = useCallback((message: string) => {
-    navigator.vibrate?.([60, 40, 60, 40, 120]);
-    setCelebration({ id: Date.now(), message });
+  // Toasts and celebrations are only seen, so screen readers get them read out:
+  // via ariaNotify() where available, else through a polite live region.
+  const [announcement, setAnnouncement] = useState("");
+  const announce = useCallback((message: string) => {
+    const doc = document as Document & { ariaNotify?: (message: string) => void };
+    if (doc.ariaNotify) return doc.ariaNotify(message);
+    // The same text twice in a row would not be read again; vary it invisibly.
+    setAnnouncement((previous) => (previous === message ? `${message}\u00a0` : message));
   }, []);
+
+  const celebrate = useCallback(
+    (message: string) => {
+      navigator.vibrate?.([60, 40, 60, 40, 120]);
+      setCelebration({ id: Date.now(), message });
+      announce(message);
+    },
+    [announce],
+  );
   useEffect(() => {
     if (!celebration) return;
     const id = setTimeout(() => setCelebration(null), 3200);
     return () => clearTimeout(id);
   }, [celebration]);
 
-  const toast = useCallback((message: string) => setToastMessage({ id: Date.now(), message }), []);
+  const toast = useCallback(
+    (message: string) => {
+      setToastMessage({ id: Date.now(), message });
+      announce(message);
+    },
+    [announce],
+  );
   useEffect(() => {
     if (!toastMessage) return;
     const id = setTimeout(() => setToastMessage(null), 2600);
@@ -238,11 +272,10 @@ export const FeedbackProvider = ({ children, labels }: { children: ReactNode; la
         </div>
       )}
       {dialog && <Dialog key={dialog.options.title} request={dialog} cancelLabel={labels.cancel} onDone={closeDialog} />}
-      {toastMessage && (
-        <div key={toastMessage.id} className="toast">
-          {toastMessage.message}
-        </div>
-      )}
+      {toastMessage && <Toast key={toastMessage.id} message={toastMessage.message} />}
+      <div className="sr-only" role="status">
+        {announcement}
+      </div>
     </FeedbackContext>
   );
 };

@@ -50,6 +50,7 @@ const StandardsPicker = () => {
         {t("Mit welchen Richtwerten möchtest du dich vergleichen?", "Which standards do you want to compare against?")}
       </p>
       <Segmented
+        label={t("Kraft-Richtwerte", "Strength standards")}
         value={"" as "male" | "female" | ""}
         onChange={(v) => v && actions.updateSettings({ standards: v })}
         options={[

@@ -58,18 +58,21 @@ export const Settings = () => {
           {t("Ziel (bestimmt Wiederholungsbereich und Vorschläge)", "Goal (sets rep range and suggestions)")}
         </div>
         <Segmented<Goal>
+          label={t("Trainingsziel", "Training goal")}
           value={s.goal}
           onChange={(goal) => actions.updateSettings({ goal, restSeconds: defaultRest[goal] })}
           options={(["strength", "hypertrophy", "endurance"] as const).map((g) => ({ value: g, label: goalShort(g, lang) }))}
         />
         <div className="field-label">{t("Wochenziel (Trainingstage pro Woche)", "Weekly goal (training days per week)")}</div>
         <Segmented
+          label={t("Wochenziel (Trainingstage pro Woche)", "Weekly goal (training days per week)")}
           value={String(s.weeklyGoal)}
           onChange={(v) => actions.updateSettings({ weeklyGoal: Number(v) })}
           options={["1", "2", "3", "4", "5", "6", "7"].map((v) => ({ value: v, label: v }))}
         />
         <div className="field-label">{t("Neue Sätze vorbelegen mit", "Pre-fill new sets with")}</div>
         <Segmented
+          label={t("Neue Sätze vorbelegen mit", "Pre-fill new sets with")}
           value={s.prefill}
           onChange={(prefill) => actions.updateSettings({ prefill })}
           options={[
@@ -79,6 +82,7 @@ export const Settings = () => {
         />
         <div className="field-label">{t("Kraft-Richtwerte", "Strength standards")}</div>
         <Segmented
+          label={t("Kraft-Richtwerte", "Strength standards")}
           value={s.standards ?? ""}
           onChange={(v) => v && actions.updateSettings({ standards: v })}
           options={[
@@ -88,6 +92,7 @@ export const Settings = () => {
         />
         <div className="field-label">{t("Pausentimer", "Rest timer")}</div>
         <Segmented
+          label={t("Pausentimer", "Rest timer")}
           value={String(s.restSeconds)}
           onChange={(v) => actions.updateSettings({ restSeconds: Number(v) })}
           options={["0", "60", "90", "120", "180", "240"].map((v) => ({
@@ -164,6 +169,7 @@ export const Settings = () => {
         <h2 className="card-title">{t("Darstellung", "Display")}</h2>
         <div className="field-label">{t("Sprache", "Language")}</div>
         <Segmented
+          label={t("Sprache", "Language")}
           value={lang}
           onChange={(language) => actions.updateSettings({ language })}
           options={[
@@ -173,6 +179,7 @@ export const Settings = () => {
         />
         <div className="field-label">{t("Einheit", "Unit")}</div>
         <Segmented
+          label={t("Einheit", "Unit")}
           value={s.unit}
           onChange={(unit) => actions.updateSettings({ unit, barWeight: unit === "kg" ? 20 : 20.41 })}
           options={[
@@ -182,6 +189,7 @@ export const Settings = () => {
         />
         <div className="field-label">{t("Stil", "Style")}</div>
         <Segmented
+          label={t("Stil", "Style")}
           value={look}
           onChange={(next) => {
             applyLook(next, true);
@@ -194,6 +202,7 @@ export const Settings = () => {
         />
         <div className="field-label">{t("Farben", "Colours")}</div>
         <Segmented
+          label={t("Farben", "Colours")}
           value={theme}
           onChange={(next) => {
             applyTheme(next, true);

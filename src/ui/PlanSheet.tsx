@@ -29,6 +29,7 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
       </p>
       <div className="field-label">{t("Art", "Type")}</div>
       <Segmented
+        label={t("Art", "Type")}
         value={style}
         onChange={(next) => {
           setStyle(next);
@@ -52,9 +53,15 @@ export const PlanSheet = ({ onClose }: { onClose: () => void }) => {
             )}
       </p>
       <div className="field-label">{t("Trainingstage pro Woche", "Training days per week")}</div>
-      <Segmented value={days} onChange={setDays} options={["2", "3", "4", "5", "6"].map((v) => ({ value: v, label: v }))} />
+      <Segmented
+        label={t("Trainingstage pro Woche", "Training days per week")}
+        value={days}
+        onChange={setDays}
+        options={["2", "3", "4", "5", "6"].map((v) => ({ value: v, label: v }))}
+      />
       <div className="field-label">{t("Wo trainierst du?", "Where do you train?")}</div>
       <Segmented
+        label={t("Wo trainierst du?", "Where do you train?")}
         value={place}
         onChange={setPlace}
         options={[

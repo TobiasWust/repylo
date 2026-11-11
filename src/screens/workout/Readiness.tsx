@@ -35,6 +35,7 @@ export const Readiness = ({ workout }: { workout: WorkoutModel }) => {
         </div>
         <div className="field-label">{t("Schlaf letzte Nacht", "Sleep last night")}</div>
         <Segmented
+          label={t("Schlaf letzte Nacht", "Sleep last night")}
           value={String(sleep ?? "")}
           onChange={(v) => setSleep(Number(v))}
           options={[
@@ -45,6 +46,7 @@ export const Readiness = ({ workout }: { workout: WorkoutModel }) => {
         />
         <div className="field-label">{t("Energie jetzt", "Energy right now")}</div>
         <Segmented
+          label={t("Energie jetzt", "Energy right now")}
           value=""
           onChange={(v) => answer(Number(v))}
           options={[

@@ -51,6 +51,7 @@ export const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose
   return (
     <Sheet title={t("Übernehmen", "Copy from")} onClose={onClose}>
       <Segmented
+        label={t("Quelle", "Source")}
         value={source}
         onChange={(v) => {
           setSource(v);

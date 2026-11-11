@@ -157,7 +157,9 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
             <div className="section-row">
               <h2 className="card-title">{t("Verlauf", "Progress")}</h2>
             </div>
-            {metricOptions.length > 1 && <Segmented value={metric} onChange={setMetric} options={metricOptions} />}
+            {metricOptions.length > 1 && (
+              <Segmented label={t("Verlauf", "Progress")} value={metric} onChange={setMetric} options={metricOptions} />
+            )}
             <LineChart points={points} format={format} />
           </section>
 
@@ -202,6 +204,7 @@ export const ExerciseStats = ({ exerciseKey }: { exerciseKey: string }) => {
         <section className="card">
           <h2 className="card-title">{t("Trainingsziel für diese Übung", "Goal for this exercise")}</h2>
           <Segmented<Goal | "default">
+            label={t("Trainingsziel für diese Übung", "Goal for this exercise")}
             value={ownGoal ?? "default"}
             onChange={(v) => actions.setExerciseGoal(exerciseKey, v === "default" ? null : v)}
             options={[

@@ -124,9 +124,6 @@ body {
   min-height: 100dvh;
   -webkit-tap-highlight-color: transparent;
 }
-body.no-scroll {
-  overflow: hidden;
-}
 button,
 input,
 select,
@@ -399,7 +396,9 @@ small {
   box-shadow: var(--shadow-sm);
   font-weight: 700;
   min-height: 48px;
-  transition: transform 0.06s;
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform 0.06s;
+  }
 }
 .button:active:not(:disabled) {
   transform: translate(2px, 2px);
@@ -508,7 +507,8 @@ small {
   overflow-x: auto;
   padding: 2px 2px 6px;
   margin: 0 -2px;
-  scrollbar-width: none;
+  /* Visible, so a mouse can tell (and use) that the row scrolls. */
+  scrollbar-color: var(--ink) transparent;
 }
 .chip {
   display: inline-flex;
@@ -586,17 +586,21 @@ small {
 .suggestion {
   touch-action: pan-y;
   user-select: none;
-  transition:
-    transform 0.2s,
-    opacity 0.2s;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 0.2s,
+      opacity 0.2s;
+  }
 }
 .suggestion:active {
   transition: none;
 }
 .suggestion.leaving {
-  transition:
-    transform 0.22s ease-in,
-    opacity 0.22s;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 0.22s ease-in,
+      opacity 0.22s;
+  }
 }
 .suggestion-head {
   display: flex;
@@ -840,16 +844,47 @@ textarea.text-input {
   min-height: 70px;
 }
 
-/* ---------- Sheets ---------- */
-.sheet-backdrop {
+/* ---------- Modals (sheets and dialogs) ----------
+   A native <dialog> shown with showModal() is an invisible full-screen shell
+   in the top layer; the visible card (.sheet / .dialog) sits inside it, so
+   card styles and the notepad frames aren't clipped by the dialog box. */
+.modal-shell {
   position: fixed;
   inset: 0;
-  background: var(--backdrop);
-  z-index: 50;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  /* Scrolling over the shell or past the card's end must not move the page. */
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+.modal-shell[open] {
   display: flex;
-  align-items: flex-end;
   justify-content: center;
-  animation: fade 0.15s;
+}
+.modal-shell::backdrop {
+  /* Older browsers don't let ::backdrop inherit the theme tokens. */
+  background: var(--backdrop, rgb(20 20 20 / 0.45));
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+.sheet-shell[open] {
+  align-items: flex-end;
+}
+.dialog-shell[open] {
+  align-items: center;
+  padding: 16px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .modal-shell::backdrop {
+    animation: fade 0.15s;
+  }
 }
 .sheet {
   width: 100%;
@@ -861,7 +896,9 @@ textarea.text-input {
   border-radius: 24px 24px 0 0;
   display: flex;
   flex-direction: column;
-  animation: slide-up 0.2s ease-out;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: slide-up 0.2s ease-out;
+  }
 }
 .sheet-header {
   display: flex;
@@ -891,17 +928,6 @@ textarea.text-input {
   }
 }
 /* ---------- Confirm / prompt dialog ---------- */
-.dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--backdrop);
-  z-index: 90;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  animation: fade 0.15s;
-}
 .dialog {
   position: relative;
   width: 100%;
@@ -916,7 +942,9 @@ textarea.text-input {
   align-items: center;
   gap: 10px;
   text-align: center;
-  animation: dialog-in 0.22s cubic-bezier(0.2, 1.4, 0.4, 1);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: dialog-in 0.22s cubic-bezier(0.2, 1.4, 0.4, 1);
+  }
 }
 .dialog h2 {
   font-size: 20px;
@@ -1031,21 +1059,47 @@ textarea.text-input {
   overflow: hidden;
   background: var(--paper);
 }
-.segmented button {
+.segmented label {
+  /* Not the column layout of form labels in sheets. */
+  display: block;
+  position: relative;
   flex: 1;
   padding: 9px 2px;
   font-weight: 700;
   font-size: 12.5px;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   min-width: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
 }
-.segmented button + button {
+.segmented label + label {
   border-left: 2px solid var(--ink);
 }
-.segmented button.active {
-  background: var(--ink);
+.segmented label.active {
   color: var(--paper);
+}
+/* The radio itself is invisible; the label is the control. */
+.segmented input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.segmented label:has(:focus-visible) {
+  outline: 3px dashed var(--yellow);
+  outline-offset: -5px;
+}
+@media (forced-colors: active) {
+  /* Forced colours drop the sliding marker's background: frame the choice instead. */
+  .segmented label.active {
+    outline: 3px solid Highlight;
+    outline-offset: -5px;
+  }
 }
 
 /* ---------- Stats ---------- */
@@ -1561,7 +1615,9 @@ body:has(.overlay-screen) .rest-timer {
 }
 .rest-done {
   background: var(--yellow);
-  animation: pulse 0.5s 4;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: pulse 0.5s 4;
+  }
 }
 @keyframes pulse {
   50% {
@@ -1574,6 +1630,10 @@ body:has(.overlay-screen) .rest-timer {
   pointer-events: none;
   z-index: 90;
   overflow: hidden;
+  /* Without motion it would only be clutter. */
+  @media (prefers-reduced-motion: reduce) {
+    display: none;
+  }
 }
 .confetti i {
   position: absolute;
@@ -1609,7 +1669,9 @@ body:has(.overlay-screen) .rest-timer {
   gap: 10px;
   align-items: center;
   z-index: 95;
-  animation: pop 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: pop 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
 }
 .celebration .sticker {
   flex-shrink: 0;
@@ -1620,8 +1682,21 @@ body:has(.overlay-screen) .rest-timer {
     opacity: 0;
   }
 }
+/* Only for screen readers: off-screen but still read out. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .toast {
   position: fixed;
+  /* Reset the popover defaults (centred, bordered) before placing it. */
+  inset: auto;
+  margin: 0;
+  border: 0;
   top: calc(env(safe-area-inset-top) + 18px);
   left: 50%;
   transform: translateX(-50%);
@@ -1670,7 +1745,9 @@ body:has(.overlay-screen) .rest-timer {
   flex-shrink: 0;
 }
 .goal-ring circle {
-  transition: stroke-dasharray 0.6s cubic-bezier(0.2, 1.2, 0.4, 1);
+  @media (prefers-reduced-motion: no-preference) {
+    transition: stroke-dasharray 0.6s cubic-bezier(0.2, 1.2, 0.4, 1);
+  }
 }
 .goal-ring-center {
   width: 40px;
@@ -2036,16 +2113,13 @@ body:has(.overlay-screen) .rest-timer {
   font-size: 14px;
 }
 .day-card-sticker {
-  animation: bob 2.4s ease-in-out infinite;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: bob 2.4s ease-in-out infinite;
+  }
 }
 @keyframes bob {
   50% {
     transform: translateY(-3px) rotate(-4deg);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .day-card-sticker {
-    animation: none;
   }
 }
 
@@ -2307,11 +2381,15 @@ body:has(.overlay-screen) .rest-timer {
   animation: row-flash 0.7s ease-out;
 }
 .set-row.just-done .check {
-  animation: pop-check 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: pop-check 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
 }
 .set-row.just-done .check path {
   stroke-dasharray: 24;
-  animation: draw 0.3s 0.05s ease-out both;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: draw 0.3s 0.05s ease-out both;
+  }
 }
 @keyframes row-flash {
   from {
@@ -2343,15 +2421,21 @@ body:has(.overlay-screen) .rest-timer {
 
 /* Workout: sets and exercises coming and going. */
 .set-row.entering {
-  animation: row-in 0.25s ease-out;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: row-in 0.25s ease-out;
+  }
 }
 .set-row.leaving {
   overflow: hidden;
   pointer-events: none;
-  animation: row-out 0.22s ease-in forwards;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: row-out 0.22s ease-in forwards;
+  }
 }
 .exercise-card.entering {
-  animation: card-in 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: card-in 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+  }
 }
 @keyframes row-in {
   from {
@@ -2384,7 +2468,9 @@ body:has(.overlay-screen) .rest-timer {
     color 0.3s;
 }
 .progress-pill.bump {
-  animation: bump 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: bump 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
 }
 .progress-pill.complete {
   background: var(--yellow);
@@ -2399,13 +2485,17 @@ body:has(.overlay-screen) .rest-timer {
 
 /* New bests: a glint runs across once; the trophy does a little dance. */
 .shine {
-  background-image: linear-gradient(110deg, transparent 38%, rgb(255 255 255 / 0.8) 50%, transparent 62%);
-  background-size: 250% 100%;
-  background-repeat: no-repeat;
-  animation: shine 1.1s 0.3s ease-in-out both;
+  @media (prefers-reduced-motion: no-preference) {
+    background-image: linear-gradient(110deg, transparent 38%, rgb(255 255 255 / 0.8) 50%, transparent 62%);
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    animation: shine 1.1s 0.3s ease-in-out both;
+  }
 }
 .celebration > :first-child {
-  animation: tada 0.7s 0.2s ease-in-out;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: tada 0.7s 0.2s ease-in-out;
+  }
 }
 @keyframes shine {
   from {
@@ -2429,10 +2519,14 @@ body:has(.overlay-screen) .rest-timer {
 /* Home: a day ticked off since you last looked gets stamped in; a grown
    streak makes the flame flicker. */
 .week-dot.stamped {
-  animation: stamp 0.45s 0.25s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: stamp 0.45s 0.25s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  }
 }
 .streak-badge.grew > :first-child {
-  animation: flicker 0.8s 0.3s ease-in-out 2;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: flicker 0.8s 0.3s ease-in-out 2;
+  }
   transform-origin: 50% 90%;
 }
 @keyframes stamp {
@@ -2456,17 +2550,23 @@ body:has(.overlay-screen) .rest-timer {
 /* Stats: bars grow in one after another; the day bubble pops open. */
 .bar {
   transform-origin: bottom;
-  animation: grow-up 0.55s cubic-bezier(0.2, 1.1, 0.4, 1) both;
-  animation-delay: calc(var(--i, 0) * 35ms);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: grow-up 0.55s cubic-bezier(0.2, 1.1, 0.4, 1) both;
+    animation-delay: calc(var(--i, 0) * 35ms);
+  }
 }
 .muscle-fill {
   transform-origin: left;
-  animation: grow-right 0.6s cubic-bezier(0.2, 1, 0.4, 1) both;
-  animation-delay: calc(var(--i, 0) * 40ms + 0.1s);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: grow-right 0.6s cubic-bezier(0.2, 1, 0.4, 1) both;
+    animation-delay: calc(var(--i, 0) * 40ms + 0.1s);
+  }
 }
 .day-bubble.pinned {
   transform-origin: var(--arrow) 0;
-  animation: pop-in 0.28s cubic-bezier(0.2, 1.5, 0.4, 1);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: pop-in 0.28s cubic-bezier(0.2, 1.5, 0.4, 1);
+  }
 }
 @keyframes grow-up {
   from {
@@ -2487,7 +2587,9 @@ body:has(.overlay-screen) .rest-timer {
 
 /* Tab bar: the newly chosen tab hops. */
 .tabbar button.active .tab-icon {
-  animation: hop 0.4s cubic-bezier(0.2, 1.6, 0.4, 1);
+  @media (prefers-reduced-motion: no-preference) {
+    animation: hop 0.4s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
 }
 @keyframes hop {
   0% {
@@ -2516,25 +2618,9 @@ body:has(.overlay-screen) .rest-timer {
   opacity: 0;
 }
 .segmented-pill.ready {
-  transition:
-    transform 0.28s cubic-bezier(0.3, 1.3, 0.5, 1),
-    width 0.28s cubic-bezier(0.3, 1.3, 0.5, 1);
-}
-.segmented button {
-  position: relative;
-  transition: color 0.2s;
-}
-.segmented button.active {
-  background: transparent;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
-    animation-duration: 0.01ms !important;
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 0.28s cubic-bezier(0.3, 1.3, 0.5, 1),
+      width 0.28s cubic-bezier(0.3, 1.3, 0.5, 1);
   }
 }

@@ -77,6 +77,7 @@ export const BodyCard = () => {
         <Sticker name="muscle" /> {t("Körperkarte", "Body map")}
       </h2>
       <Segmented
+        label={t("Ansicht", "View")}
         value={mode}
         onChange={setMode}
         options={[

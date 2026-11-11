@@ -102,9 +102,14 @@ const Shell = () => {
         )}
       </main>
       {!screen && (
-        <nav className="tabbar">
+        <nav className="tabbar" aria-label={t("Hauptnavigation", "Main navigation")}>
           {tabs.map((x) => (
-            <button key={x.tab} className={tab === x.tab ? "active" : ""} onClick={() => setTab(x.tab)}>
+            <button
+              key={x.tab}
+              className={tab === x.tab ? "active" : ""}
+              aria-current={tab === x.tab ? "page" : undefined}
+              onClick={() => setTab(x.tab)}
+            >
               <span className="tab-icon">
                 <Icon name={x.icon} />
               </span>
