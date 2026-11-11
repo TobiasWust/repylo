@@ -1,0 +1,13 @@
+<!-- Source of pencil-frame-small.png (rendered at 3x with a transparent background).
+     A rounded rectangle drawn with a wobbly, grainy pencil line; the app uses
+     it as a 9-slice border image in the notepad theme for small elements such as buttons. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+  <filter id="p" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" result="w" />
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="5.5" xChannelSelector="R" yChannelSelector="G" result="d" />
+    <feTurbulence type="fractalNoise" baseFrequency="0.9 1.6" seed="8" result="g" />
+    <feColorMatrix in="g" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 1.25" result="m" />
+    <feComposite in="d" in2="m" operator="in" />
+  </filter>
+  <rect x="5" y="5" width="110" height="110" rx="15" fill="none" stroke="#141414" stroke-width="2.5" filter="url(#p)" />
+</svg>

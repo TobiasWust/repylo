@@ -1951,27 +1951,6 @@ body:has(.overlay-screen) .rest-timer {
   background-size: 18px 18px;
 }
 
-/* The outline as one hand-drawn line. Uneven elliptical corner radii make the
-   edges bow slightly, like a quick pencil sketch. Plain CSS on purpose: live
-   SVG filters made scrolling stutter on phones. */
-[data-look="sketch"]
-  :is(
-    .card,
-    .stat-tile,
-    .tile-icon,
-    .pick-card,
-    .plan-day,
-    .button:not(.dashed),
-    .rep-record,
-    .empty,
-    .tips-box,
-    .review-tile,
-    .tabbar,
-    .celebration
-  ) {
-  border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
-}
-
 [data-look="sketch"]
   :is(
     .card,
@@ -2103,4 +2082,33 @@ body:has(.overlay-screen) .rest-timer {
     22px 22px,
     640px 640px,
     160px 160px;
+}
+
+/* Pencil line for the boxy elements: a wobbly, grainy outline pre-rendered as
+   a PNG (source: assets/pencil-frame.svg) and laid on as a border image. Live
+   SVG filters made scrolling stutter on phones, and an SVG border image breaks
+   at the slice seams because each slice is re-rendered at its own scale. */
+[data-look="sketch"]
+  :is(
+    .card,
+    .stat-tile,
+    .tile-icon,
+    .pick-card,
+    .plan-day,
+    .button:not(.dashed),
+    .rep-record,
+    .empty,
+    .tips-box,
+    .review-tile,
+    .tabbar,
+    .celebration
+  )::after {
+  inset: -6.25px;
+  border: 24px solid transparent;
+  /* 9-slice: the image is 3× (1080 px for 360 CSS px), so 72 px = 24 CSS px. */
+  border-image: url("./assets/pencil-frame.png") 72 / 24px stretch;
+}
+/* Small elements get a smaller frame, so the short sides aren't squeezed. */
+[data-look="sketch"] :is(.button:not(.dashed), .tile-icon, .stat-tile, .rep-record, .plan-day)::after {
+  border-image-source: url("./assets/pencil-frame-small.png");
 }
