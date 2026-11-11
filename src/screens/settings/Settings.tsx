@@ -15,7 +15,7 @@ import { ConnectSheet, ShowCodeSheet } from "./DeviceSheets";
 import { SyncStatus } from "./SyncStatus";
 
 export const Settings = () => {
-  const { t, data, actions, lang, open, exerciseName } = useApp();
+  const { t, data, actions, lang, exerciseName } = useApp();
   const { toast } = useFeedback();
   const [sheet, setSheet] = useState<"share" | "connect" | null>(null);
   const [plan, setPlan] = useState(false);
@@ -94,9 +94,6 @@ export const Settings = () => {
             label: v === "0" ? t("Aus", "Off") : `${Number(v) / 60 >= 1 && Number(v) % 60 === 0 ? `${Number(v) / 60} min` : `${v}s`}`,
           }))}
         />
-        <button className="button full" onClick={() => open({ type: "plates" })}>
-          <Sticker name="plate" size={22} /> {t("Scheibenrechner", "Plate calculator")}
-        </button>
       </section>
 
       <section className="card">
