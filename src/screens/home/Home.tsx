@@ -3,7 +3,6 @@ import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
 import { computeSuggestions } from "../../domain/suggestions";
 import { hasValue, trainedDays, weekStreak } from "../../domain/stats";
-import { BackfillSheet } from "../../ui/BackfillSheet";
 import { InstallCard } from "../../ui/InstallCard";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { Icon } from "../../ui/components";
@@ -34,7 +33,8 @@ export const Home = () => {
   const thisWeek = weekStart(today());
   const weekWorkouts = data.workouts.filter((w) => w.date >= thisWeek && w.exercises.some((e) => e.sets.some(hasValue)));
   const weekSets = weekWorkouts.reduce((n, w) => n + w.exercises.reduce((m, e) => m + e.sets.filter(hasValue).length, 0), 0);
-  const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 5);
+  // Only the last workout; the History tab has the rest.
+  const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 1);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
   const daysThisWeek = weekDays.filter((d) => days.has(d)).length;
   // Since this screen was last shown: days ticked off get stamped, a grown streak flickers.
@@ -49,7 +49,6 @@ export const Home = () => {
     data.workouts.some((w) => w.date.startsWith(lastMonth)) &&
     (data.dismissedUntil.get(`review:${lastMonth}`) ?? 0) < now;
 
-  const [backfill, setBackfill] = useState(false);
   const [planSheet, setPlanSheet] = useState(false);
   const startToday = () => open({ type: "workout", id: ensureTodayWorkout(data, actions).id });
   const startTemplate = (templateId: string) => {
@@ -123,9 +122,6 @@ export const Home = () => {
         <button className="button dark big full" onClick={startToday}>
           <Icon name={todays ? "dumbbell" : "bolt"} />
           {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Training starten", "Start workout")}
-        </button>
-        <button className="button full soft" onClick={() => setBackfill(true)}>
-          <Sticker name="calendar" size={24} /> {t("Früheres Training nachtragen", "Log a past workout")}
         </button>
       </section>
 
@@ -204,7 +200,7 @@ export const Home = () => {
 
       <section>
         <div className="section-row">
-          <h2 className="section-title">{t("Letzte Trainings", "Recent workouts")}</h2>
+          <h2 className="section-title">{t("Letztes Training", "Last workout")}</h2>
           {recent.length > 0 && (
             <button className="link" onClick={() => setTab("history")}>
               {t("Alle", "All")}
@@ -241,7 +237,6 @@ export const Home = () => {
           </div>
         )}
       </section>
-      {backfill && <BackfillSheet onClose={() => setBackfill(false)} />}
       {planSheet && <PlanSheet onClose={() => setPlanSheet(false)} />}
     </div>
   );
