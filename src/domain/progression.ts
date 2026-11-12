@@ -3,8 +3,11 @@
  *
  * 1. Stay at a weight and add reps until every set reaches the top of the
  *    goal's rep range.
- * 2. Then add the smallest sensible increment for that equipment and start
- *    again at the bottom of the range.
+ * 2. Then raise the weight so the bottom of the range takes about the same
+ *    effort as the top did (Epley: 12 → 8 reps ≈ +10 %), rounded down to the
+ *    equipment's increments and at least one increment. Dropping four reps
+ *    but adding only one small step (1 kg on 50 kg) would leave every set far
+ *    from failure; ACSM suggests 2–10 % jumps once the target is beaten.
  * 3. Deload (~90 %) when performance (estimated 1RM) dropped three sessions
  *    in a row, or when the last two sessions stayed below the rep range in
  *    every set — the weight is too heavy for now.
@@ -33,6 +36,16 @@ export interface Progression {
 }
 
 const roundTo = (value: number, step: number) => Math.round(value / step) * step;
+
+/**
+ * Weight for `min` reps after reaching `reps` at `top`, by the Epley ratio.
+ * Reps beyond the range count up to five extra; the jump is capped at 20 %.
+ */
+export const nextWeight = (top: number, reps: number, [min, max]: readonly [number, number], inc: number): number => {
+  const ratio = Math.min(1.2, (1 + Math.min(reps, max + 5) / 30) / (1 + min / 30));
+  const steps = Math.max(1, Math.floor((top * ratio - top) / inc + 1e-9));
+  return top + steps * inc;
+};
 
 const isDeclining = (sessions: readonly Session[]): boolean => {
   if (sessions.length < 4) return false;
@@ -83,7 +96,8 @@ export const suggestProgression = (data: Data, exerciseKey: string, beforeWorkou
   const topSets = last.sets.filter((s) => (s.weight ?? 0) >= top);
   const allAtMax = topSets.length > 0 && topSets.every((s) => (s.reps ?? 0) >= max);
   if (allAtMax) {
-    const weight = fromUnit(roundTo(toUnit(top, unit) + inc, step), unit);
+    const reps = Math.min(...topSets.map((s) => s.reps ?? 0));
+    const weight = fromUnit(roundTo(nextWeight(toUnit(top, unit), reps, [min, max], inc), step), unit);
     return { kind: "addWeight", last, sets: last.sets.map((s) => ({ ...copy(s), weight, reps: min })) };
   }
 

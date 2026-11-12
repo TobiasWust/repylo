@@ -46,6 +46,23 @@ const goalShortNames: Record<Goal, [string, string]> = {
 };
 export const goalShort = (g: Goal, lang: Language) => goalShortNames[g][lang === "de" ? 0 : 1];
 
+/** What each goal is for and what it changes, for the goal picker. */
+const goalInfos: Record<Goal, [string, string]> = {
+  strength: [
+    "Für maximale Kraft: schwere Gewichte, wenige Wiederholungen, lange Pausen. Muskeln wachsen dabei auch, aber jeder Satz ermüdet mehr.",
+    "For maximal strength: heavy weights, few reps, long rests. Muscles grow too, but every set is more fatiguing.",
+  ],
+  hypertrophy: [
+    "Für mehr Muskelmasse. Entscheidend ist weniger die Wiederholungszahl als dass jeder Satz nah ans Muskelversagen geht – ein bis drei Wiederholungen dürfen übrig bleiben.",
+    "For more muscle. What matters most is not the rep count but taking each set close to failure – one to three reps left in the tank.",
+  ],
+  endurance: [
+    "Für ausdauernde Muskeln und einen gelenkschonenden Einstieg: leichtere Gewichte, viele Wiederholungen, kurze Pausen. Nah ans Versagen trainiert, wachsen die Muskeln auch hier.",
+    "For muscular endurance and an easy-on-the-joints start: lighter weights, many reps, short rests. Taken close to failure, muscles grow here too.",
+  ],
+};
+export const goalInfo = (g: Goal, lang: Language) => goalInfos[g][lang === "de" ? 0 : 1];
+
 const equipmentNames: Record<Equipment, [string, string]> = {
   barbell: ["Langhantel", "Barbell"],
   dumbbell: ["Kurzhantel", "Dumbbell"],

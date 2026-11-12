@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { createBackup, downloadJson, importBackup, parseBackup } from "../../db/backup";
 import { today } from "../../domain/dates";
 import { defaultRest, type Goal } from "../../domain/model";
+import { repRange } from "../../domain/progression";
 import { Icon, Segmented } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
@@ -9,7 +10,7 @@ import { InstallCard } from "../../ui/InstallCard";
 import { LegalFooter } from "../../ui/Legal";
 import { applyLook, applyTheme, getLook, getTheme } from "../../ui/look";
 import { PlanSheet } from "../../ui/PlanSheet";
-import { goalShort, plural } from "../../ui/text";
+import { goalInfo, goalName, goalShort, plural } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
 import { ConnectSheet, ShowCodeSheet } from "./DeviceSheets";
 import { SyncStatus } from "./SyncStatus";
@@ -63,6 +64,13 @@ export const Settings = () => {
           onChange={(goal) => actions.updateSettings({ goal, restSeconds: defaultRest[goal] })}
           options={(["strength", "hypertrophy", "endurance"] as const).map((g) => ({ value: g, label: goalShort(g, lang) }))}
         />
+        <p className="hint" aria-live="polite">
+          <strong>
+            {goalName(s.goal, lang)}: {repRange[s.goal][0]}–{repRange[s.goal][1]} {t("Wdh.", "reps")}, {defaultRest[s.goal]} s{" "}
+            {t("Pause", "rest")}.
+          </strong>{" "}
+          {goalInfo(s.goal, lang)}
+        </p>
         <div className="field-label">{t("Wochenziel (Trainingstage pro Woche)", "Weekly goal (training days per week)")}</div>
         <Segmented
           label={t("Wochenziel (Trainingstage pro Woche)", "Weekly goal (training days per week)")}

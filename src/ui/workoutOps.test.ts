@@ -26,6 +26,6 @@ describe("prefill", () => {
 
   it("uses the progression target when chosen", () => {
     const data = build(history, { settings: settings("target") as unknown as Rows["settings"] });
-    expect(initialSets(data, "bench_press")[0]).toMatchObject({ weight: 62.5, reps: 8 });
+    expect(initialSets(data, "bench_press")[0]).toMatchObject({ weight: 65, reps: 8 });
   });
 });

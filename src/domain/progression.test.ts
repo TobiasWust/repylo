@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { suggestProgression } from "./progression";
+import { nextWeight, suggestProgression } from "./progression";
 import { build } from "../test/fixtures";
 
 describe("progression (double progression)", () => {
@@ -22,7 +22,7 @@ describe("progression (double progression)", () => {
     expect(p.sets.every((s) => s.weight === 60)).toBe(true);
   });
 
-  it("adds the equipment increment once every set hits the top", () => {
+  it("raises the weight about 10 % once every set hits the top", () => {
     const data = build([
       {
         daysAgo: 2,
@@ -37,7 +37,7 @@ describe("progression (double progression)", () => {
     ]);
     const p = suggestProgression(data, "bench_press")!;
     expect(p.kind).toBe("addWeight");
-    expect(p.sets.every((s) => s.weight === 62.5 && s.reps === 8)).toBe(true);
+    expect(p.sets.every((s) => s.weight === 65 && s.reps === 8)).toBe(true);
   });
 
   it("uses 1 kg steps on EGYM machines and the exercise's own goal", () => {
@@ -60,7 +60,7 @@ describe("progression (double progression)", () => {
     );
     const p = suggestProgression(data, "egym_chest_press")!;
     expect(p.kind).toBe("addWeight");
-    expect(p.sets[0]).toMatchObject({ weight: 22, reps: 15 });
+    expect(p.sets[0]).toMatchObject({ weight: 23, reps: 15 });
   });
 
   it("suggests a deload after two sessions below the range", () => {
@@ -87,5 +87,21 @@ describe("progression (double progression)", () => {
     const p = suggestProgression(data, "squat")!;
     expect(p.kind).toBe("deload");
     expect(p.sets[0]!.weight).toBe(90);
+  });
+});
+
+describe("weight jump after the top of the range", () => {
+  it("keeps the effort of 12 reps for 8 reps on EGYM (50 kg × 12 → 55 kg)", () => {
+    expect(nextWeight(50, 12, [8, 12], 1)).toBe(55);
+  });
+
+  it("rounds down to the equipment step but always adds at least one", () => {
+    expect(nextWeight(100, 6, [3, 6], 2.5)).toBe(107.5);
+    expect(nextWeight(8, 12, [8, 12], 2)).toBe(10);
+  });
+
+  it("jumps further when the sets went well past the range, up to 20 %", () => {
+    expect(nextWeight(50, 16, [8, 12], 1)).toBe(60);
+    expect(nextWeight(50, 30, [8, 12], 1)).toBe(60);
   });
 });
