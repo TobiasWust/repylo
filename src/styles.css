@@ -2178,6 +2178,20 @@ body:has(.overlay-screen) .rest-timer {
   font-size: 14px;
   text-align: center;
 }
+.muscle-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1.5px solid var(--hairline);
+  padding-top: 12px;
+}
+.muscle-detail h3 {
+  font-size: 18px;
+}
+.muscle-detail .stat-tile small {
+  font-size: 12px;
+  font-weight: 600;
+}
 
 /* ---------- Day card ---------- */
 .day-card {

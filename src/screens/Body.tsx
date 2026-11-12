@@ -7,6 +7,7 @@ import { useApp } from "../ui/context";
 import { useFeedback } from "../ui/feedback";
 import { formatDate } from "../ui/text";
 import { DateField } from "../ui/DateField";
+import { BodyMapCard } from "./BodyMapCard";
 
 export const Body = () => {
   const { t, data, actions, lang, weight } = useApp();
@@ -31,6 +32,8 @@ export const Body = () => {
   return (
     <div className="screen">
       <h1 className="page-title">{t("Körper", "Body")}</h1>
+
+      <BodyMapCard />
 
       <section className="card hero">
         <div className="hero-label">{t("Körpergewicht eintragen", "Log body weight")}</div>
