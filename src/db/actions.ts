@@ -125,6 +125,15 @@ export const createActions = (evolu: AppEvolu) => {
       reordered.forEach((e, i) => evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(e.id), position: int(i) }));
     },
 
+    /** Swaps an exercise for another one at the same position, with fresh sets. */
+    replaceExercise: (workout: Workout, id: string, exerciseKey: string, sets: readonly TemplateSet[]): string | null => {
+      const e = workout.exercises.find((x) => x.id === id);
+      if (!e) return null;
+      for (const s of e.sets) evolu.update("workoutSet", { id: WorkoutSetId.orThrow(s.id), isDeleted: sqliteTrue });
+      evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(id), isDeleted: sqliteTrue });
+      return insertExercise(workout.id, exerciseKey, e.position, sets);
+    },
+
     removeExercise: (workout: Workout, id: string) => {
       const e = workout.exercises.find((x) => x.id === id);
       if (!e) return;

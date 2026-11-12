@@ -25,6 +25,7 @@ import { DurationField, Stepper } from "./SetInputs";
 import { weightStep } from "./weightStep";
 import { CoachLine } from "./CoachLine";
 import { useInitialIds } from "../../ui/motion";
+import { ReplaceSheet } from "./ReplaceSheet";
 
 export const ExerciseBlock = ({
   workout,
@@ -51,6 +52,7 @@ export const ExerciseBlock = ({
   const [showNote, setShowNote] = useState(!!entry.note);
   const [menu, setMenu] = useState(false);
   const [showTips, setShowTips] = useState(false);
+  const [replacing, setReplacing] = useState(false);
   // Values committed on blur aren't in `data` until Evolu's query refreshes.
   // Tapping ✓ right after typing must still see them (for PR detection).
   const pending = useRef(new Map<string, Partial<TemplateSet>>());
@@ -147,6 +149,9 @@ export const ExerciseBlock = ({
           <button className="chip" disabled={index === count - 1} onClick={() => actions.moveExercise(workout, entry.id, 1)}>
             <Icon name="down" size={16} /> {t("Runter", "Down")}
           </button>
+          <button className="chip" onClick={() => setReplacing(true)}>
+            <Icon name="sync" size={16} /> {t("Ersetzen", "Replace")}
+          </button>
           <button className="chip" onClick={() => setShowNote(true)}>
             <Icon name="note" size={16} /> {t("Notiz", "Note")}
           </button>
@@ -167,6 +172,7 @@ export const ExerciseBlock = ({
       )}
 
       {showTips && <TipsList exerciseKey={entry.exerciseKey} />}
+      {replacing && <ReplaceSheet workout={workout} entry={entry} onClose={() => setReplacing(false)} />}
 
       {!progression && estimate && (
         <div className="progress-hint">
