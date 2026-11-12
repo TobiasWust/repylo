@@ -33,6 +33,9 @@ export const ExerciseBlock = ({
   index,
   count,
   added = false,
+  open: isOpen,
+  onToggle,
+  onOpen,
 }: {
   workout: WorkoutModel;
   entry: WorkoutExercise;
@@ -40,6 +43,11 @@ export const ExerciseBlock = ({
   count: number;
   /** Added after the workout was opened: slides in. */
   added?: boolean;
+  /** Collapsed cards show one line; tapping it opens the card. */
+  open: boolean;
+  onToggle: () => void;
+  /** Opens another exercise (after replacing this one). */
+  onOpen: (id: string) => void;
 }) => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName } = app;
@@ -106,6 +114,28 @@ export const ExerciseBlock = ({
     });
   };
 
+  const doneSets = entry.sets.filter((s) => s.done).length;
+  const finished = entry.sets.length > 0 && doneSets === entry.sets.length;
+
+  if (!isOpen)
+    return (
+      <section className={`card exercise-card collapsed ${finished ? "finished" : ""} ${added ? "entering" : ""}`}>
+        <button className="exercise-row" onClick={onToggle} aria-expanded={false}>
+          <span className="list-main">
+            <strong>{exerciseName(exercise)}</strong>
+            <small>{describeSets(app, entry.sets, exercise.metric) || equipmentName(exercise.equipment, lang)}</small>
+          </span>
+          {finished ? (
+            <Sticker name="ok" size={26} />
+          ) : (
+            <span className={`set-count ${doneSets > 0 ? "started" : ""}`}>
+              {doneSets}/{entry.sets.length}
+            </span>
+          )}
+        </button>
+      </section>
+    );
+
   const weightLabel = exercise.metric === "bodyweight" ? `+${unit}` : unit;
   const showPlates = exercise.equipment === "barbell";
 
@@ -140,6 +170,9 @@ export const ExerciseBlock = ({
         <button className="icon-button" onClick={() => setMenu(!menu)} aria-label={t("Mehr", "More")}>
           <Icon name="more" />
         </button>
+        <button className="icon-button" onClick={onToggle} aria-expanded={true} aria-label={t("Einklappen", "Collapse")}>
+          <Icon name="up" />
+        </button>
       </div>
       {menu && (
         <div className="chips">
@@ -172,7 +205,7 @@ export const ExerciseBlock = ({
       )}
 
       {showTips && <TipsList exerciseKey={entry.exerciseKey} />}
-      {replacing && <ReplaceSheet workout={workout} entry={entry} onClose={() => setReplacing(false)} />}
+      {replacing && <ReplaceSheet workout={workout} entry={entry} onClose={() => setReplacing(false)} onReplaced={onOpen} />}
 
       {!progression && estimate && (
         <div className="progress-hint">

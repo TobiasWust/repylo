@@ -12,7 +12,18 @@ import { initialSets } from "../../ui/workoutOps";
 const shortList = 12;
 
 /** Other exercises for the same muscles, to swap in when a machine is missing or for variety. */
-export const ReplaceSheet = ({ workout, entry, onClose }: { workout: Workout; entry: WorkoutExercise; onClose: () => void }) => {
+export const ReplaceSheet = ({
+  workout,
+  entry,
+  onClose,
+  onReplaced,
+}: {
+  workout: Workout;
+  entry: WorkoutExercise;
+  onClose: () => void;
+  /** Gets the new exercise's id, e.g. to keep it open. */
+  onReplaced?: (id: string) => void;
+}) => {
   const { t, lang, data, actions, exerciseName } = useApp();
   const { confirm } = useFeedback();
   const [equipment, setEquipment] = useState<"all" | Equipment>("all");
@@ -37,8 +48,9 @@ export const ReplaceSheet = ({ workout, entry, onClose }: { workout: Workout; en
       });
       if (!ok) return;
     }
-    actions.replaceExercise(workout, entry.id, key, initialSets(data, key, workout.id));
+    const id = actions.replaceExercise(workout, entry.id, key, initialSets(data, key, workout.id));
     onClose();
+    if (id) onReplaced?.(id);
   };
 
   return (

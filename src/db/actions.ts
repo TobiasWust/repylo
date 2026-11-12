@@ -97,7 +97,7 @@ export const createActions = (evolu: AppEvolu) => {
       evolu.update("workout", { id: WorkoutId.orThrow(workout.id), isDeleted: sqliteTrue });
     },
 
-    addExercise: (workout: Workout, exerciseKey: string, sets: readonly TemplateSet[]) =>
+    addExercise: (workout: Workout, exerciseKey: string, sets: readonly TemplateSet[]): string =>
       insertExercise(workout.id, exerciseKey, nextPosition(workout), sets),
 
     /** Copies exercises + set values from a template or earlier workout. */
