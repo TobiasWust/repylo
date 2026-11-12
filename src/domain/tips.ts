@@ -245,20 +245,98 @@ const tips: Record<string, Tips> = {
   },
 };
 
-const egymTips: Tips = {
-  de: [
-    "Anmelden, das Gerät stellt Sitz und Hebel automatisch ein",
-    "Ruhig und gleichmäßig dem Tempo auf dem Bildschirm folgen",
-    "In der Endposition nicht ablegen, Spannung halten",
-  ],
-  en: [
-    "Log in so the machine sets seat and lever for you",
-    "Follow the on-screen tempo calmly and evenly",
-    "Don't rest at the end position, keep tension",
-  ],
+/**
+ * EGYM machines set seat, lever and weight themselves – the tips are about
+ * the movement, the same way as for any other exercise.
+ */
+const egymTips: Record<string, Tips> = {
+  egym_seated_row: {
+    de: ["Brust aufrecht, nicht nach hinten lehnen", "Ziehen mit den Ellbogen, nah am Körper", "Hinten Schulterblätter zusammendrücken"],
+    en: ["Chest up, don't lean back", "Pull with your elbows, close to your body", "Squeeze shoulder blades together at the back"],
+  },
+  egym_abdominal: {
+    de: ["Brustbein Richtung Becken einrollen", "Ausatmen beim Zusammenziehen", "Nicht mit den Armen ziehen, die Bauchmuskeln arbeiten"],
+    en: ["Curl your breastbone towards your pelvis", "Breathe out as you crunch", "Don't pull with your arms, let the abs work"],
+  },
+  egym_chest_press: {
+    de: [
+      "Schulterblätter an der Lehne lassen",
+      "Drücken aus der Brust, Ellbogen etwas unter Schulterhöhe",
+      "Arme vorne nicht ganz durchstrecken",
+    ],
+    en: [
+      "Keep shoulder blades against the pad",
+      "Push from the chest, elbows a little below shoulder height",
+      "Don't fully lock your arms at the front",
+    ],
+  },
+  egym_triceps: {
+    de: ["Oberarme ruhig halten, nur der Unterarm bewegt sich", "Unten kurz voll strecken", "Schultern locker, nicht hochziehen"],
+    en: ["Keep upper arms still, only the forearms move", "Fully straighten briefly at the bottom", "Shoulders relaxed, don't shrug"],
+  },
+  egym_lat_pulldown: {
+    de: ["Brust raus, leicht zurücklehnen", "Ellbogen nach unten zu den Hüften ziehen", "Oben strecken, Schultern dabei unten lassen"],
+    en: ["Chest up, lean back slightly", "Drive your elbows down to your hips", "Stretch at the top, keep shoulders down"],
+  },
+  egym_shoulder_press: {
+    de: ["Rücken an der Lehne, kein Hohlkreuz", "Senkrecht nach oben drücken", "Unten bis etwa Kinnhöhe absenken"],
+    en: ["Back against the pad, no arching", "Press straight up", "Lower to about chin height"],
+  },
+  egym_biceps: {
+    de: ["Oberarme fest auf dem Polster", "Langsam ablassen, unten fast strecken", "Handgelenke gerade, nicht einknicken"],
+    en: ["Upper arms firmly on the pad", "Lower slowly, almost straight at the bottom", "Wrists straight, don't curl them"],
+  },
+  egym_adductor: {
+    de: ["Becken bleibt ruhig auf dem Sitz", "Beine aus der Innenseite der Oberschenkel schließen", "Langsam öffnen, die Dehnung spüren"],
+    en: ["Keep your pelvis still on the seat", "Close your legs from the inner thighs", "Open slowly and feel the stretch"],
+  },
+  egym_abductor: {
+    de: ["Becken ruhig, Rücken an der Lehne", "Knie nach außen drücken, aus dem Gesäß", "Außen kurz halten, langsam zurück"],
+    en: ["Pelvis still, back against the pad", "Push your knees out from the glutes", "Hold briefly at the outside, return slowly"],
+  },
+  egym_back_extension: {
+    de: ["Bewegung aus der Hüfte, Rücken lang", "Nur bis zur geraden Linie strecken, nicht überstrecken", "Bauch leicht anspannen"],
+    en: ["Move from the hips, keep your back long", "Extend only to a straight line, not beyond", "Brace your abs lightly"],
+  },
+  egym_leg_curl: {
+    de: ["Hüfte bleibt am Sitz, nicht abheben", "Fersen kräftig Richtung Gesäß ziehen", "Langsam zurück, fast bis zur Streckung"],
+    en: ["Hips stay on the seat, don't lift", "Pull your heels hard towards your glutes", "Return slowly, almost to full extension"],
+  },
+  egym_leg_extension: {
+    de: ["Oben kurz voll strecken und anspannen", "Langsam absenken, nicht fallen lassen", "Am Sitz festhalten, Gesäß bleibt unten"],
+    en: ["Fully straighten and squeeze briefly at the top", "Lower slowly, don't drop it", "Hold the seat, keep your glutes down"],
+  },
+  egym_leg_press: {
+    de: ["Knie zeigen in Richtung Fußspitzen", "Durch die ganze Fußsohle drücken", "Oben Knie nicht ganz durchdrücken"],
+    en: ["Knees track over your toes", "Push through your whole foot", "Don't lock your knees at the top"],
+  },
+  egym_squat: {
+    de: ["Knie zeigen in Richtung Fußspitzen", "Rücken gerade, Brust aufrecht", "Aus den Fersen nach oben drücken"],
+    en: ["Knees track over your toes", "Back straight, chest up", "Drive up through your heels"],
+  },
+  egym_glute: {
+    de: ["Becken stabil, kein Hohlkreuz", "Bewegung aus dem Gesäß, nicht aus dem Rücken", "Am Ende kurz anspannen"],
+    en: ["Pelvis stable, no arching", "Move from the glutes, not the lower back", "Squeeze briefly at the end"],
+  },
+  egym_hip_thrust: {
+    de: ["Kinn leicht zur Brust, Blick nach vorne", "Hüfte bis zur geraden Linie strecken", "Oben das Gesäß fest anspannen"],
+    en: ["Chin slightly tucked, eyes forward", "Extend your hips to a straight line", "Squeeze your glutes hard at the top"],
+  },
+  egym_butterfly: {
+    de: ["Ellbogen leicht gebeugt, Winkel bleibt gleich", "Bewegung aus der Brust, nicht aus den Armen", "Vorne kurz zusammendrücken"],
+    en: ["Elbows slightly bent, keep the angle", "Move from the chest, not the arms", "Squeeze briefly at the front"],
+  },
+  egym_reverse_butterfly: {
+    de: ["Brust ans Polster, Schultern unten", "Arme weit nach hinten-außen führen", "Hinten Schulterblätter zusammen"],
+    en: ["Chest against the pad, shoulders down", "Sweep your arms wide, back and out", "Squeeze shoulder blades together at the back"],
+  },
+  egym_rotation: {
+    de: ["Becken bleibt fest, nur der Oberkörper dreht", "Drehung aus den seitlichen Bauchmuskeln", "Langsam zurück zur Mitte"],
+    en: ["Pelvis stays put, only your torso turns", "Rotate from your obliques", "Return slowly to the centre"],
+  },
 };
 
 export const tipsFor = (exerciseKey: string, lang: Language): readonly string[] | null => {
-  const entry = tips[exerciseKey] ?? (exerciseKey.startsWith("egym_") ? egymTips : null);
+  const entry = tips[exerciseKey] ?? egymTips[exerciseKey];
   return entry ? entry[lang] : null;
 };
