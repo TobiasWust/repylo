@@ -3,11 +3,14 @@
  *
  * Recovery is a deliberately simple model: the harder a muscle was worked in
  * one workout (direct sets count 1, secondary 0.5), the longer it needs –
- * 24 h for a little work, 48 h for a normal session, 72 h for a hard one.
+ * one day for a little work, two for a normal session (4–9 sets, in line with
+ * the ~48 h guidance between sessions for the same muscle), three only for
+ * very high volume. It counts calendar days, so a muscle trained on Monday
+ * with a normal session is ready on Wednesday morning, whatever the time.
  */
 import { addDays, parseDay, toDay, weekStart } from "./dates";
 import { muscles, type Muscle } from "./exercises";
-import { getExercise, type Data, type Workout } from "./model";
+import { getExercise, type Data } from "./model";
 import { hasValue, majorMuscles, trainedDays } from "./stats";
 
 const majorMuscleSet: ReadonlySet<Muscle> = new Set(majorMuscles);
@@ -20,11 +23,10 @@ export interface MuscleRecovery {
   readonly lastTrained: string | null;
 }
 
-const recoveryHours = (sets: number): number => (sets >= 6 ? 72 : sets >= 3 ? 48 : 24);
+const recoveryDays = (sets: number): number => (sets >= 10 ? 3 : sets >= 4 ? 2 : 1);
 
-/** When a workout happened: its start time if logged live, otherwise late afternoon of its day. */
-const workoutTime = (w: Workout): number =>
-  w.startedAt > 0 && toDay(new Date(w.startedAt)) === w.date ? w.startedAt : parseDay(w.date).getTime() + 5 * 3_600_000;
+/** Midnight at the start of a day, local time. */
+const startOf = (day: string): number => new Date(`${day}T00:00:00`).getTime();
 
 export const muscleRecovery = (data: Data, now: number = Date.now()): MuscleRecovery[] => {
   const since = addDays(toDay(new Date(now)), -4);
@@ -40,9 +42,8 @@ export const muscleRecovery = (data: Data, now: number = Date.now()): MuscleReco
       for (const m of ex.primary) load.set(m, (load.get(m) ?? 0) + sets);
       for (const m of ex.secondary) load.set(m, (load.get(m) ?? 0) + sets * 0.5);
     }
-    const time = workoutTime(w);
     for (const [m, sets] of load) {
-      readyAt.set(m, Math.max(readyAt.get(m) ?? 0, time + recoveryHours(sets) * 3_600_000));
+      readyAt.set(m, Math.max(readyAt.get(m) ?? 0, startOf(addDays(w.date, recoveryDays(sets)))));
       if (!last.has(m) || w.date > last.get(m)!) last.set(m, w.date);
     }
   }
@@ -57,6 +58,7 @@ export type AdviceReason =
   | "done" // already trained today
   | "goalAtRisk" // the weekly goal needs today
   | "backToBack" // trained the last two days
+  | "catchUp" // behind the week's pace – train what's fresh, rest the rest
   | "recovering" // most big muscles still recovering
   | "goalReached" // weekly goal already met – rest is fine
   | "fresh"; // recovered and the goal isn't met yet
@@ -72,6 +74,14 @@ export interface DailyAdvice {
   readonly needed: number;
 }
 
+/** A catch-up day needs at least this many rested big muscle groups to be worth it. */
+const minFreshForCatchUp = 2;
+
+/**
+ * Order matters: the weekly goal sets the pace, so when you are behind it and
+ * some big muscles are rested, those get trained while the tired ones rest –
+ * instead of saving every workout up for the weekend.
+ */
 export const dailyAdvice = (data: Data, now: number = Date.now()): DailyAdvice => {
   const day = toDay(new Date(now));
   const days = trainedDays(data);
@@ -82,11 +92,16 @@ export const dailyAdvice = (data: Data, now: number = Date.now()): DailyAdvice =
   const monday = weekStart(day);
   const doneThisWeek = Array.from({ length: 7 }, (_, i) => addDays(monday, i)).filter((d) => days.has(d) && d <= day).length;
   const needed = Math.max(0, data.settings.weeklyGoal - doneThisWeek);
-  const daysLeft = 7 - Math.round((parseDay(day).getTime() - parseDay(monday).getTime()) / 86_400_000);
+  const dayOfWeek = Math.round((parseDay(day).getTime() - parseDay(monday).getTime()) / 86_400_000);
+  const daysLeft = 7 - dayOfWeek;
+  // Spreading the goal evenly over the week, this many workouts should be done by tonight.
+  const pace = Math.floor((data.settings.weeklyGoal * (dayOfWeek + 1)) / 7);
+  const behind = doneThisWeek < pace && fresh.length >= minFreshForCatchUp;
 
   const base = { fresh, tired, needed };
   if (days.has(day)) return { ...base, train: false, reason: "done" };
   if (needed > 0 && needed >= daysLeft) return { ...base, train: true, reason: "goalAtRisk" };
+  if (behind) return { ...base, train: true, reason: tired.length > 0 ? "catchUp" : "fresh" };
   if (days.has(addDays(day, -1)) && days.has(addDays(day, -2))) return { ...base, train: false, reason: "backToBack" };
   if (fresh.length < recovery.length / 2) return { ...base, train: false, reason: "recovering" };
   if (needed === 0) return { ...base, train: false, reason: "goalReached" };

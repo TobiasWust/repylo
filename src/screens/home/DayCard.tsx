@@ -9,6 +9,7 @@ const looks: Record<AdviceReason, { sticker: StickerName; color: string }> = {
   done: { sticker: "party", color: "var(--mint)" },
   goalAtRisk: { sticker: "muscle", color: "var(--pink)" },
   fresh: { sticker: "muscle", color: "var(--mint)" },
+  catchUp: { sticker: "muscle", color: "var(--mint)" },
   backToBack: { sticker: "sleep", color: "var(--lavender)" },
   recovering: { sticker: "sleep", color: "var(--lavender)" },
   goalReached: { sticker: "sleep", color: "var(--sky)" },
@@ -48,6 +49,13 @@ export const DayCard = () => {
         ? t(`Ausgeruht und bereit: ${fresh}.`, `Rested and ready: ${fresh}.`)
         : t("Du bist ausgeruht – los geht's.", "You're rested – let's go."),
     ],
+    catchUp: [
+      t("Heute geht was", "Today's a go"),
+      t(
+        `Damit sich dein Wochenziel gut verteilt: Training für ${fresh}. ${tired} ${Math.min(advice.tired.length, 2) === 1 ? "darf" : "dürfen"} sich noch ausruhen.`,
+        `To spread your weekly goal evenly: train ${fresh}. Let ${tired} rest a bit longer.`,
+      ),
+    ],
     backToBack: [
       t("Heute lieber Ruhetag", "Better a rest day today"),
       t(
@@ -60,13 +68,13 @@ export const DayCard = () => {
       t(`${tired} erholen sich noch. Ein Spaziergang tut trotzdem gut.`, `${tired} are still recovering. A walk is still a good idea.`),
     ],
     goalReached: [
-      t("Ruhetag verdient", "You've earned a rest day"),
+      t("Wochenziel geschafft!", "Weekly goal done!"),
       fresh
         ? t(
-            `Wochenziel geschafft! Wenn du Lust hast: etwas Leichtes für ${fresh}.`,
-            `Weekly goal done! If you feel like it: something light for ${fresh}.`,
+            `Heute ist frei – oder ein Bonus-Training für ${fresh}, wenn du Lust hast.`,
+            `Take the day off – or add a bonus workout for ${fresh} if you feel like it.`,
           )
-        : t("Wochenziel geschafft – genieß den freien Tag.", "Weekly goal done – enjoy the day off."),
+        : t("Genieß den freien Tag.", "Enjoy the day off."),
     ],
   };
   const [title, body] = text[advice.reason];
