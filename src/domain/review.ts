@@ -4,15 +4,15 @@
  */
 import { addDays, today } from "./dates";
 import type { Data } from "./model";
-import { daysPerWeek, exerciseSessions, hasValue, trainedDays } from "./stats";
+import { daysPerWeek, exerciseSessions, hasValue, strengthChange, trainedDays } from "./stats";
 
 export interface MonthlyReview {
   readonly month: string;
   readonly workouts: number;
   readonly trainingDays: number;
   readonly sets: number;
-  /** kg × reps */
-  readonly volume: number;
+  /** Average est. 1RM change over the month's exercises, in %. */
+  readonly strength: number | null;
   /** Weeks (starting in this month) in which the weekly goal was reached. */
   readonly goalWeeks: number;
   readonly weeks: number;
@@ -38,7 +38,7 @@ export const reviewMonths = (data: Data): string[] => [...new Set(data.workouts.
 export const monthlyReview = (data: Data, month: string): MonthlyReview => {
   const workouts = data.workouts.filter((w) => inMonth(w.date, month) && w.exercises.some((e) => e.sets.some(hasValue)));
   const sets = workouts.flatMap((w) => w.exercises.flatMap((e) => e.sets.filter(hasValue)));
-  const volume = sets.reduce((sum, s) => sum + (s.weight ?? 0) * (s.reps ?? 0), 0);
+  const strength = strengthChange(data, `${month}-01`, `${month}-31`)?.percent ?? null;
 
   const perWeek = daysPerWeek(trainedDays(data));
   const mondays: string[] = [];
@@ -72,7 +72,7 @@ export const monthlyReview = (data: Data, month: string): MonthlyReview => {
     workouts: workouts.length,
     trainingDays: new Set(workouts.map((w) => w.date)).size,
     sets: sets.length,
-    volume,
+    strength,
     goalWeeks,
     weeks: mondays.length,
     favorite: favoriteEntry ? { exerciseKey: favoriteEntry[0], sessions: favoriteEntry[1] } : null,

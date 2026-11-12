@@ -28,13 +28,14 @@ const tilesFor = (app: App, review: MonthlyReview): Tile[] => {
       color: "var(--pink)",
     },
     { sticker: "chartUp", label: t("Sätze", "Sets"), value: String(review.sets), color: "var(--lavender)" },
-    {
-      sticker: "muscle",
-      label: t("Bewegt", "Lifted"),
-      value: `${formatNumber(toUnit(review.volume, unit) / 1000, lang, 1)} t`,
-      color: "var(--mint)",
-    },
   ];
+  if (review.strength !== null)
+    tiles.push({
+      sticker: "muscle",
+      label: t("Kraft im Schnitt", "Average strength"),
+      value: `${review.strength >= 0 ? "+" : ""}${formatNumber(review.strength, lang, 1)} %`,
+      color: "var(--mint)",
+    });
   if (review.favorite)
     tiles.push({
       sticker: "medal",

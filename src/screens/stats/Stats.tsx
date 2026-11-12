@@ -9,11 +9,12 @@ import {
   setsPerMuscle,
   trainedDays,
   weeklySetTarget,
+  strengthChange,
   weeklyVolume,
   weekStreak,
   workoutsPerWeek,
 } from "../../domain/stats";
-import { formatNumber, toUnit } from "../../domain/units";
+import { formatNumber } from "../../domain/units";
 import { BarChart, CountUp, Empty, Sparkline } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { formatDate, muscleName, plural } from "../../ui/text";
@@ -30,7 +31,6 @@ export const Stats = () => {
   const perWeek = useMemo(() => workoutsPerWeek(data), [data]);
   const last7 = useMemo(() => setsPerMuscle(data, addDays(today(), -6)), [data]);
   const prs = useMemo(() => recentPrs(data, 6), [data]);
-  const unit = data.settings.unit;
   const [target, upper] = weeklySetTarget[data.settings.goal];
 
   const exercises = useMemo(() => {
@@ -63,10 +63,7 @@ export const Stats = () => {
     );
 
   const totalWorkouts = data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).length;
-  const totalVolume = data.workouts.reduce(
-    (sum, w) => sum + w.exercises.reduce((s, e) => s + e.sets.reduce((v, x) => v + (x.weight ?? 0) * (x.reps ?? 0), 0), 0),
-    0,
-  );
+  const strength = strengthChange(data, addDays(today(), -55), today());
 
   return (
     <div className="screen">
@@ -86,10 +83,16 @@ export const Stats = () => {
             <CountUp value={weekStreak(days, data.settings.weeklyGoal)} format={(n) => String(Math.round(n))} /> {t("Wo.", "wk")}
           </strong>
         </div>
-        <div className="stat-tile lavender">
-          <span>{t("Bewegt gesamt", "Total lifted")}</span>
+        <div
+          className="stat-tile lavender"
+          title={t(
+            "Ø Veränderung des geschätzten 1RM deiner Übungen in den letzten 8 Wochen",
+            "Average change in est. 1RM across your exercises over the last 8 weeks",
+          )}
+        >
+          <span>{t("Kraft (8 Wo.)", "Strength (8 wk)")}</span>
           <strong>
-            <CountUp value={toUnit(totalVolume, unit) / 1000} format={(n) => `${formatNumber(n, lang, 1)} t`} />
+            {strength ? <CountUp value={strength.percent} format={(n) => `${n >= 0 ? "+" : ""}${formatNumber(n, lang, 1)} %`} /> : "–"}
           </strong>
         </div>
         <div className="stat-tile mint">
@@ -110,14 +113,14 @@ export const Stats = () => {
       </section>
 
       <section className="card">
-        <h2 className="card-title">{t("Volumen pro Woche", "Volume per week")}</h2>
+        <h2 className="card-title">{t("Sätze pro Woche", "Sets per week")}</h2>
         <BarChart
           bars={weeks.map((w) => ({
             label: formatDate(w.week, lang).replace(/\.$/, ""),
-            value: toUnit(w.volume, unit),
+            value: w.sets,
             highlight: w.week === weekStart(today()),
           }))}
-          format={(v) => `${formatNumber(v, lang, 0)} ${unit}`}
+          format={(v) => formatNumber(v, lang, 0)}
         />
       </section>
 

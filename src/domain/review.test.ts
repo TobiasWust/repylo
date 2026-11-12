@@ -22,7 +22,7 @@ describe("monthly review", () => {
     const review = monthlyReview(data, thisMonth);
     expect(review.workouts).toBe(1);
     expect(review.sets).toBe(2);
-    expect(review.volume).toBe(1100);
+    expect(review.strength).toBeCloseTo(10);
     expect(review.favorite?.exerciseKey).toBe("squat");
     expect(review.biggestGain?.percent).toBeCloseTo(10);
     expect(review.records).toBe(1);

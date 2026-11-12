@@ -244,6 +244,28 @@ export const weeklyVolume = (data: Data, weeks: number): WeekVolume[] => {
   return [...map].map(([week, v]) => ({ week, ...v }));
 };
 
+/**
+ * How much stronger you got between `from` and `to`: per exercise, the best
+ * est. 1RM of its last session in the range against its last session before
+ * the range (or, if it's new, its first session in the range), averaged over
+ * all exercises with two such sessions. Tonnage would mostly measure how
+ * heavy the machines are; this measures progress.
+ */
+export const strengthChange = (data: Data, from: string, to: string): { percent: number; exercises: number } | null => {
+  const keys = new Set(data.workouts.filter((w) => w.date >= from && w.date <= to).flatMap((w) => w.exercises.map((e) => e.exerciseKey)));
+  const changes: number[] = [];
+  for (const key of keys) {
+    const sessions = exerciseSessions(data, key).filter((s) => s.bestE1rm > 0 && s.date <= to);
+    const inRange = sessions.filter((s) => s.date >= from);
+    const baseline = sessions.filter((s) => s.date < from).at(-1) ?? inRange[0];
+    const current = inRange.at(-1);
+    if (!baseline || !current || baseline === current) continue;
+    changes.push(((current.bestE1rm - baseline.bestE1rm) / baseline.bestE1rm) * 100);
+  }
+  if (changes.length === 0) return null;
+  return { percent: changes.reduce((a, b) => a + b, 0) / changes.length, exercises: changes.length };
+};
+
 /** Body weight on or before `date` (latest entry), if any. */
 export const bodyWeightAt = (data: Data, date: string): number | null => {
   let result: number | null = null;

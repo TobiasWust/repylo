@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { addDays, today, weekStart, daysBetween } from "./dates";
 import { suggestProgression } from "./progression";
-import { detectPrs, e1rm, exerciseSessions, records, setsPerMuscle, weekStreak, workoutsPerWeek } from "./stats";
+import { detectPrs, e1rm, exerciseSessions, records, setsPerMuscle, strengthChange, weekStreak, workoutsPerWeek } from "./stats";
 import { build } from "../test/fixtures";
 
 describe("stats", () => {
@@ -105,5 +105,23 @@ describe("workouts per week", () => {
       { daysAgo: daysBetween(addDays(monday, -7), today()), exercises: { squat: [[100, 5]] } },
     ]);
     expect(workoutsPerWeek(data)).toEqual({ average: 1.5, weeks: 2 });
+  });
+});
+
+describe("strength change", () => {
+  it("averages each exercise's est. 1RM change against its last session before the range", () => {
+    const data = build([
+      { daysAgo: 70, exercises: { squat: [[100, 5]], bench_press: [[60, 5]] } },
+      { daysAgo: 30, exercises: { squat: [[105, 5]] } },
+      { daysAgo: 2, exercises: { squat: [[110, 5]], bench_press: [[66, 5]] } },
+    ]);
+    const change = strengthChange(data, addDays(today(), -55), today())!;
+    // Squat 100 → 110 (+10 %), bench 60 → 66 (+10 %).
+    expect(change.exercises).toBe(2);
+    expect(change.percent).toBeCloseTo(10);
+  });
+
+  it("is null without two sessions to compare", () => {
+    expect(strengthChange(build([{ daysAgo: 2, exercises: { squat: [[100, 5]] } }]), addDays(today(), -55), today())).toBeNull();
   });
 });
