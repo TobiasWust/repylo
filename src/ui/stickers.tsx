@@ -4,15 +4,17 @@
  */
 import type { ReactNode } from "react";
 
-const ink = "var(--ink)";
+// Own tokens, so a dark theme can keep stickers bright with dark outlines
+// while its surfaces and text go the other way.
+const ink = "var(--sticker-ink)";
 const c = {
-  yellow: "var(--yellow)",
-  pink: "var(--pink)",
-  mint: "var(--mint)",
-  lavender: "var(--lavender)",
-  sky: "var(--sky)",
-  white: "var(--paper)",
-  orange: "var(--orange)",
+  yellow: "var(--st-yellow)",
+  pink: "var(--st-pink)",
+  mint: "var(--st-mint)",
+  lavender: "var(--st-lavender)",
+  sky: "var(--st-sky)",
+  white: "var(--st-white)",
+  orange: "var(--st-orange)",
 };
 
 /** Two dot eyes and a smile, centred at (x, y). */
