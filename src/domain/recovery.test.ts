@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Rows } from "./model";
+import { addDays, today } from "./dates";
 import { dailyAdvice, muscleRecovery } from "./recovery";
 import { build, type SetSpec } from "../test/fixtures";
 
@@ -107,5 +108,30 @@ describe("daily advice keeps the weekly pace", () => {
     const fullBody = { squat: sets(4), bench_press: sets(4), barbell_row: sets(4), overhead_press: sets(3), rdl: sets(3) };
     const advice = dailyAdvice(build([{ daysAgo: 1, exercises: fullBody }], { settings: withGoal(2) }));
     expect(advice).toMatchObject({ train: false, reason: "recovering" });
+  });
+});
+
+describe("ready day", () => {
+  it("names the day a muscle is recovered and none once it is", () => {
+    const morning = new Date().setHours(7, 0, 0, 0);
+    const quads = (daysAgo: number) =>
+      muscleRecovery(
+        build([
+          {
+            daysAgo,
+            exercises: {
+              squat: [
+                [100, 5],
+                [100, 5],
+                [100, 5],
+                [100, 5],
+              ],
+            },
+          },
+        ]),
+        morning,
+      ).find((r) => r.muscle === "quads")!;
+    expect(quads(0).readyOn).toBe(addDays(today(), 2));
+    expect(quads(2).readyOn).toBeNull();
   });
 });

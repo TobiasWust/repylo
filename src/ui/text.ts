@@ -1,4 +1,4 @@
-import { parseDay } from "../domain/dates";
+import { daysBetween, parseDay, today } from "../domain/dates";
 import type { Equipment, Metric, Muscle, Pattern } from "../domain/exercises";
 import type { Goal, Language } from "../domain/model";
 
@@ -98,6 +98,18 @@ export const formatDate = (day: string, lang: Language, style: "long" | "short" 
     lang,
     style === "long" ? { weekday: "long", day: "numeric", month: "long" } : { day: "numeric", month: "short" },
   );
+
+/** When something happens again, relative to today: "morgen", "am Mittwoch", "am 24. Nov.". */
+export const readyLabel = (day: string, lang: Language, from: string = today()): string => {
+  const days = daysBetween(from, day);
+  if (days <= 0) return lang === "de" ? "jetzt" : "now";
+  if (days === 1) return lang === "de" ? "morgen" : "tomorrow";
+  if (days < 7) {
+    const weekday = parseDay(day).toLocaleDateString(lang, { weekday: "long" });
+    return lang === "de" ? `am ${weekday}` : `on ${weekday}`;
+  }
+  return `${lang === "de" ? "am" : "on"} ${formatDate(day, lang)}`;
+};
 
 export const formatMonth = (day: string, lang: Language) => parseDay(day).toLocaleDateString(lang, { month: "long", year: "numeric" });
 

@@ -21,6 +21,8 @@ export interface MuscleRecovery {
   readonly hoursLeft: number;
   /** Day the muscle was last trained, if within the last few days. */
   readonly lastTrained: string | null;
+  /** Day it's recovered again (from that morning on); null = ready now. */
+  readonly readyOn: string | null;
 }
 
 const recoveryDays = (sets: number): number => (sets >= 10 ? 3 : sets >= 4 ? 2 : 1);
@@ -47,11 +49,15 @@ export const muscleRecovery = (data: Data, now: number = Date.now()): MuscleReco
       if (!last.has(m) || w.date > last.get(m)!) last.set(m, w.date);
     }
   }
-  return muscles.map((muscle) => ({
-    muscle,
-    hoursLeft: Math.max(0, Math.ceil(((readyAt.get(muscle) ?? 0) - now) / 3_600_000)),
-    lastTrained: last.get(muscle) ?? null,
-  }));
+  return muscles.map((muscle) => {
+    const ready = readyAt.get(muscle) ?? 0;
+    return {
+      muscle,
+      hoursLeft: Math.max(0, Math.ceil((ready - now) / 3_600_000)),
+      lastTrained: last.get(muscle) ?? null,
+      readyOn: ready > now ? toDay(new Date(ready)) : null,
+    };
+  });
 };
 
 export type AdviceReason =

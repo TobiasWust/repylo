@@ -2207,6 +2207,9 @@ body:has(.overlay-screen) .rest-timer {
 .day-card p {
   font-size: 14px;
 }
+.day-card-ready {
+  margin-top: 4px;
+}
 .day-card-sticker {
   @media (prefers-reduced-motion: no-preference) {
     animation: bob 2.4s ease-in-out infinite;

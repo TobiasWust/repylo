@@ -3,7 +3,7 @@ import type { Muscle } from "../../domain/exercises";
 import { dailyAdvice, type AdviceReason } from "../../domain/recovery";
 import { useApp } from "../../ui/context";
 import { Sticker, type StickerName } from "../../ui/stickers";
-import { muscleName } from "../../ui/text";
+import { muscleName, readyLabel } from "../../ui/text";
 
 const looks: Record<AdviceReason, { sticker: StickerName; color: string }> = {
   done: { sticker: "party", color: "var(--mint)" },
@@ -77,6 +77,17 @@ export const DayCard = () => {
         : t("Genieß den freien Tag.", "Enjoy the day off."),
     ],
   };
+  // When the tired big muscles are back, grouped by day: "Beine morgen · Brust und Rücken am Mittwoch".
+  const byDay = new Map<string, Muscle[]>();
+  for (const r of advice.tired) if (r.readyOn) byDay.set(r.readyOn, [...(byDay.get(r.readyOn) ?? []), r.muscle]);
+  const ready = [...byDay]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(
+      ([day, list]) =>
+        `${list.length > 3 ? t(`${list.length} Muskelgruppen`, `${list.length} muscle groups`) : names(list)} ${readyLabel(day, lang)}`,
+    )
+    .join(" · ");
+
   const [title, body] = text[advice.reason];
   const look = looks[advice.reason];
   return (
@@ -85,6 +96,11 @@ export const DayCard = () => {
       <div>
         <h3>{title}</h3>
         <p>{body}</p>
+        {ready && advice.reason !== "goalAtRisk" && (
+          <p className="day-card-ready">
+            <strong>{t("Wieder fit:", "Ready again:")}</strong> {ready}
+          </p>
+        )}
       </div>
     </section>
   );

@@ -10,7 +10,7 @@ import { BodyMap } from "../ui/BodyMap";
 import { Segmented } from "../ui/components";
 import { useApp } from "../ui/context";
 import { Sticker } from "../ui/stickers";
-import { formatDate, muscleName } from "../ui/text";
+import { formatDate, muscleName, readyLabel } from "../ui/text";
 
 type Mode = "volume" | "recovery";
 
@@ -103,9 +103,7 @@ export const BodyMapCard = () => {
             <div className={`stat-tile ${info.recovery.hoursLeft > 0 ? "lavender" : "mint"}`}>
               <span>{t("Erholung", "Recovery")}</span>
               <strong>
-                {info.recovery.hoursLeft > 0
-                  ? t(`noch ${info.recovery.hoursLeft} h`, `${info.recovery.hoursLeft} h left`)
-                  : t("bereit", "ready")}
+                {info.recovery.readyOn ? t("bereit ", "ready ") + readyLabel(info.recovery.readyOn, lang) : t("bereit", "ready")}
               </strong>
               <small>
                 {info.recovery.lastTrained
