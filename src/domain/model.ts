@@ -35,6 +35,8 @@ export interface WorkoutExercise {
   readonly exerciseKey: string;
   readonly position: number;
   readonly note: string | null;
+  /** How it felt: 1 easy (4+ reps left), 2 right (1–3 left), 3 at the limit; null = not asked. */
+  readonly effort: number | null;
   readonly sets: readonly SetEntry[];
 }
 
@@ -209,6 +211,7 @@ export const buildData = (rows: Rows): Data => {
       exerciseKey: r.exerciseKey,
       position: r.position ?? 0,
       note: r.note,
+      effort: r.effort === 1 || r.effort === 2 || r.effort === 3 ? r.effort : null,
       sets: (setsByExercise.get(r.id) ?? []).sort(byPosition),
     });
   }

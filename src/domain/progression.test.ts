@@ -105,3 +105,41 @@ describe("weight jump after the top of the range", () => {
     expect(nextWeight(50, 30, [8, 12], 1)).toBe(60);
   });
 });
+
+describe("progression by how it felt", () => {
+  const session = (reps: number, effort: number) =>
+    build([
+      {
+        daysAgo: 2,
+        exercises: {
+          egym_adductor: [
+            [50, reps],
+            [50, reps],
+            [50, reps],
+          ],
+        },
+        effort: { egym_adductor: effort },
+      },
+    ]);
+
+  it("adds two reps after an easy session below the top", () => {
+    const p = suggestProgression(session(8, 1), "egym_adductor")!;
+    expect(p).toMatchObject({ kind: "addReps" });
+    expect(p.sets[0]).toMatchObject({ weight: 50, reps: 10 });
+  });
+
+  it("goes straight to more weight when easy reps would reach the top", () => {
+    const p = suggestProgression(session(10, 1), "egym_adductor")!;
+    expect(p.kind).toBe("addWeight");
+    expect(p.sets[0]).toMatchObject({ weight: 56, reps: 8 });
+  });
+
+  it("jumps less after a session at the limit", () => {
+    expect(suggestProgression(session(12, 2), "egym_adductor")!.sets[0]).toMatchObject({ weight: 55, reps: 8 });
+    expect(suggestProgression(session(12, 3), "egym_adductor")!.sets[0]).toMatchObject({ weight: 53, reps: 8 });
+  });
+
+  it("adds one rep when it felt right or wasn't rated", () => {
+    expect(suggestProgression(session(9, 2), "egym_adductor")!.sets[0]).toMatchObject({ weight: 50, reps: 10 });
+  });
+});

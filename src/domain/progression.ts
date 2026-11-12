@@ -8,6 +8,12 @@
  *    equipment's increments and at least one increment. Dropping four reps
  *    but adding only one small step (1 kg on 50 kg) would leave every set far
  *    from failure; ACSM suggests 2–10 % jumps once the target is beaten.
+ * How the exercise felt last time (one tap: easy / right / at the limit)
+ * tunes both steps. Proximity to failure is what drives hypertrophy (Refalo
+ * et al. 2023, Robinson et al. 2024), so "easy" counts as about three more
+ * reps in the tank: two reps more next time, or straight to more weight.
+ * "At the limit" jumps a little more carefully.
+ *
  * 3. Deload (~90 %) when performance (estimated 1RM) dropped three sessions
  *    in a row, or when the last two sessions stayed below the rep range in
  *    every set — the weight is too heavy for now.
@@ -36,6 +42,9 @@ export interface Progression {
 }
 
 const roundTo = (value: number, step: number) => Math.round(value / step) * step;
+
+/** Reps the user could have done beyond what they logged, by how it felt. */
+const repsInReserve = (effort: number | null): number => (effort === 1 ? 3 : effort === 3 ? -1 : 0);
 
 /**
  * Weight for `min` reps after reaching `reps` at `top`, by the Epley ratio.
@@ -93,21 +102,23 @@ export const suggestProgression = (data: Data, exerciseKey: string, beforeWorkou
     return { kind: "deload", last, sets: last.sets.map((s) => ({ ...copy(s), weight, reps: Math.round((min + max) / 2) })) };
   }
 
+  const reserve = repsInReserve(last.effort);
   const topSets = last.sets.filter((s) => (s.weight ?? 0) >= top);
-  const allAtMax = topSets.length > 0 && topSets.every((s) => (s.reps ?? 0) >= max);
+  const allAtMax = topSets.length > 0 && topSets.every((s) => (s.reps ?? 0) + Math.max(0, reserve) >= max);
   if (allAtMax) {
-    const reps = Math.min(...topSets.map((s) => s.reps ?? 0));
+    const reps = Math.min(...topSets.map((s) => s.reps ?? 0)) + reserve;
     const weight = fromUnit(roundTo(nextWeight(toUnit(top, unit), reps, [min, max], inc), step), unit);
     return { kind: "addWeight", last, sets: last.sets.map((s) => ({ ...copy(s), weight, reps: min })) };
   }
 
   const anyBelowMax = last.sets.some((s) => (s.reps ?? 0) < max);
   if (anyBelowMax) {
-    // Add one rep to every set that hasn't reached the top yet, keeping weight.
+    // Add a rep (two if it felt easy) to every set below the top, keeping weight.
+    const add = reserve > 0 ? 2 : 1;
     return {
       kind: "addReps",
       last,
-      sets: last.sets.map((s) => ({ ...copy(s), reps: Math.min(max, (s.reps ?? 0) + 1) })),
+      sets: last.sets.map((s) => ({ ...copy(s), reps: Math.min(max, (s.reps ?? 0) + add) })),
     };
   }
   return { kind: "repeat", last, sets: last.sets.map(copy) };

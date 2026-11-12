@@ -19,6 +19,8 @@ export interface Session {
   readonly workoutId: string;
   readonly date: string;
   readonly note: string | null;
+  /** How the exercise felt that day (see WorkoutExercise.effort). */
+  readonly effort: number | null;
   readonly sets: readonly SetEntry[];
   readonly topWeight: number;
   readonly bestE1rm: number;
@@ -31,7 +33,7 @@ export interface Session {
   readonly totalDistance: number;
 }
 
-const summarize = (workoutId: string, date: string, note: string | null, sets: SetEntry[]): Session => {
+const summarize = (workoutId: string, date: string, note: string | null, effort: number | null, sets: SetEntry[]): Session => {
   let topWeight = 0,
     bestE1rm = 0,
     volume = 0,
@@ -53,7 +55,21 @@ const summarize = (workoutId: string, date: string, note: string | null, sets: S
     totalDuration += d;
     totalDistance += s.distance ?? 0;
   }
-  return { workoutId, date, note, sets, topWeight, bestE1rm, volume, maxReps, totalReps, maxDuration, totalDuration, totalDistance };
+  return {
+    workoutId,
+    date,
+    note,
+    effort,
+    sets,
+    topWeight,
+    bestE1rm,
+    volume,
+    maxReps,
+    totalReps,
+    maxDuration,
+    totalDuration,
+    totalDistance,
+  };
 };
 
 /**
@@ -73,7 +89,8 @@ export const exerciseSessions = (data: Data, key: string, beforeWorkoutId?: stri
     if (w.id === beforeWorkoutId || !isBefore(w)) continue;
     const sets = w.exercises.filter((e) => e.exerciseKey === key).flatMap((e) => e.sets.filter(hasValue));
     const note = w.exercises.find((e) => e.exerciseKey === key && e.note)?.note ?? null;
-    if (sets.length > 0) sessions.push(summarize(w.id, w.date, note, sets));
+    const effort = w.exercises.find((e) => e.exerciseKey === key && e.effort)?.effort ?? null;
+    if (sets.length > 0) sessions.push(summarize(w.id, w.date, note, effort, sets));
   }
   return sessions;
 };

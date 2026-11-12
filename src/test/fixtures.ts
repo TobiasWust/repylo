@@ -7,6 +7,8 @@ export interface WorkoutSpec {
   daysAgo: number;
   templateId?: string;
   exercises: Record<string, SetSpec[]>;
+  /** How each exercise felt (1 easy, 2 right, 3 at the limit). */
+  effort?: Record<string, number>;
 }
 
 export const build = (workouts: WorkoutSpec[], extra: Partial<Rows> = {}): Data => {
@@ -49,7 +51,7 @@ export const build = (workouts: WorkoutSpec[], extra: Partial<Rows> = {}): Data 
     });
     Object.entries(spec.exercises).forEach(([key, sets], ei) => {
       const exId = `${workoutId}e${ei}`;
-      we.push({ id: exId, workoutId, exerciseKey: key, position: ei, note: null });
+      we.push({ id: exId, workoutId, exerciseKey: key, position: ei, note: null, effort: spec.effort?.[key] ?? null });
       sets.forEach(([weight, reps], si) =>
         s.push({
           id: `${exId}s${si}`,

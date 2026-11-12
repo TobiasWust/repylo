@@ -2003,6 +2003,12 @@ body:has(.overlay-screen) .rest-timer {
   background: var(--mint);
 }
 
+.effort {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .plan-offer {
   background: var(--mint);
 }

@@ -32,7 +32,7 @@ export const progressionLabel = (app: App, p: Progression): string => {
     case "addWeight":
       return t("Mehr Gewicht", "Add weight");
     case "addReps":
-      return t("Eine Wdh. mehr", "One more rep");
+      return t("Mehr Wiederholungen", "More reps");
     case "deload":
       return t("Leichter (Deload)", "Lighter (deload)");
     case "addTime":

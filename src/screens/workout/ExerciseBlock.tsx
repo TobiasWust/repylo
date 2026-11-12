@@ -15,7 +15,7 @@ import { tipsFor } from "../../domain/tips";
 import { estimateStart } from "../../domain/estimate";
 import { TipsList } from "../../ui/Tips";
 import { fromUnit, toUnit } from "../../domain/units";
-import { Icon, NumberField } from "../../ui/components";
+import { Icon, NumberField, Segmented } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
 import { equipmentName, formatDate } from "../../ui/text";
@@ -302,6 +302,21 @@ export const ExerciseBlock = ({
         ))}
       </div>
       {feedback && <CoachLine feedback={feedback} metric={exercise.metric} />}
+      {(exercise.metric === "weight" || exercise.metric === "bodyweight") && entry.sets.some((s) => s.done) && (
+        <div className="effort">
+          <div className="field-label">{t("Wie hat sich die Übung angefühlt?", "How did the exercise feel?")}</div>
+          <Segmented<"" | "1" | "2" | "3">
+            label={t("Anstrengung", "Effort")}
+            value={entry.effort ? (String(entry.effort) as "1" | "2" | "3") : ""}
+            onChange={(v) => v && actions.setExerciseEffort(entry.id, Number(v) as 1 | 2 | 3)}
+            options={[
+              { value: "1", label: t("Leicht", "Easy") },
+              { value: "2", label: t("Passend", "Right") },
+              { value: "3", label: t("Am Limit", "At the limit") },
+            ]}
+          />
+        </div>
+      )}
       <button
         className="button small full"
         onClick={() => actions.addSet(workout.id, entry.id, entry.exerciseKey, entry.sets.at(-1), (entry.sets.at(-1)?.position ?? -1) + 1)}

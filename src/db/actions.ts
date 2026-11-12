@@ -109,6 +109,9 @@ export const createActions = (evolu: AppEvolu) => {
     updateExerciseNote: (id: string, text: string) =>
       evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(id), note: note(text) }),
 
+    setExerciseEffort: (id: string, effort: 1 | 2 | 3) =>
+      evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(id), effort: int(effort) }),
+
     moveExercise: (workout: Workout, id: string, direction: -1 | 1) => {
       const list = workout.exercises;
       const index = list.findIndex((e) => e.id === id);

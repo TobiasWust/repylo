@@ -54,6 +54,8 @@ export const Schema = {
     exerciseKey: NonEmptyTrimmedString100,
     position: NonNegativeInt,
     note: nullOr(Text1000),
+    /** How the exercise felt: 1 = easy, 2 = right, 3 = at the limit. */
+    effort: nullOr(NonNegativeInt),
   },
   workoutSet: {
     id: WorkoutSetId,
@@ -140,7 +142,7 @@ export const workoutsQuery = createQuery((db) =>
     .orderBy("startedAt", "desc"),
 );
 export const workoutExercisesQuery = createQuery((db) =>
-  db.selectFrom("workoutExercise").select(["id", "workoutId", "exerciseKey", "position", "note"]).where("isDeleted", "is not", 1),
+  db.selectFrom("workoutExercise").select(["id", "workoutId", "exerciseKey", "position", "note", "effort"]).where("isDeleted", "is not", 1),
 );
 export const setsQuery = createQuery((db) =>
   db
