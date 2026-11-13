@@ -201,11 +201,19 @@ small {
   margin: 0 auto;
   padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 110px);
 }
-/* Firefox on iOS lays out fixed elements as if its bottom toolbar were still
-   showing after it has hidden, so the tab bar sits ~100px higher than the page
-   end. Reserve that extra room there. */
-[data-browser="fxios"] .app {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 230px);
+/* The tab bar follows the page in the flow (see .tabbar), so it needs no reserved room. */
+.app:has(+ .tabbar) {
+  padding-bottom: 16px;
+}
+/* Fill the screen so the tab bar sits at the bottom even on short pages. */
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+#root > .app {
+  flex: 1;
+  width: 100%;
 }
 .screen {
   display: flex;
@@ -1655,11 +1663,12 @@ details[open] {
 }
 
 /* ---------- Tab bar ---------- */
+/* Sticky, not fixed: iOS home-screen apps can place fixed elements well above the
+   screen bottom. In the flow, the bar always ends up below the last card. */
 .tabbar {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
+  position: sticky;
   bottom: calc(env(safe-area-inset-bottom) + 10px);
+  margin: 0 auto calc(env(safe-area-inset-bottom) + 10px);
   width: calc(100% - 24px);
   max-width: 536px;
   display: flex;
