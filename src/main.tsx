@@ -15,6 +15,8 @@ import "./ui/install";
 import "./styles.css";
 
 applyLook(getLook());
+// Firefox on iOS needs extra room below the page for the tab bar (see styles.css).
+if (navigator.userAgent.includes("FxiOS")) document.documentElement.dataset.browser = "fxios";
 applyTheme(getTheme());
 
 // Surface Evolu's errors (plain objects) to the boot watchdog in index.html.

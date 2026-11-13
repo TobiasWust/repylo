@@ -201,6 +201,12 @@ small {
   margin: 0 auto;
   padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 110px);
 }
+/* Firefox on iOS lays out fixed elements as if its bottom toolbar were still
+   showing after it has hidden, so the tab bar sits ~100px higher than the page
+   end. Reserve that extra room there. */
+[data-browser="fxios"] .app {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 230px);
+}
 .screen {
   display: flex;
   flex-direction: column;
