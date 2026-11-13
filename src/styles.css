@@ -293,28 +293,24 @@ small {
 .hero-value small {
   font-size: 18px;
 }
-.form-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.form-value {
-  font-size: 34px;
+.fitness-value {
+  font-size: 30px;
   font-weight: 800;
   line-height: 1.1;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 8px;
+  column-gap: 8px;
 }
-.form-value small {
+.fitness-value small {
   font-size: 15px;
 }
-.form-value .up,
+.fitness-value .depot-change {
+  font-size: 14px;
+}
 .depot-change.up {
   color: var(--success);
 }
-.form-value .down,
 .depot-change.down {
   color: var(--danger);
 }
@@ -329,10 +325,6 @@ small {
 }
 .depot-change {
   font-weight: 800;
-}
-.form-level {
-  font-weight: 700;
-  font-size: 14px;
 }
 .hero-stats {
   display: flex;
@@ -376,18 +368,23 @@ small {
 .week-dot.ready:not(.on) {
   background: var(--mint);
 }
-.week-ready {
+button.week-dot {
+  font: inherit;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
 }
-.week-ready i {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--edge);
-  border-radius: 4px;
-  background: var(--mint);
-  vertical-align: -1px;
+.week-dot.on {
+  color: var(--on-solid-warm);
+}
+.week-dot.selected {
+  box-shadow: 0 0 0 3px var(--ink);
+}
+.week-detail {
+  font-size: 14px;
+  min-height: 1.4em;
 }
 .week-dot.today {
   outline: 3px dashed var(--ink);

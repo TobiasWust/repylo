@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
 import { computeSuggestions } from "../../domain/suggestions";
-import { majorMuscles, trainedDays, weekStreak } from "../../domain/stats";
+import { hasValue, majorMuscles, recentPrs, trainedDays, weekStreak } from "../../domain/stats";
 import { muscleRecovery } from "../../domain/recovery";
 import type { Muscle } from "../../domain/exercises";
 import { InstallCard } from "../../ui/InstallCard";
@@ -17,7 +17,7 @@ import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
 import { DayCard } from "./DayCard";
-import { FormCard } from "./FormCard";
+import { FitnessCard } from "./FitnessCard";
 import { useLastSeen } from "../../ui/motion";
 
 const tileColors = ["var(--yellow)", "var(--pink)", "var(--mint)", "var(--lavender)", "var(--sky)"];
@@ -32,6 +32,7 @@ export const Home = () => {
   // One suggestion at a time keeps the home screen calm; the most important comes first.
   const suggestions = useMemo(() => computeSuggestions(data).slice(0, 1), [data]);
   const days = useMemo(() => trainedDays(data), [data]);
+  const dayPrs = useMemo(() => recentPrs(data, 30), [data]);
   const goal = data.settings.weeklyGoal;
   const streak = weekStreak(days, goal);
   const thisWeek = weekStart(today());
@@ -44,6 +45,37 @@ export const Home = () => {
   for (const r of muscleRecovery(data, now))
     if (r.readyOn && majorMuscles.includes(r.muscle) && weekDays.includes(r.readyOn))
       readyByDay.set(r.readyOn, [...(readyByDay.get(r.readyOn) ?? []), r.muscle]);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  /** What a tapped day in the week row stands for. */
+  const dayInfo = (d: string): string => {
+    if (days.has(d)) {
+      const w = data.workouts.filter((x) => x.date === d && x.exercises.some((e) => e.sets.some(hasValue)));
+      const name =
+        w.map((x) => data.templates.find((tpl) => tpl.id === x.templateId)?.name).find(Boolean) ??
+        w
+          .flatMap((x) => x.exercises.map((e) => exerciseName(getExercise(data, e.exerciseKey))))
+          .slice(0, 2)
+          .join(", ");
+      const sets = w.reduce((n, x) => n + x.exercises.reduce((m, e) => m + e.sets.filter(hasValue).length, 0), 0);
+      const prs = dayPrs.filter((p) => p.date === d).length;
+      return [
+        t(`Trainingstag – ${name}`, `Training day – ${name}`),
+        `${sets} ${t("Sätze", "sets")}`,
+        prs > 0 && `${prs} ${plural(prs, t("Bestwert", "record"), t("Bestwerte", "records"))}`,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }
+    if (d < today()) return t("Ruhetag", "Rest day");
+    if (d === today()) return t("Heute noch kein Training", "No training yet today");
+    const ready = readyByDay.get(d);
+    if (ready)
+      return t(
+        `Wieder fit: ${ready.map((m) => muscleName(m, lang)).join(", ")}`,
+        `Ready again: ${ready.map((m) => muscleName(m, lang)).join(", ")}`,
+      );
+    return t("Noch offen", "Not planned yet");
+  };
   // Since this screen was last shown: days ticked off get stamped, a grown streak flickers.
   const seenDays = useLastSeen("home.week", weekDays.filter((d) => days.has(d)).join(","));
   const seenStreak = useLastSeen("home.streak", streak);
@@ -107,30 +139,23 @@ export const Home = () => {
             </div>
           </div>
         </div>
-        <div className="week-dots">
+        <div className="week-dots" role="group" aria-label={t("Diese Woche", "This week")}>
           {weekDays.map((d) => (
-            <span
+            <button
               key={d}
-              className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""} ${stamped(d) ? "stamped" : ""} ${readyByDay.has(d) ? "ready" : ""}`}
+              className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""} ${stamped(d) ? "stamped" : ""} ${readyByDay.has(d) ? "ready" : ""} ${selectedDay === d ? "selected" : ""}`}
+              aria-pressed={selectedDay === d}
+              aria-label={new Date(`${d}T12:00`).toLocaleDateString(lang, { weekday: "long" })}
+              onClick={() => setSelectedDay(selectedDay === d ? null : d)}
+              title={dayInfo(d)}
             >
               {new Date(`${d}T12:00`).toLocaleDateString(lang, { weekday: "narrow" })}
-            </span>
+            </button>
           ))}
         </div>
-        {readyByDay.size > 0 && (
-          <p className="week-ready">
-            <i aria-hidden="true" /> {t("Wieder fit:", "Ready again:")}{" "}
-            {[...readyByDay]
-              .sort(([a], [b]) => a.localeCompare(b))
-              .map(
-                ([d, list]) =>
-                  `${new Date(`${d}T12:00`).toLocaleDateString(lang, { weekday: "short" })} ${
-                    list.length > 2
-                      ? t(`${list.length} Muskelgruppen`, `${list.length} muscle groups`)
-                      : list.map((m) => muscleName(m, lang)).join(", ")
-                  }`,
-              )
-              .join(" · ")}
+        {selectedDay && (
+          <p className="week-detail" aria-live="polite">
+            <strong>{new Date(`${selectedDay}T12:00`).toLocaleDateString(lang, { weekday: "long" })}:</strong> {dayInfo(selectedDay)}
           </p>
         )}
         <button className="button dark big full" onClick={startToday}>
@@ -139,7 +164,7 @@ export const Home = () => {
         </button>
       </section>
 
-      <FormCard />
+      <FitnessCard />
 
       {data.templates.length === 0 && (data.dismissedUntil.get("plan-offer") ?? 0) < now && (
         <section className="card plan-offer">

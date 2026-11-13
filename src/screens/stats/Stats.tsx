@@ -8,9 +8,7 @@ import {
   setsPerMuscle,
   trainedDays,
   weeklySetTarget,
-  strengthChange,
   weeklyVolume,
-  weekStreak,
   workoutsPerWeek,
 } from "../../domain/stats";
 import { formatNumber } from "../../domain/units";
@@ -44,7 +42,6 @@ export const Stats = () => {
     );
 
   const totalWorkouts = data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).length;
-  const strength = strengthChange(data, addDays(today(), -55), today());
 
   return (
     <div className="screen">
@@ -55,25 +52,6 @@ export const Stats = () => {
           <span>{t("Trainings", "Workouts")}</span>
           <strong>
             <CountUp value={totalWorkouts} format={(n) => String(Math.round(n))} />
-          </strong>
-        </div>
-        <div className="stat-tile pink">
-          <span>{t("Serie", "Streak")}</span>
-          <strong className="with-sticker">
-            <Sticker name="flame" size={26} />{" "}
-            <CountUp value={weekStreak(days, data.settings.weeklyGoal)} format={(n) => String(Math.round(n))} /> {t("Wo.", "wk")}
-          </strong>
-        </div>
-        <div
-          className="stat-tile lavender"
-          title={t(
-            "Ø Veränderung des geschätzten 1RM deiner Übungen in den letzten 8 Wochen",
-            "Average change in est. 1RM across your exercises over the last 8 weeks",
-          )}
-        >
-          <span>{t("Kraft (8 Wo.)", "Strength (8 wk)")}</span>
-          <strong>
-            {strength ? <CountUp value={strength.percent} format={(n) => `${n >= 0 ? "+" : ""}${formatNumber(n, lang, 1)} %`} /> : "–"}
           </strong>
         </div>
         <div className="stat-tile mint">
