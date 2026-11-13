@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
 import { computeSuggestions } from "../../domain/suggestions";
-import { trainedDays, weekStreak } from "../../domain/stats";
+import { majorMuscles, trainedDays, weekStreak } from "../../domain/stats";
+import { muscleRecovery } from "../../domain/recovery";
+import type { Muscle } from "../../domain/exercises";
 import { InstallCard } from "../../ui/InstallCard";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { Icon } from "../../ui/components";
@@ -10,11 +12,12 @@ import { Sticker } from "../../ui/stickers";
 import { previousMonth } from "../../domain/review";
 import { isDeloadWeek } from "../../domain/progression";
 import { useApp } from "../../ui/context";
-import { formatDate, monthName, plural } from "../../ui/text";
+import { formatDate, monthName, muscleName, plural } from "../../ui/text";
 import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
 import { DayCard } from "./DayCard";
+import { FormCard } from "./FormCard";
 import { useLastSeen } from "../../ui/motion";
 
 const tileColors = ["var(--yellow)", "var(--pink)", "var(--mint)", "var(--lavender)", "var(--sky)"];
@@ -36,6 +39,11 @@ export const Home = () => {
   const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 1);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
   const daysThisWeek = weekDays.filter((d) => days.has(d)).length;
+  // Days later this week when tired big muscles are recovered again, marked on the week row.
+  const readyByDay = new Map<string, Muscle[]>();
+  for (const r of muscleRecovery(data, now))
+    if (r.readyOn && majorMuscles.includes(r.muscle) && weekDays.includes(r.readyOn))
+      readyByDay.set(r.readyOn, [...(readyByDay.get(r.readyOn) ?? []), r.muscle]);
   // Since this screen was last shown: days ticked off get stamped, a grown streak flickers.
   const seenDays = useLastSeen("home.week", weekDays.filter((d) => days.has(d)).join(","));
   const seenStreak = useLastSeen("home.streak", streak);
@@ -101,16 +109,37 @@ export const Home = () => {
         </div>
         <div className="week-dots">
           {weekDays.map((d) => (
-            <span key={d} className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""} ${stamped(d) ? "stamped" : ""}`}>
+            <span
+              key={d}
+              className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""} ${stamped(d) ? "stamped" : ""} ${readyByDay.has(d) ? "ready" : ""}`}
+            >
               {new Date(`${d}T12:00`).toLocaleDateString(lang, { weekday: "narrow" })}
             </span>
           ))}
         </div>
+        {readyByDay.size > 0 && (
+          <p className="week-ready">
+            <i aria-hidden="true" /> {t("Wieder fit:", "Ready again:")}{" "}
+            {[...readyByDay]
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(
+                ([d, list]) =>
+                  `${new Date(`${d}T12:00`).toLocaleDateString(lang, { weekday: "short" })} ${
+                    list.length > 2
+                      ? t(`${list.length} Muskelgruppen`, `${list.length} muscle groups`)
+                      : list.map((m) => muscleName(m, lang)).join(", ")
+                  }`,
+              )
+              .join(" · ")}
+          </p>
+        )}
         <button className="button dark big full" onClick={startToday}>
           <Icon name={todays ? "dumbbell" : "bolt"} />
           {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Training starten", "Start workout")}
         </button>
       </section>
+
+      <FormCard />
 
       {data.templates.length === 0 && (data.dismissedUntil.get("plan-offer") ?? 0) < now && (
         <section className="card plan-offer">

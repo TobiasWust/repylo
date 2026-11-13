@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
 import {
-  exerciseSessions,
   hasValue,
   majorMuscles,
   recentPrs,
@@ -15,14 +14,15 @@ import {
   workoutsPerWeek,
 } from "../../domain/stats";
 import { formatNumber } from "../../domain/units";
-import { BarChart, CountUp, Empty, Sparkline } from "../../ui/components";
+import { BarChart, CountUp, Empty } from "../../ui/components";
 import { useApp } from "../../ui/context";
-import { formatDate, muscleName, plural } from "../../ui/text";
+import { formatDate, muscleName } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
 import { StrengthOverview } from "../../ui/StrengthLevel";
 import { ReadinessCard } from "./ReadinessCard";
 import { Heatmap } from "./Heatmap";
 import { BalanceCard } from "./BalanceCard";
+import { DepotCard } from "./DepotCard";
 
 export const Stats = () => {
   const { t, data, lang, open, exerciseName, weight } = useApp();
@@ -32,25 +32,6 @@ export const Stats = () => {
   const last7 = useMemo(() => setsPerMuscle(data, addDays(today(), -6)), [data]);
   const prs = useMemo(() => recentPrs(data, 6), [data]);
   const [target, upper] = weeklySetTarget[data.settings.goal];
-
-  const exercises = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const w of data.workouts)
-      for (const e of w.exercises) if (e.sets.some(hasValue)) counts.set(e.exerciseKey, (counts.get(e.exerciseKey) ?? 0) + 1);
-    return [...counts]
-      .sort((a, b) => b[1] - a[1])
-      .map(([key, count]) => {
-        const sessions = exerciseSessions(data, key);
-        const metric = getExercise(data, key).metric;
-        // What "progress" means depends on how the exercise is measured.
-        const value = (s: (typeof sessions)[number]) =>
-          metric === "time" || metric === "cardio" ? s.maxDuration : s.bestE1rm > 0 ? s.bestE1rm : s.maxReps;
-        const window = sessions.slice(-12);
-        const trend = window.map(value);
-        const change = trend.length >= 2 && trend[0]! > 0 ? ((trend.at(-1)! - trend[0]!) / trend[0]!) * 100 : null;
-        return { key, count, best: Math.max(0, ...sessions.map((s) => s.bestE1rm)), trend, change, since: window[0]?.date ?? null };
-      });
-  }, [data]);
 
   if (days.size === 0)
     return (
@@ -194,38 +175,7 @@ export const Stats = () => {
         </section>
       )}
 
-      <section>
-        <h2 className="section-title">{t("Übungen", "Exercises")}</h2>
-        <p className="hint list-hint">
-          {t(
-            "Kurve und %: wie sich dein geschätztes 1RM in den letzten bis zu 12 Einheiten entwickelt hat.",
-            "Line and %: how your estimated 1RM changed over your last 12 sessions at most.",
-          )}
-        </p>
-        <div className="stack">
-          {exercises.map((e) => (
-            <button key={e.key} className="card list-card" onClick={() => open({ type: "exercise", key: e.key })}>
-              <span className="list-main">
-                <strong>{exerciseName(getExercise(data, e.key))}</strong>
-                <small>
-                  {e.count} {plural(e.count, t("Einheit", "session"), t("Einheiten", "sessions"))}
-                  {e.best > 0 && ` · 1RM ${weight(e.best)}`}
-                </small>
-              </span>
-              <span className="trend">
-                <Sparkline values={e.trend} />
-                {e.change !== null && e.since && (
-                  <small className={e.change >= 0 ? "up" : "down"}>
-                    {e.change >= 0 ? "+" : ""}
-                    {formatNumber(e.change, lang, 0)} %{" "}
-                    <span className="trend-since">{t(`seit ${formatDate(e.since, lang)}`, `since ${formatDate(e.since, lang)}`)}</span>
-                  </small>
-                )}
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
+      <DepotCard />
     </div>
   );
 };
