@@ -3,7 +3,9 @@ import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
 import {
   hasValue,
+  averageDuration,
   majorMuscles,
+  recordsSince,
   recentPrs,
   setsPerMuscle,
   trainedDays,
@@ -41,6 +43,8 @@ export const Stats = () => {
       </div>
     );
 
+  const records30 = recordsSince(data, addDays(today(), -29));
+  const duration = averageDuration(data);
   const totalWorkouts = data.workouts.filter((w) => w.exercises.some((e) => e.sets.some(hasValue))).length;
 
   return (
@@ -53,6 +57,22 @@ export const Stats = () => {
           <strong>
             <CountUp value={totalWorkouts} format={(n) => String(Math.round(n))} />
           </strong>
+        </div>
+        <div
+          className="stat-tile pink"
+          title={t("Neue Bestwerte (geschätztes 1RM) in den letzten 30 Tagen", "New records (est. 1RM) in the last 30 days")}
+        >
+          <span>{t("Bestwerte (30 T.)", "Records (30 d)")}</span>
+          <strong className="with-sticker">
+            <Sticker name="trophy" size={26} /> <CountUp value={records30} format={(n) => String(Math.round(n))} />
+          </strong>
+        </div>
+        <div
+          className="stat-tile lavender"
+          title={t("Von Start bis „Fertig“, letzte 20 Trainings", "From start to “Done”, last 20 workouts")}
+        >
+          <span>{t("Ø Dauer", "Avg duration")}</span>
+          <strong>{duration !== null ? <CountUp value={duration} format={(n) => `${Math.round(n)} min`} /> : "–"}</strong>
         </div>
         <div className="stat-tile mint">
           <span>

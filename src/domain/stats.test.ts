@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { addDays, today, weekStart, daysBetween } from "./dates";
 import { suggestProgression } from "./progression";
-import { detectPrs, e1rm, exerciseSessions, records, setsPerMuscle, strengthChange, weekStreak, workoutsPerWeek } from "./stats";
+import {
+  averageDuration,
+  detectPrs,
+  e1rm,
+  exerciseSessions,
+  records,
+  recordsSince,
+  setsPerMuscle,
+  strengthChange,
+  weekStreak,
+  workoutsPerWeek,
+} from "./stats";
 import { build } from "../test/fixtures";
 
 describe("stats", () => {
@@ -123,5 +134,37 @@ describe("strength change", () => {
 
   it("is null without two sessions to compare", () => {
     expect(strengthChange(build([{ daysAgo: 2, exercises: { squat: [[100, 5]] } }]), addDays(today(), -55), today())).toBeNull();
+  });
+});
+
+describe("stat tiles", () => {
+  it("counts records since a day", () => {
+    const data = build([
+      { daysAgo: 40, exercises: { squat: [[100, 5]] } },
+      { daysAgo: 20, exercises: { squat: [[105, 5]] } },
+      { daysAgo: 5, exercises: { squat: [[110, 5]] } },
+    ]);
+    expect(recordsSince(data, addDays(today(), -29))).toBe(2);
+    expect(recordsSince(data, addDays(today(), -9))).toBe(1);
+  });
+
+  it("averages workout length, skipping unclosed or reopened ones", () => {
+    const minutes = (m: number) => m * 60_000;
+    const base = build([
+      { daysAgo: 1, exercises: { squat: [[100, 5]] } },
+      { daysAgo: 3, exercises: { squat: [[100, 5]] } },
+      { daysAgo: 5, exercises: { squat: [[100, 5]] } },
+    ]);
+    const start = 1_700_000_000_000;
+    const data = {
+      ...base,
+      workouts: base.workouts.map((w, i) => ({
+        ...w,
+        startedAt: start,
+        finishedAt: start + minutes([50, 60, 600][i]!),
+      })),
+    };
+    expect(averageDuration(data)).toBeCloseTo(55);
+    expect(averageDuration(base)).toBeNull();
   });
 });

@@ -266,6 +266,23 @@ export const strengthChange = (data: Data, from: string, to: string): { percent:
   return { percent: changes.reduce((a, b) => a + b, 0) / changes.length, exercises: changes.length };
 };
 
+/**
+ * Average workout length in minutes over the last `count` workouts that were
+ * started live and finished with "Done". Sessions under 10 minutes or over
+ * four hours are left out – usually a workout reopened later or never closed.
+ */
+export const averageDuration = (data: Data, count = 20): number | null => {
+  const minutes = data.workouts
+    .filter((w) => w.startedAt > 0 && w.finishedAt !== null && w.exercises.some((e) => e.sets.some(hasValue)))
+    .map((w) => (w.finishedAt! - w.startedAt) / 60_000)
+    .filter((m) => m >= 10 && m <= 240)
+    .slice(0, count);
+  return minutes.length > 0 ? minutes.reduce((a, b) => a + b, 0) / minutes.length : null;
+};
+
+/** Number of new est. 1RM records from `from` on. */
+export const recordsSince = (data: Data, from: string): number => recentPrs(data, Infinity).filter((p) => p.date >= from).length;
+
 /** Body weight on or before `date` (latest entry), if any. */
 export const bodyWeightAt = (data: Data, date: string): number | null => {
   let result: number | null = null;
