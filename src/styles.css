@@ -364,6 +364,11 @@ button.week-dot {
 .week-dot.on {
   color: var(--on-solid-warm);
 }
+/* Days of next week, shown only up to the next "ready again" day. */
+.week-dot.next-week {
+  opacity: 0.75;
+  border-style: dashed;
+}
 .week-dot.selected {
   box-shadow: 0 0 0 3px var(--ink);
 }

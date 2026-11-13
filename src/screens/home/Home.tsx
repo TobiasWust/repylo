@@ -4,7 +4,6 @@ import { getExercise } from "../../domain/model";
 import { computeSuggestions } from "../../domain/suggestions";
 import { hasValue, majorMuscles, recentPrs, trainedDays, weekStreak } from "../../domain/stats";
 import { muscleRecovery } from "../../domain/recovery";
-import type { Muscle } from "../../domain/exercises";
 import { InstallCard } from "../../ui/InstallCard";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { Icon } from "../../ui/components";
@@ -12,7 +11,7 @@ import { Sticker } from "../../ui/stickers";
 import { previousMonth } from "../../domain/review";
 import { isDeloadWeek } from "../../domain/progression";
 import { useApp } from "../../ui/context";
-import { formatDate, monthName, muscleName, plural } from "../../ui/text";
+import { formatDate, monthName, plural } from "../../ui/text";
 import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
@@ -39,11 +38,16 @@ export const Home = () => {
   const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 1);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
   const daysThisWeek = weekDays.filter((d) => days.has(d)).length;
-  // Days later this week when tired big muscles are recovered again, marked on the week row.
-  const readyByDay = new Map<string, Muscle[]>();
-  for (const r of muscleRecovery(data, now))
-    if (r.readyOn && majorMuscles.includes(r.muscle) && weekDays.includes(r.readyOn))
-      readyByDay.set(r.readyOn, [...(readyByDay.get(r.readyOn) ?? []), r.muscle]);
+  // Days when tired big muscles are recovered again, marked on the week row.
+  const readyDays = new Set(
+    muscleRecovery(data, now)
+      .filter((r) => r.readyOn && majorMuscles.includes(r.muscle))
+      .map((r) => r.readyOn!),
+  );
+  // The row shows this week, and runs on into next week up to the last "ready again" day.
+  const lastReady = [...readyDays].sort().at(-1);
+  const rowDays = [...weekDays];
+  while (lastReady && rowDays.at(-1)! < lastReady) rowDays.push(addDays(rowDays.at(-1)!, 1));
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   /** What a tapped day in the week row stands for. */
   const dayInfo = (d: string): string => {
@@ -67,12 +71,7 @@ export const Home = () => {
     }
     if (d < today()) return t("Ruhetag", "Rest day");
     if (d === today()) return t("Heute noch kein Training", "No training yet today");
-    const ready = readyByDay.get(d);
-    if (ready)
-      return t(
-        `Wieder fit: ${ready.map((m) => muscleName(m, lang)).join(", ")}`,
-        `Ready again: ${ready.map((m) => muscleName(m, lang)).join(", ")}`,
-      );
+    if (readyDays.has(d)) return t("Wieder fit", "Ready again");
     return t("Noch offen", "Not planned yet");
   };
   // Since this screen was last shown: days ticked off get stamped, a grown streak flickers.
@@ -139,10 +138,10 @@ export const Home = () => {
           </div>
         </div>
         <div className="week-dots" role="group" aria-label={t("Diese Woche", "This week")}>
-          {weekDays.map((d) => (
+          {rowDays.map((d) => (
             <button
               key={d}
-              className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""} ${stamped(d) ? "stamped" : ""} ${readyByDay.has(d) ? "ready" : ""} ${selectedDay === d ? "selected" : ""}`}
+              className={`week-dot ${days.has(d) ? "on" : ""} ${d === today() ? "today" : ""} ${stamped(d) ? "stamped" : ""} ${readyDays.has(d) ? "ready" : ""} ${d > weekDays.at(-1)! ? "next-week" : ""} ${selectedDay === d ? "selected" : ""}`}
               aria-pressed={selectedDay === d}
               aria-label={new Date(`${d}T12:00`).toLocaleDateString(lang, { weekday: "long" })}
               onClick={() => setSelectedDay(selectedDay === d ? null : d)}
