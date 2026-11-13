@@ -30,6 +30,7 @@ export const build = (workouts: WorkoutSpec[], extra: Partial<Rows> = {}): Data 
         standards: "male",
         prefill: "last",
         deloadWeek: null,
+        effortCheck: null,
       },
     ],
     exerciseSettings: [],

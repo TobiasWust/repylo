@@ -88,6 +88,22 @@ export const Settings = () => {
             { value: "target", label: t("Ziel (Progression)", "Target (progression)") },
           ]}
         />
+        <div className="field-label">{t("Nach Anstrengung fragen", "Ask how it felt")}</div>
+        <Segmented
+          label={t("Nach Anstrengung fragen", "Ask how it felt")}
+          value={s.effortCheck ? "on" : "off"}
+          onChange={(v) => actions.updateSettings({ effortCheck: v === "on" })}
+          options={[
+            { value: "on", label: t("Wenn es zählt", "When it matters") },
+            { value: "off", label: t("Nie", "Never") },
+          ]}
+        />
+        <p className="hint">
+          {t(
+            "„Leicht / Passend / Am Limit“ erscheint nur, wenn alle Sätze erledigt sind und die Antwort die nächste Steigerung verändert.",
+            "“Easy / Right / At the limit” only shows once all sets are done and the answer changes the next step.",
+          )}
+        </p>
         <div className="field-label">{t("Kraft-Richtwerte", "Strength standards")}</div>
         <Segmented
           label={t("Kraft-Richtwerte", "Strength standards")}

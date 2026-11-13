@@ -2038,6 +2038,22 @@ body:has(.overlay-screen) .rest-timer {
   background: var(--mint);
 }
 
+.chips.center {
+  justify-content: center;
+}
+.readiness-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.readiness-question {
+  font-weight: 700;
+  font-size: 14px;
+}
+.readiness-line .chips {
+  flex: 1;
+}
 .effort {
   display: flex;
   flex-direction: column;

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
 import { computeSuggestions } from "../../domain/suggestions";
-import { hasValue, trainedDays, weekStreak } from "../../domain/stats";
+import { trainedDays, weekStreak } from "../../domain/stats";
 import { InstallCard } from "../../ui/InstallCard";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { Icon } from "../../ui/components";
@@ -26,13 +26,12 @@ export const Home = () => {
   // Read the clock once per mount; render must stay pure.
   const [now] = useState(Date.now);
   // Recompute when data changes; "now" is fixed per render on purpose.
-  const suggestions = useMemo(() => computeSuggestions(data), [data]);
+  // One suggestion at a time keeps the home screen calm; the most important comes first.
+  const suggestions = useMemo(() => computeSuggestions(data).slice(0, 1), [data]);
   const days = useMemo(() => trainedDays(data), [data]);
   const goal = data.settings.weeklyGoal;
   const streak = weekStreak(days, goal);
   const thisWeek = weekStart(today());
-  const weekWorkouts = data.workouts.filter((w) => w.date >= thisWeek && w.exercises.some((e) => e.sets.some(hasValue)));
-  const weekSets = weekWorkouts.reduce((n, w) => n + w.exercises.reduce((m, e) => m + e.sets.filter(hasValue).length, 0), 0);
   // Only the last workout; the History tab has the rest.
   const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 1);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
@@ -107,18 +106,6 @@ export const Home = () => {
             </span>
           ))}
         </div>
-        <div className="hero-stats">
-          <div>
-            <span>{t("Sätze", "Sets")}</span>
-            <strong>{weekSets}</strong>
-          </div>
-          <div>
-            <span>{t("Serie", "Streak")}</span>
-            <strong>
-              {streak} {t(streak === 1 ? "Woche" : "Wochen", streak === 1 ? "week" : "weeks")}
-            </strong>
-          </div>
-        </div>
         <button className="button dark big full" onClick={startToday}>
           <Icon name={todays ? "dumbbell" : "bolt"} />
           {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Training starten", "Start workout")}
@@ -189,7 +176,7 @@ export const Home = () => {
 
       {suggestions.length > 0 && (
         <section>
-          <h2 className="section-title">{t("Vorschläge für dich", "Suggestions for you")}</h2>
+          <h2 className="section-title">{t("Vorschlag für dich", "Suggestion for you")}</h2>
           <div className="stack">
             {suggestions.map((s) => (
               <SuggestionCard key={s.key} suggestion={s} />

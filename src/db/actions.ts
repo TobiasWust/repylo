@@ -224,6 +224,7 @@ export const createActions = (evolu: AppEvolu) => {
       standards?: Standards;
       prefill?: Prefill;
       deloadWeek?: string;
+      effortCheck?: boolean;
     }) =>
       evolu.upsert("settings", {
         id: settingsId,
@@ -236,6 +237,7 @@ export const createActions = (evolu: AppEvolu) => {
         ...(values.standards && { standards: Text40.orThrow(values.standards) }),
         ...(values.prefill && { prefill: Text40.orThrow(values.prefill) }),
         ...(values.deloadWeek && { deloadWeek: Text40.orThrow(values.deloadWeek) }),
+        ...(values.effortCheck !== undefined && { effortCheck: Text40.orThrow(values.effortCheck ? "on" : "off") }),
       }),
 
     setExerciseGoal: (exerciseKey: string, goal: Goal | null) =>

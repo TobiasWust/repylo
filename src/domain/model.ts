@@ -91,6 +91,8 @@ export interface Settings {
   readonly prefill: Prefill;
   /** Monday of the last planned deload week, if any. */
   readonly deloadWeek: string | null;
+  /** Ask "easy / right / at the limit" when it changes the next suggestion. */
+  readonly effortCheck: boolean;
 }
 
 export type Prefill = "last" | "target";
@@ -149,6 +151,7 @@ export interface Rows {
     standards: string;
     prefill: string;
     deloadWeek: string;
+    effortCheck: string;
   }>[];
   readonly exerciseSettings: readonly Nullable<{ exerciseKey: string; goal: string }>[];
   readonly dismissals: readonly Nullable<{ key: string; until: number }>[];
@@ -266,6 +269,7 @@ export const buildData = (rows: Rows): Data => {
     standards: s?.standards === "male" || s?.standards === "female" ? s.standards : null,
     prefill: s?.prefill === "target" ? "target" : "last",
     deloadWeek: s?.deloadWeek ?? null,
+    effortCheck: s?.effortCheck !== "off",
   };
 
   const exerciseGoals = new Map<string, Goal>();

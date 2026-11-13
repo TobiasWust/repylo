@@ -1,61 +1,46 @@
-import { useState } from "react";
 import { today } from "../../domain/dates";
 import type { Workout as WorkoutModel } from "../../domain/model";
 import { readinessOf } from "../../domain/readiness";
-import { Icon, Segmented } from "../../ui/components";
+import { Icon } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { Sticker } from "../../ui/stickers";
 
 /**
- * Readiness check before today's workout, then a short hint for the day.
- * Poor readiness also makes the progression suggestions lighter.
+ * Readiness check before today's workout: one line, gone after the answer
+ * or the first set. A poor day makes the suggestions lighter and says so.
  */
 export const Readiness = ({ workout }: { workout: WorkoutModel }) => {
   const { t, actions } = useApp();
-  const [sleep, setSleep] = useState<number | null>(null);
   if (workout.date !== today()) return null;
   const level = readinessOf(workout);
   const asked = workout.sleep !== null || workout.energy !== null;
   const started = workout.exercises.some((e) => e.sets.some((s) => s.done));
 
   if (!asked && !started) {
-    const answer = (energy: number) => actions.updateWorkout(workout.id, { sleep: sleep ?? 2, energy });
+    // One question instead of two: how you feel covers sleep and energy alike.
+    const answer = (value: number) => actions.updateWorkout(workout.id, { sleep: value, energy: value });
     return (
-      <section className="card readiness">
-        <div className="suggestion-head">
-          <Sticker name="scale" size={30} />
-          <h3>{t("Wie ist deine Tagesform?", "How are you feeling today?")}</h3>
-          <button
-            className="icon-button small"
-            onClick={() => actions.updateWorkout(workout.id, { sleep: 0, energy: 0 })}
-            aria-label={t("Überspringen", "Skip")}
-          >
-            <Icon name="close" size={18} />
+      <div className="readiness-line">
+        <span className="readiness-question">{t("Wie fühlst du dich?", "How do you feel?")}</span>
+        <div className="chips" role="group" aria-label={t("Tagesform", "Readiness")}>
+          <button className="chip" onClick={() => answer(1)}>
+            {t("Müde", "Tired")}
+          </button>
+          <button className="chip" onClick={() => answer(2)}>
+            {t("Normal", "Normal")}
+          </button>
+          <button className="chip" onClick={() => answer(3)}>
+            {t("Fit", "Fresh")}
           </button>
         </div>
-        <div className="field-label">{t("Schlaf letzte Nacht", "Sleep last night")}</div>
-        <Segmented
-          label={t("Schlaf letzte Nacht", "Sleep last night")}
-          value={String(sleep ?? "")}
-          onChange={(v) => setSleep(Number(v))}
-          options={[
-            { value: "1", label: t("Schlecht", "Poor") },
-            { value: "2", label: t("Okay", "Okay") },
-            { value: "3", label: t("Gut", "Good") },
-          ]}
-        />
-        <div className="field-label">{t("Energie jetzt", "Energy right now")}</div>
-        <Segmented
-          label={t("Energie jetzt", "Energy right now")}
-          value=""
-          onChange={(v) => answer(Number(v))}
-          options={[
-            { value: "1", label: t("Müde", "Tired") },
-            { value: "2", label: t("Normal", "Normal") },
-            { value: "3", label: t("Fit", "Fresh") },
-          ]}
-        />
-      </section>
+        <button
+          className="icon-button small"
+          onClick={() => actions.updateWorkout(workout.id, { sleep: 0, energy: 0 })}
+          aria-label={t("Überspringen", "Skip")}
+        >
+          <Icon name="close" size={16} />
+        </button>
+      </div>
     );
   }
   if (level === "low")
@@ -68,13 +53,6 @@ export const Readiness = ({ workout }: { workout: WorkoutModel }) => {
             "Take it easier today: suggestions are about 10 % lighter. Clean reps matter more than records.",
           )}
         </span>
-      </div>
-    );
-  if (level === "high")
-    return (
-      <div className="coach-line positive">
-        <Sticker name="flame" size={28} />
-        <span>{t("Top-Tagesform! Ein guter Tag für einen Rekordversuch.", "Great shape today! A good day to go for a record.")}</span>
       </div>
     );
   return null;

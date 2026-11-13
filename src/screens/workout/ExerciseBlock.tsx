@@ -2,13 +2,14 @@ import { useRef, useState } from "react";
 import { today } from "../../domain/dates";
 import {
   getExercise,
+  goalFor,
   defaultRest,
   type SetEntry,
   type TemplateSet,
   type Workout as WorkoutModel,
   type WorkoutExercise,
 } from "../../domain/model";
-import { suggestProgression } from "../../domain/progression";
+import { repRange, suggestProgression } from "../../domain/progression";
 import { detectPrs, hasValue } from "../../domain/stats";
 import { setFeedback } from "../../domain/coach";
 import { tipsFor } from "../../domain/tips";
@@ -136,6 +137,24 @@ export const ExerciseBlock = ({
       </section>
     );
 
+  // The suggestion chip only shows while the sets don't already hold it and there's something left to do.
+  const alreadyApplied =
+    !!progression &&
+    (finished ||
+      progression.sets.every((p, i) => {
+        const s = entry.sets[i];
+        return !!s && (s.done || (s.weight === p.weight && s.reps === p.reps && s.duration === p.duration));
+      }));
+  // "How did it feel?" only once all sets are done, and only when the answer changes the next step:
+  // close to the top of the rep range, where "easy" means more weight right away.
+  const [, repMax] = repRange[goalFor(data, entry.exerciseKey)];
+  const lowestReps = Math.min(...entry.sets.map((s) => s.reps ?? 0));
+  const showEffort =
+    data.settings.effortCheck &&
+    (exercise.metric === "weight" || exercise.metric === "bodyweight") &&
+    finished &&
+    (entry.effort !== null || lowestReps >= repMax - 3);
+
   const weightLabel = exercise.metric === "bodyweight" ? `+${unit}` : unit;
   const showPlates = exercise.equipment === "barbell";
 
@@ -209,18 +228,14 @@ export const ExerciseBlock = ({
 
       {!progression && estimate && (
         <div className="progress-hint">
-          <div>
-            <small>{t("Neu für dich", "New for you")}</small>
-            <div>
-              {estimate.basedOn.length > 0
-                ? t(
-                    `Startwerte geschätzt aus deiner Kraft bei ${estimate.basedOn.map((k) => exerciseName(getExercise(data, k))).join(" und ")}.`,
-                    `Starting values estimated from your strength on ${estimate.basedOn.map((k) => exerciseName(getExercise(data, k))).join(" and ")}.`,
-                  )
-                : t("Startwerte geschätzt aus Durchschnittswerten.", "Starting values estimated from average values.")}{" "}
-              {t("Lieber etwas leichter anfangen und dann steigern.", "Better start a bit lighter and build up.")}
-            </div>
-          </div>
+          <small>
+            {estimate.basedOn.length > 0
+              ? t(
+                  `Neu: Startwerte geschätzt aus ${estimate.basedOn.map((k) => exerciseName(getExercise(data, k))).join(" und ")}`,
+                  `New: starting values estimated from ${estimate.basedOn.map((k) => exerciseName(getExercise(data, k))).join(" and ")}`,
+                )
+              : t("Neu: Startwerte geschätzt – lieber leichter anfangen", "New: estimated starting values – better start light")}
+          </small>
           {entry.sets.every((s) => s.weight == null && !s.done) && estimate.sets[0]?.weight != null && (
             <button
               className="suggest-chip"
@@ -237,13 +252,11 @@ export const ExerciseBlock = ({
 
       {progression && (
         <div className="progress-hint">
-          <div>
-            <small>
-              {t("Letztes Mal", "Last time")} ({formatDate(progression.last.date, lang)})
-            </small>
-            <div>{describeSets(app, progression.last.sets, exercise.metric)}</div>
-          </div>
-          {progression.kind !== "repeat" && (
+          <small>
+            {t("Letztes Mal", "Last time")} ({formatDate(progression.last.date, lang)}):{" "}
+            <strong>{describeSets(app, progression.last.sets, exercise.metric)}</strong>
+          </small>
+          {progression.kind !== "repeat" && !alreadyApplied && (
             <button className="suggest-chip" onClick={applyProgression}>
               <span className="with-sticker">
                 <Sticker name="bulb" size={22} /> {progressionLabel(app, progression)}
@@ -340,8 +353,10 @@ export const ExerciseBlock = ({
           </div>
         ))}
       </div>
-      {feedback && <CoachLine feedback={feedback} metric={exercise.metric} />}
-      {(exercise.metric === "weight" || exercise.metric === "bodyweight") && entry.sets.some((s) => s.done) && (
+      {feedback && (feedback.kind === "fewerReps" || feedback.kind === "lighter") && (
+        <CoachLine feedback={feedback} metric={exercise.metric} />
+      )}
+      {showEffort && (
         <div className="effort">
           <div className="field-label">{t("Wie hat sich die Übung angefühlt?", "How did the exercise feel?")}</div>
           <Segmented<"" | "1" | "2" | "3">

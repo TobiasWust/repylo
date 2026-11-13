@@ -24,6 +24,9 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
   const { t, data, actions, back, lang } = useApp();
   const { confirm } = useFeedback();
   const [sheet, setSheet] = useState<"add" | "copy" | "template" | "summary" | null>(null);
+  // Comment, template and delete live behind "More" – rarely needed mid-workout.
+  const [more, setMore] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
   const workout = data.workouts.find((w) => w.id === id);
   useWakeLock(workout?.date === today());
   // Exercises there when the screen opened (null while still loading); later ones slide in.
@@ -140,16 +143,9 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
         </button>
       </div>
 
-      <textarea
-        className="text-input note"
-        defaultValue={workout.note ?? ""}
-        placeholder={t("Kommentar zum Training (wie lief’s?)", "Workout comment (how did it go?)")}
-        onBlur={(e) => e.target.value !== (workout.note ?? "") && actions.updateWorkout(workout.id, { note: e.target.value })}
-      />
-
       <div className="action-grid">
-        <button className="button" disabled={workout.exercises.length === 0} onClick={() => setSheet("template")}>
-          <Icon name="bookmark" /> {t("Als Vorlage", "Save template")}
+        <button className="button" onClick={() => setMore(!more)} aria-expanded={more}>
+          <Icon name="more" /> {t("Mehr", "More")}
         </button>
         <button
           className="button pink"
@@ -163,22 +159,41 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
           <Icon name="check" /> {t("Fertig", "Done")}
         </button>
       </div>
-      <button
-        className="link danger center"
-        onClick={async () => {
-          const ok = await confirm({
-            title: t("Dieses Training löschen?", "Delete this workout?"),
-            message: t("Alle Sätze darin sind dann weg.", "All its sets will be gone."),
-            confirmLabel: t("Löschen", "Delete"),
-            danger: true,
-          });
-          if (!ok) return;
-          actions.deleteWorkout(workout);
-          back();
-        }}
-      >
-        {t("Training löschen", "Delete workout")}
-      </button>
+      {more && (
+        <div className="chips center">
+          <button className="chip" onClick={() => setNoteOpen(true)}>
+            <Icon name="note" size={16} /> {t("Kommentar", "Comment")}
+          </button>
+          <button className="chip" disabled={workout.exercises.length === 0} onClick={() => setSheet("template")}>
+            <Icon name="bookmark" size={16} /> {t("Als Vorlage", "Save template")}
+          </button>
+          <button
+            className="chip danger"
+            onClick={async () => {
+              const ok = await confirm({
+                title: t("Dieses Training löschen?", "Delete this workout?"),
+                message: t("Alle Sätze darin sind dann weg.", "All its sets will be gone."),
+                confirmLabel: t("Löschen", "Delete"),
+                danger: true,
+              });
+              if (!ok) return;
+              actions.deleteWorkout(workout);
+              back();
+            }}
+          >
+            <Icon name="trash" size={16} /> {t("Training löschen", "Delete workout")}
+          </button>
+        </div>
+      )}
+      {(noteOpen || !!workout.note) && (
+        <textarea
+          className="text-input note"
+          defaultValue={workout.note ?? ""}
+          autoFocus={noteOpen && !workout.note}
+          placeholder={t("Kommentar zum Training (wie lief’s?)", "Workout comment (how did it go?)")}
+          onBlur={(e) => e.target.value !== (workout.note ?? "") && actions.updateWorkout(workout.id, { note: e.target.value })}
+        />
+      )}
 
       {sheet === "add" && (
         <ExercisePicker
