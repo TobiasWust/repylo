@@ -33,15 +33,15 @@ export const Readiness = ({ workout }: { workout: WorkoutModel }) => {
         </div>
         <div className="feel-options" role="group" aria-label={t("Tagesform", "Readiness")}>
           <button className="feel-option" onClick={() => answer(1)}>
-            <Sticker name="sleep" size={34} />
+            <Sticker name="zzz" size={34} />
             {t("Müde", "Tired")}
           </button>
           <button className="feel-option" onClick={() => answer(2)}>
-            <Sticker name="smile" size={34} />
+            <Sticker name="pulse" size={34} />
             {t("Normal", "Normal")}
           </button>
           <button className="feel-option" onClick={() => answer(3)}>
-            <Sticker name="flame" size={34} />
+            <Sticker name="bolt" size={34} />
             {t("Fit", "Fresh")}
           </button>
         </div>

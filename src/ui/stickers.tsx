@@ -177,13 +177,23 @@ const art = {
       <Face x={16} y={13.6} scale={0.7} />
     </>
   ),
-  smile: (
+  zzz: (
     <>
-      <circle cx={16} cy={16.5} r={12.5} fill={c.sky} />
-      <path d="M13.5 4.4q1-2.6 3.6-2.2" strokeWidth={1.8} />
-      <circle cx={9.6} cy={19.4} r={2} fill={c.pink} stroke="none" />
-      <circle cx={22.4} cy={19.4} r={2} fill={c.pink} stroke="none" />
-      <Face x={16} y={15.6} scale={1.5} />
+      <path d="M3 14h13v3.4l-7.8 7.2H16V28H3v-3.4l7.8-7.2H3z" fill={c.lavender} strokeWidth={1.9} />
+      <path d="M17 7h9v2.4l-5.4 4.2H26V16h-9v-2.4l5.4-4.2H17z" fill={c.lavender} strokeWidth={1.6} />
+      <path d="M25 1.5h5V3l-2.8 2H30v1.5h-5V5l2.8-2H25z" fill={c.lavender} strokeWidth={1.2} />
+    </>
+  ),
+  pulse: (
+    <>
+      <rect x={3} y={6} width={26} height={20} rx={5} fill={c.sky} />
+      <path d="M6.5 17h4.5l2.5-5.5 4 11 3-7.5 1.6 2H25.5" strokeWidth={2.3} />
+    </>
+  ),
+  bolt: (
+    <>
+      <path d="M18.5 2.5 6.5 18h8l-2 11.5 13-16.5H17z" fill={c.yellow} />
+      <path d="M20.5 9.5l-1 3" strokeWidth={1.5} />
     </>
   ),
   sleep: (
