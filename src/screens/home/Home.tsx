@@ -17,7 +17,6 @@ import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
 import { DayCard } from "./DayCard";
-import { FitnessCard } from "./FitnessCard";
 import { useLastSeen } from "../../ui/motion";
 
 const tileColors = ["var(--yellow)", "var(--pink)", "var(--mint)", "var(--lavender)", "var(--sky)"];
@@ -163,8 +162,6 @@ export const Home = () => {
           {todays ? t("Heutiges Training fortsetzen", "Continue today’s workout") : t("Training starten", "Start workout")}
         </button>
       </section>
-
-      <FitnessCard />
 
       {data.templates.length === 0 && (data.dismissedUntil.get("plan-offer") ?? 0) < now && (
         <section className="card plan-offer">

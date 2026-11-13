@@ -293,21 +293,6 @@ small {
 .hero-value small {
   font-size: 18px;
 }
-.fitness-value {
-  font-size: 30px;
-  font-weight: 800;
-  line-height: 1.1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 8px;
-}
-.fitness-value small {
-  font-size: 15px;
-}
-.fitness-value .depot-change {
-  font-size: 14px;
-}
 .depot-change.up {
   color: var(--success);
 }
