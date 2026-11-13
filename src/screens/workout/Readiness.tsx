@@ -20,27 +20,32 @@ export const Readiness = ({ workout }: { workout: WorkoutModel }) => {
     // One question instead of two: how you feel covers sleep and energy alike.
     const answer = (value: number) => actions.updateWorkout(workout.id, { sleep: value, energy: value });
     return (
-      <div className="readiness-line">
-        <span className="readiness-question">{t("Wie fühlst du dich?", "How do you feel?")}</span>
-        <div className="chips" role="group" aria-label={t("Tagesform", "Readiness")}>
-          <button className="chip" onClick={() => answer(1)}>
+      <section className="card readiness-card">
+        <div className="suggestion-head">
+          <h3>{t("Wie fühlst du dich?", "How do you feel?")}</h3>
+          <button
+            className="icon-button small"
+            onClick={() => actions.updateWorkout(workout.id, { sleep: 0, energy: 0 })}
+            aria-label={t("Überspringen", "Skip")}
+          >
+            <Icon name="close" size={18} />
+          </button>
+        </div>
+        <div className="feel-options" role="group" aria-label={t("Tagesform", "Readiness")}>
+          <button className="feel-option" onClick={() => answer(1)}>
+            <Sticker name="sleep" size={34} />
             {t("Müde", "Tired")}
           </button>
-          <button className="chip" onClick={() => answer(2)}>
+          <button className="feel-option" onClick={() => answer(2)}>
+            <Sticker name="smile" size={34} />
             {t("Normal", "Normal")}
           </button>
-          <button className="chip" onClick={() => answer(3)}>
+          <button className="feel-option" onClick={() => answer(3)}>
+            <Sticker name="flame" size={34} />
             {t("Fit", "Fresh")}
           </button>
         </div>
-        <button
-          className="icon-button small"
-          onClick={() => actions.updateWorkout(workout.id, { sleep: 0, energy: 0 })}
-          aria-label={t("Überspringen", "Skip")}
-        >
-          <Icon name="close" size={16} />
-        </button>
-      </div>
+      </section>
     );
   }
   if (level === "low")

@@ -177,6 +177,15 @@ const art = {
       <Face x={16} y={13.6} scale={0.7} />
     </>
   ),
+  smile: (
+    <>
+      <circle cx={16} cy={16.5} r={12.5} fill={c.sky} />
+      <path d="M13.5 4.4q1-2.6 3.6-2.2" strokeWidth={1.8} />
+      <circle cx={9.6} cy={19.4} r={2} fill={c.pink} stroke="none" />
+      <circle cx={22.4} cy={19.4} r={2} fill={c.pink} stroke="none" />
+      <Face x={16} y={15.6} scale={1.5} />
+    </>
+  ),
   sleep: (
     <>
       <path d="M17 4.5a11.5 11.5 0 1 0 10.5 16A9.5 9.5 0 0 1 17 4.5z" fill={c.yellow} />
