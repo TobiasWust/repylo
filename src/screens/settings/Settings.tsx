@@ -156,6 +156,7 @@ export const Settings = () => {
                 onClick={async () => {
                   const ok = await confirm({
                     title: t(`Vorlage „${tpl.name}“ löschen?`, `Delete template “${tpl.name}”?`),
+                    message: t("Deine Trainings mit dieser Vorlage bleiben erhalten.", "Your workouts from this template are kept."),
                     confirmLabel: t("Löschen", "Delete"),
                     danger: true,
                   });
