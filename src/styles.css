@@ -710,6 +710,44 @@ button.week-dot {
   font-size: 17px;
   font-weight: 800;
 }
+/* "Why?": the research behind a hint, folded away. */
+.why summary {
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  width: fit-content;
+  text-decoration: underline dashed;
+  text-underline-offset: 3px;
+}
+.why p {
+  font-size: 13px;
+  margin: 6px 0 0;
+  opacity: 0.85;
+}
+.coach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.coach-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: start;
+}
+.coach-item > :not(.sticker-cell) {
+  grid-column: 2;
+}
+.coach-item .sticker-cell {
+  grid-row: span 3;
+}
+.coach-item strong {
+  font-size: 15px;
+}
+.coach-item p {
+  margin: 0;
+  font-size: 14px;
+}
 
 .hint {
   font-size: 13px;

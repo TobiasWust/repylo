@@ -1,85 +1,14 @@
 import { useRef, useState } from "react";
 import { today, weekStart } from "../../domain/dates";
-import type { Muscle } from "../../domain/exercises";
 import { getExercise } from "../../domain/model";
+import { insightDismissDays } from "../../domain/insights";
 import { dismissDays, type Suggestion } from "../../domain/suggestions";
 import { Icon } from "../../ui/components";
-import { Sticker, type StickerName } from "../../ui/stickers";
-import { useApp, type App } from "../../ui/context";
+import { Sticker } from "../../ui/stickers";
+import { cardColors, cardSticker, suggestionText, whyText } from "../../ui/suggestionText";
+import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
-import { isPluralMuscle, muscleName } from "../../ui/text";
 import { ensureTodayWorkout, initialSets, templateItems } from "../../ui/workoutOps";
-import type { BalanceKey } from "../../domain/balance";
-import { balanceSides } from "../../ui/balance";
-
-const cardColors: Record<Suggestion["kind"], string> = {
-  split: "var(--yellow)",
-  neglected: "var(--pink)",
-  missing: "var(--lavender)",
-  imbalance: "var(--mint)",
-  plateau: "var(--sky)",
-  deload: "var(--lavender)",
-};
-const cardSticker: Record<Suggestion["kind"], StickerName> = {
-  split: "repeat",
-  neglected: "target",
-  missing: "hourglass",
-  imbalance: "balance",
-  plateau: "chartUp",
-  deload: "scale",
-};
-
-const suggestionText = (s: Suggestion, app: App): { title: string; text: string } => {
-  const { t, lang, data, exerciseName } = app;
-  const p = s.params;
-  const ex = (key: string | number | undefined) => exerciseName(getExercise(data, String(key)));
-  switch (s.kind) {
-    case "split":
-      return {
-        title: t(`Als Nächstes dran: ${p.name}`, `Up next: ${p.name}`),
-        text: p.last
-          ? t(`Zuletzt hast du „${p.last}“ trainiert.`, `Last time you did “${p.last}”.`)
-          : t("Starte deinen Split.", "Start your split."),
-      };
-    case "neglected":
-      return {
-        title: t(
-          `${muscleName(p.muscle as Muscle, lang)} ${isPluralMuscle(p.muscle as Muscle, lang) ? "kommen" : "kommt"} zu kurz`,
-          `${muscleName(p.muscle as Muscle, lang)} ${isPluralMuscle(p.muscle as Muscle, lang) ? "need" : "needs"} work`,
-        ),
-        text: t(`Nur ~${p.sets} Sätze pro Woche – Ziel: ${p.target}+.`, `Only ~${p.sets} sets per week – target: ${p.target}+.`),
-      };
-    case "missing":
-      return {
-        title: t("Lange nicht gemacht", "Haven’t done these in a while"),
-        text: t(`${ex(p.exercise)} seit ${p.days} Tagen nicht mehr.`, `${ex(p.exercise)}: ${p.days} days ago.`),
-      };
-    case "imbalance": {
-      const [l, r] = balanceSides[p.pair as BalanceKey];
-      const weak = p.side === "left" ? l : r;
-      return {
-        title: t(`Mehr ${weak.de}`, `More ${weak.en.toLowerCase()}`),
-        text: t(
-          `${l.de} vs. ${r.de} in 14 Tagen: ${p.left} zu ${p.right} Sätze.`,
-          `${l.en} vs. ${r.en.toLowerCase()} in 14 days: ${p.left} to ${p.right} sets.`,
-        ),
-      };
-    }
-    case "deload":
-      return {
-        title: t("Zeit für eine leichtere Woche", "Time for an easier week"),
-        text: t(
-          `Du trainierst seit ${p.weeks} Wochen am Stück. Eine Deload-Woche mit etwas weniger Gewicht und einem Satz weniger lässt Muskeln und Gelenke aufholen – danach geht's stärker weiter.`,
-          `You've trained ${p.weeks} weeks in a row. A deload week with a bit less weight and one set fewer lets muscles and joints catch up – you'll come back stronger.`,
-        ),
-      };
-    case "plateau":
-      return {
-        title: t(`Plateau bei ${ex(p.exercise)}`, `Plateau on ${ex(p.exercise)}`),
-        text: t(`Seit ~4 Wochen kein neuer Bestwert. Probier mal ${ex(p.variant)}.`, `No new best in ~4 weeks. Try ${ex(p.variant)}.`),
-      };
-  }
-};
 
 export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
   const app = useApp();
@@ -89,14 +18,16 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
   const [leaving, setLeaving] = useState(false);
   const start = useRef<{ x: number; y: number; dragging: boolean } | null>(null);
   const { title, text } = suggestionText(suggestion, app);
+  const why = whyText(suggestion, app);
 
   const dismiss = () => {
     setLeaving(true);
     setDx((d) => (d < 0 ? -500 : 500));
-    setTimeout(() => actions.dismiss(suggestion.key, dismissDays), 220);
+    setTimeout(() => actions.dismiss(suggestion.key, suggestion.info ? insightDismissDays : dismissDays), 220);
   };
 
   const accept = () => {
+    if (suggestion.info) return dismiss();
     if (suggestion.kind === "deload") {
       actions.updateSettings({ deloadWeek: weekStart(today()) });
       toast(
@@ -154,6 +85,12 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
         </button>
       </div>
       <p>{text}</p>
+      {why && (
+        <details className="why">
+          <summary>{t("Warum?", "Why?")}</summary>
+          <p>{why}</p>
+        </details>
+      )}
       <div className="chips" hidden={suggestion.exerciseKeys.length === 0}>
         {suggestion.exerciseKeys.slice(0, 4).map((k) => (
           <span key={k} className="chip static">
@@ -163,7 +100,9 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
         {suggestion.exerciseKeys.length > 4 && <span className="chip static">+{suggestion.exerciseKeys.length - 4}</span>}
       </div>
       <button className="button dark full" onClick={accept}>
-        {suggestion.kind === "deload" ? (
+        {suggestion.info ? (
+          t("Verstanden", "Got it")
+        ) : suggestion.kind === "deload" ? (
           t("Deload-Woche starten", "Start deload week")
         ) : (
           <>

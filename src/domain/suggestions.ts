@@ -5,11 +5,28 @@
  */
 import { balanceChecks, imbalances, trainsSide } from "./balance";
 import { addDays, daysBetween, today, weekStart } from "./dates";
-import { builtinExercises, type Exercise, type Muscle } from "./exercises";
+import { builtinExercises, type Muscle } from "./exercises";
+import { insightRules } from "./insights";
+import { pickExercises } from "./pick";
 import { getExercise, type Data } from "./model";
 import { exerciseSessions, hasValue, majorMuscles, setsPerMuscle, trainedDays, weeklySetTarget } from "./stats";
 
-export type SuggestionKind = "split" | "neglected" | "missing" | "imbalance" | "plateau" | "deload";
+export type SuggestionKind =
+  | "split"
+  | "neglected"
+  | "missing"
+  | "imbalance"
+  | "plateau"
+  | "deload"
+  | "comeback"
+  | "overVolume"
+  | "crammed"
+  | "similar"
+  | "variety"
+  | "stretch"
+  | "easy"
+  | "repRange"
+  | "order";
 
 export interface Suggestion {
   /** Stable identity used for dismissing. */
@@ -20,18 +37,12 @@ export interface Suggestion {
   readonly templateId?: string;
   /** Values the UI interpolates into the card text. */
   readonly params: Readonly<Record<string, string | number>>;
+  /** A hint to read, not exercises to add: the card's button just acknowledges it. */
+  readonly info?: boolean;
 }
 
 /** How long a swiped-away suggestion stays hidden. */
 export const dismissDays = 4;
-
-/** How often each exercise was done (sessions), as a preference signal. */
-const usageCounts = (data: Data): Map<string, number> => {
-  const counts = new Map<string, number>();
-  for (const w of data.workouts)
-    for (const e of w.exercises) if (e.sets.some(hasValue)) counts.set(e.exerciseKey, (counts.get(e.exerciseKey) ?? 0) + 1);
-  return counts;
-};
 
 /**
  * Muscles trained hard (≥ 3 direct sets) today or yesterday. They need ~48 h,
@@ -49,18 +60,6 @@ export const recoveringMuscles = (data: Data, now: string): Set<Muscle> => {
     }
   }
   return result;
-};
-
-/** Best exercises for a predicate: the user's favourites first, then the library. */
-const pickExercises = (data: Data, matches: (e: Exercise) => boolean, recovering: ReadonlySet<Muscle>, count: number): string[] => {
-  const usage = usageCounts(data);
-  const candidates = [...data.exercises.values()].filter(
-    (e) => matches(e) && e.metric !== "cardio" && !e.primary.some((m) => recovering.has(m)),
-  );
-  // Without history, prefer the general library over specialised machines.
-  const libraryRank = (e: Exercise) => (e.equipment === "egym" ? 1 : 0);
-  candidates.sort((a, b) => (usage.get(b.key) ?? 0) - (usage.get(a.key) ?? 0) || libraryRank(a) - libraryRank(b));
-  return candidates.slice(0, count).map((e) => e.key);
 };
 
 const splitRule = (data: Data, now: string): Suggestion[] => {
@@ -207,7 +206,8 @@ const deloadRule = (data: Data, now: string): Suggestion[] => {
   return [{ key: `deload:${weekStart(now)}`, kind: "deload", priority: 93, exerciseKeys: [], params: { weeks } }];
 };
 
-export const computeSuggestions = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion[] => {
+/** Every current suggestion, best first, without the dismissed ones. */
+export const allSuggestions = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion[] => {
   const recovering = recoveringMuscles(data, now);
   return [
     ...deloadRule(data, now),
@@ -216,8 +216,11 @@ export const computeSuggestions = (data: Data, nowMs: number = Date.now(), now: 
     ...missingRule(data, now, recovering),
     ...imbalanceRule(data, now, recovering),
     ...plateauRule(data, now, recovering),
+    ...insightRules(data, now, recovering),
   ]
     .filter((s) => (data.dismissedUntil.get(s.key) ?? 0) < nowMs)
-    .sort((a, b) => b.priority - a.priority)
-    .slice(0, 3);
+    .sort((a, b) => b.priority - a.priority);
 };
+
+export const computeSuggestions = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion[] =>
+  allSuggestions(data, nowMs, now).slice(0, 3);

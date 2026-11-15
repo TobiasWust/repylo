@@ -28,6 +28,7 @@ repylo is a Progressive Web App for logging strength training – free weights, 
 - Double progression per goal (strength 3–6, hypertrophy 8–12, endurance 15–20 reps), deloads when performance drops
 - Feedback after every set ("+2 reps vs. last time – next set: 10 × 62.5 kg") and a summary after each workout
 - Suggestion cards: next split, neglected muscle groups, exercises you dropped, push/pull and quad/hamstring balance, plateaus with variants, planned deload weeks – respecting 48 h recovery
+- Research-based coach hints with sources ("Why?"): too many weekly sets for a muscle, a muscle's whole week in one session, near-identical exercises, no variety or no stretched-position exercise for a muscle, sets mostly far from failure, reps that don't fit the goal, the main lift always coming late, and a lighter restart after 3+ weeks off
 - Readiness check (sleep, energy) that lightens suggestions on a bad day
 - Plan assistant: split or circuit for 2–6 days a week, at the gym, on EGYM machines or at home
 - Technique tips for the most common exercises
@@ -49,7 +50,7 @@ repylo is a Progressive Web App for logging strength training – free weights, 
 ```
 src/
   domain/     Pure logic, no UI: exercises, stats, progression, suggestions,
-              coach, planner, estimates, standards, review – each with tests
+              insights, coach, planner, estimates, standards, review – each with tests
   db/         Evolu schema and queries, write actions, device identity, backup, demo data
   ui/         App/feedback context, shared components, stickers, date field, install prompt
   screens/    home/, workout/, stats/, settings/ and the smaller screens

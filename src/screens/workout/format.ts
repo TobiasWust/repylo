@@ -39,6 +39,8 @@ export const progressionLabel = (app: App, p: Progression): string => {
       return t("+5 Sekunden", "+5 seconds");
     case "repeat":
       return t("Wiederholen", "Repeat");
+    case "comeback":
+      return t("Leichter Wiedereinstieg", "Easy comeback");
   }
 };
 

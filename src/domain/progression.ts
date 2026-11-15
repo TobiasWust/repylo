@@ -26,6 +26,7 @@ import { exerciseSessions, type Session } from "./stats";
 import { fromUnit, toUnit } from "./units";
 import { today, weekStart } from "./dates";
 import { readinessOf } from "./readiness";
+import { breakBefore, comebackDays } from "./insights";
 
 export const repRange: Record<Goal, readonly [number, number]> = {
   strength: [3, 6],
@@ -33,7 +34,7 @@ export const repRange: Record<Goal, readonly [number, number]> = {
   endurance: [15, 20],
 };
 
-export type ProgressionKind = "addWeight" | "addReps" | "repeat" | "deload" | "addTime";
+export type ProgressionKind = "addWeight" | "addReps" | "repeat" | "deload" | "addTime" | "comeback";
 
 export interface Progression {
   readonly kind: ProgressionKind;
@@ -93,6 +94,15 @@ export const suggestProgression = (data: Data, exerciseKey: string, beforeWorkou
     const weight = fromUnit(roundTo(toUnit(top, unit) * 0.9, step), unit);
     const sets = last.sets.slice(0, Math.max(2, last.sets.length - 1));
     return { kind: "deload", last, sets: sets.map((s) => ({ ...copy(s), weight, reps: min })) };
+  }
+
+  // Back after weeks off: strength holds ~3 weeks, then fades slowly and
+  // returns fast (Bosquet et al. 2013). Start a bit lighter and build up again.
+  const pause = breakBefore(data, day, beforeWorkoutId);
+  if (pause !== null && pause >= comebackDays && top > 0) {
+    const factor = pause >= 42 ? 0.85 : 0.9;
+    const weight = fromUnit(roundTo(toUnit(top, unit) * factor, step), unit);
+    return { kind: "comeback", last, sets: last.sets.map((s) => ({ ...copy(s), weight, reps: Math.round((min + max) / 2) })) };
   }
 
   const belowRange = (session: Session | undefined) => !!session && session.sets.every((s) => (s.reps ?? 0) < min);
