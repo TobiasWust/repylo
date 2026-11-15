@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { getExercise } from "../domain/model";
-import { hasValue } from "../domain/stats";
+import { hasValue, workoutTimes } from "../domain/stats";
 import { formatNumber, toUnit } from "../domain/units";
 import { BackfillSheet } from "../ui/BackfillSheet";
 import { Empty, Icon } from "../ui/components";
 import { useApp } from "../ui/context";
-import { formatDate, formatMonth, plural } from "../ui/text";
+import { formatDate, formatMonth, formatTimes, plural } from "../ui/text";
 import { Sticker } from "../ui/stickers";
 
 export const History = () => {
@@ -39,6 +39,7 @@ export const History = () => {
               const sets = w.exercises.flatMap((e) => e.sets.filter(hasValue));
               const volume = sets.reduce((sum, s) => sum + (s.weight ?? 0) * (s.reps ?? 0), 0);
               const template = data.templates.find((x) => x.id === w.templateId);
+              const times = workoutTimes(w);
               return (
                 <button key={w.id} className="card list-card" onClick={() => open({ type: "workout", id: w.id })}>
                   <span className="date-block">
@@ -55,6 +56,7 @@ export const History = () => {
                           t("Leeres Training", "Empty workout"))}
                     </strong>
                     <small>
+                      {times && `${formatTimes(times, lang)} · `}
                       {w.exercises.length} {plural(w.exercises.length, t("Übung", "exercise"), t("Übungen", "exercises"))} · {sets.length}{" "}
                       {plural(sets.length, t("Satz", "set"), t("Sätze", "sets"))}
                       {volume > 0 && ` · ${formatNumber(toUnit(volume, unit), lang, 0)} ${unit}`}

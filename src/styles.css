@@ -749,6 +749,16 @@ button.week-dot {
 .overlay-title small {
   font-weight: 600;
 }
+.overlay-sub {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 8px;
+}
+.overlay-sub small {
+  font-size: 14px;
+  color: var(--muted);
+}
 .date-pill-wrap {
   position: relative;
   align-self: flex-start;

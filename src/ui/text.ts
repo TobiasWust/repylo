@@ -93,6 +93,12 @@ const patternNames: Record<Pattern, [string, string]> = {
 };
 export const patternName = (p: Pattern, lang: Language) => patternNames[p][lang === "de" ? 0 : 1];
 
+export const formatTime = (time: number, lang: Language) => new Date(time).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit" });
+
+/** "18:05–19:12", or just the start while there's no end. */
+export const formatTimes = (times: { start: number; end: number | null }, lang: Language) =>
+  times.end === null ? formatTime(times.start, lang) : `${formatTime(times.start, lang)}–${formatTime(times.end, lang)}`;
+
 export const formatDate = (day: string, lang: Language, style: "long" | "short" = "short") =>
   parseDay(day).toLocaleDateString(
     lang,

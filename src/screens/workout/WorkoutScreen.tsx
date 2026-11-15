@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from "react";
 import { today } from "../../domain/dates";
 import type { WorkoutExercise } from "../../domain/model";
-import { hasValue } from "../../domain/stats";
+import { hasValue, workoutTimes } from "../../domain/stats";
 import { Icon } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
 import { ExercisePicker } from "../../ui/ExercisePicker";
-import { formatDate } from "../../ui/text";
+import { formatDate, formatTimes } from "../../ui/text";
 import { initialSets } from "../../ui/workoutOps";
 import { DatePill } from "../../ui/DateField";
 import { useWakeLock } from "./useWakeLock";
@@ -72,6 +72,7 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
       </div>
     );
 
+  const times = workoutTimes(workout);
   const done = workout.exercises.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0);
   const total = workout.exercises.reduce((n, e) => n + e.sets.length, 0);
   const exclude = new Set(workout.exercises.map((e) => e.exerciseKey));
@@ -97,9 +98,17 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
         </button>
         <div className="overlay-title">
           <h1>{t("Training", "Workout")}</h1>
-          <DatePill value={workout.date} onChange={(date) => actions.updateWorkout(workout.id, { date })}>
-            {formatDate(workout.date, lang, "long")}
-          </DatePill>
+          <div className="overlay-sub">
+            <DatePill value={workout.date} onChange={(date) => actions.updateWorkout(workout.id, { date })}>
+              {formatDate(workout.date, lang, "long")}
+            </DatePill>
+            {times && (
+              <small>
+                {times.end === null && workout.finishedAt === null ? t("seit ", "since ") : ""}
+                {formatTimes(times, lang)}
+              </small>
+            )}
+          </div>
         </div>
         {total > 0 && (
           <span

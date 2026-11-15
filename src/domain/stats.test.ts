@@ -3,6 +3,7 @@ import { addDays, today, weekStart, daysBetween } from "./dates";
 import { suggestProgression } from "./progression";
 import {
   averageDuration,
+  workoutTimes,
   detectPrs,
   e1rm,
   exerciseSessions,
@@ -166,5 +167,28 @@ describe("stat tiles", () => {
     };
     expect(averageDuration(data)).toBeCloseTo(55);
     expect(averageDuration(base)).toBeNull();
+  });
+});
+
+describe("workoutTimes", () => {
+  const at = (day: string, time: string) => new Date(`${day}T${time}`).getTime();
+  const workout = (date: string, startedAt: number, finishedAt: number | null) =>
+    ({ id: "w", date, startedAt, finishedAt, note: null, templateId: null, sleep: null, energy: null, exercises: [] }) as const;
+
+  it("gives start and end of a live workout", () => {
+    expect(workoutTimes(workout("2026-11-15", at("2026-11-15", "18:05"), at("2026-11-15", "19:12")))).toEqual({
+      start: at("2026-11-15", "18:05"),
+      end: at("2026-11-15", "19:12"),
+    });
+  });
+
+  it("has no end while running or when finished much later", () => {
+    expect(workoutTimes(workout("2026-11-15", at("2026-11-15", "18:05"), null))?.end).toBeNull();
+    expect(workoutTimes(workout("2026-11-15", at("2026-11-15", "08:00"), at("2026-11-15", "20:00")))?.end).toBeNull();
+  });
+
+  it("has no times for backfilled or demo workouts", () => {
+    expect(workoutTimes(workout("2026-11-10", at("2026-11-15", "18:05"), null))).toBeNull();
+    expect(workoutTimes(workout("2026-11-10", 0, null))).toBeNull();
   });
 });

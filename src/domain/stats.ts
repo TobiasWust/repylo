@@ -1,4 +1,4 @@
-import { addDays, daysBetween, today, weekStart } from "./dates";
+import { addDays, daysBetween, toDay, today, weekStart } from "./dates";
 import { minorMuscles, muscles, type Muscle } from "./exercises";
 import { getExercise, type Data, type SetEntry, type Workout } from "./model";
 
@@ -278,6 +278,18 @@ export const averageDuration = (data: Data, count = 20): number | null => {
     .filter((m) => m >= 10 && m <= 240)
     .slice(0, count);
   return minutes.length > 0 ? minutes.reduce((a, b) => a + b, 0) / minutes.length : null;
+};
+
+/**
+ * When a workout ran, as timestamps. Only for workouts started live on their
+ * own day (backfilled ones get the time they were entered, not trained).
+ * `end` is left out unless "Done" came within four hours – later means the
+ * workout was reopened or never closed.
+ */
+export const workoutTimes = (w: Workout): { start: number; end: number | null } | null => {
+  if (w.startedAt <= 0 || toDay(new Date(w.startedAt)) !== w.date) return null;
+  const length = w.finishedAt === null ? -1 : w.finishedAt - w.startedAt;
+  return { start: w.startedAt, end: length > 0 && length <= 240 * 60_000 ? w.finishedAt : null };
 };
 
 /** Number of new est. 1RM records from `from` on. */
