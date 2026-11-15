@@ -9,7 +9,7 @@ import { builtinExercises, type Muscle } from "./exercises";
 import { insightRules } from "./insights";
 import { pickExercises } from "./pick";
 import { getExercise, type Data } from "./model";
-import { exerciseSessions, hasValue, majorMuscles, setsPerMuscle, trainedDays, weeklySetTarget } from "./stats";
+import { exerciseSessions, hasValue, looksUnchecked, majorMuscles, setsPerMuscle, trainedDays, weeklySetTarget } from "./stats";
 
 export type SuggestionKind =
   | "split"
@@ -26,7 +26,10 @@ export type SuggestionKind =
   | "stretch"
   | "easy"
   | "repRange"
-  | "order";
+  | "order"
+  | "jump"
+  | "long"
+  | "unchecked";
 
 export interface Suggestion {
   /** Stable identity used for dismissing. */
@@ -99,7 +102,8 @@ const neglectedRule = (data: Data, now: string, recovering: ReadonlySet<Muscle>)
       key: `neglected:${muscle}`,
       kind: "neglected" as const,
       priority: 70 + (1 - weekly / target) * 20,
-      exerciseKeys: pickExercises(data, (e) => e.primary.includes(muscle), recovering, 2),
+      // Exercises led by this muscle: a Turkish get-up lists abs, but it's no ab exercise.
+      exerciseKeys: pickExercises(data, (e) => e.primary[0] === muscle, recovering, 2),
       params: { muscle, sets: Math.round(weekly), target },
     }))
     .filter((s) => s.exerciseKeys.length > 0);
@@ -206,10 +210,24 @@ const deloadRule = (data: Data, now: string): Suggestion[] => {
   return [{ key: `deload:${weekStart(now)}`, kind: "deload", priority: 93, exerciseKeys: [], params: { weeks } }];
 };
 
+/** Recent workouts that may never have happened (see `looksUnchecked`): ask before they skew the stats. */
+const uncheckedRule = (data: Data, now: string): Suggestion[] =>
+  data.workouts
+    .filter((w) => w.date >= addDays(now, -13) && looksUnchecked(w))
+    .slice(0, 1)
+    .map((w) => ({
+      key: `unchecked:${w.id}`,
+      kind: "unchecked" as const,
+      priority: 96,
+      exerciseKeys: [],
+      params: { workoutId: w.id, date: w.date },
+    }));
+
 /** Every current suggestion, best first, without the dismissed ones. */
 export const allSuggestions = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion[] => {
   const recovering = recoveringMuscles(data, now);
   return [
+    ...uncheckedRule(data, now),
     ...deloadRule(data, now),
     ...splitRule(data, now),
     ...neglectedRule(data, now, recovering),

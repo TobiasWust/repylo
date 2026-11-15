@@ -5,6 +5,8 @@ import {
   comebackRule,
   crammedRule,
   easyRule,
+  jumpRule,
+  longRule,
   orderRule,
   overVolumeRule,
   repRangeRule,
@@ -14,7 +16,10 @@ import {
 } from "./insights";
 import { movementOf } from "./movement";
 import { suggestProgression } from "./progression";
-import { today } from "./dates";
+import { addDays, today } from "./dates";
+import type { Data } from "./model";
+import { looksUnchecked } from "./stats";
+import { allSuggestions } from "./suggestions";
 import { build, type SetSpec, type WorkoutSpec } from "../test/fixtures";
 
 const sets = (n: number, weight: number | null, reps: number): SetSpec[] => Array.from({ length: n }, () => [weight, reps]);
@@ -185,5 +190,117 @@ describe("insights", () => {
     const recent = build([{ daysAgo: 7, exercises: { bench_press: sets(3, 100, 8) } }, ...history, ...history]);
     expect(comebackRule(recent, now)).toEqual([]);
     expect(suggestProgression(recent, "bench_press")?.kind).not.toBe("comeback");
+  });
+});
+
+/** Gives each workout a live start at `hour` on its own day, lasting `minutes`. */
+const timed = (data: Data, hour: number, minutes: number | null): Data => ({
+  ...data,
+  workouts: data.workouts.map((w) => {
+    const start = new Date(`${w.date}T${String(hour).padStart(2, "0")}:00`).getTime();
+    return { ...w, startedAt: start, finishedAt: minutes === null ? null : start + minutes * 60_000 };
+  }),
+});
+
+describe("more insights", () => {
+  it("speaks up about exercise choice even while the muscle recovers, as a note", () => {
+    const data = build([
+      { daysAgo: 1, exercises: { triceps_pushdown: sets(4, 30, 12) } },
+      { daysAgo: 5, exercises: { triceps_pushdown: sets(4, 30, 12) } },
+      ...history,
+    ]);
+    const [hint] = stretchRule(data, now, new Set(["triceps"]));
+    expect(hint?.info).toBe(true);
+    expect(stretchRule(data, now, none)[0]?.info).toBeUndefined();
+  });
+
+  it("counts the seated EGYM leg curl as a lengthened hamstring exercise", () => {
+    const data = build([
+      { daysAgo: 1, exercises: { egym_leg_curl: sets(3, 30, 10) } },
+      { daysAgo: 5, exercises: { egym_leg_curl: sets(3, 30, 10) } },
+      ...history,
+    ]);
+    expect(stretchRule(data, now, none).some((s) => s.params.muscle === "hamstrings")).toBe(false);
+  });
+
+  it("leaves upper back out of the variety check", () => {
+    const data = build([
+      { daysAgo: 1, exercises: { cable_row: sets(4, 50, 10) } },
+      { daysAgo: 5, exercises: { machine_row: sets(4, 50, 10) } },
+      ...history,
+    ]);
+    expect(varietyRule(data, now, none).some((s) => s.params.muscle === "upperBack")).toBe(false);
+  });
+
+  it("flags a big lift at the end of long workouts for growth goals too", () => {
+    const small = {
+      lateral_raise: 0,
+      db_curl: 0,
+      triceps_pushdown: 0,
+      leg_extension: 0,
+      leg_curl_lying: 0,
+      cable_fly: 0,
+      face_pull: 0,
+      hammer_curl: 0,
+      calf_raise_standing: 0,
+    };
+    const exercises = Object.fromEntries([...Object.keys(small).map((k) => [k, sets(3, 10, 12)]), ["squat", sets(3, 80, 10)]]);
+    const late: WorkoutSpec[] = [1, 4].map((daysAgo) => ({ daysAgo, exercises }));
+    expect(orderRule(build(late), now)[0]?.params).toMatchObject({ exercise: "squat", goal: "growth", before: 9 });
+    // Short workouts: order hardly matters for growth.
+    expect(orderRule(build(late.map((s) => ({ ...s, exercises: { db_curl: sets(3, 10, 12), squat: sets(3, 80, 10) } }))), now)).toEqual([]);
+  });
+
+  it("notices estimated maxes jumping on several exercises at once", () => {
+    const data = build([
+      { daysAgo: 1, exercises: { egym_chest_press: sets(3, 42, 8), egym_triceps: sets(3, 67, 8), egym_shoulder_press: sets(3, 48, 8) } },
+      { daysAgo: 4, exercises: { egym_chest_press: sets(3, 28, 13), egym_triceps: sets(3, 47, 13), egym_shoulder_press: sets(3, 36, 13) } },
+    ]);
+    expect(jumpRule(data, now)[0]?.params).toMatchObject({ count: 3, exercise: "egym_chest_press", percent: 36 });
+    const steady = build([
+      { daysAgo: 1, exercises: { egym_chest_press: sets(3, 30, 13), egym_triceps: sets(3, 48, 13), egym_shoulder_press: sets(3, 37, 13) } },
+      { daysAgo: 4, exercises: { egym_chest_press: sets(3, 28, 13), egym_triceps: sets(3, 47, 13), egym_shoulder_press: sets(3, 36, 13) } },
+    ]);
+    expect(jumpRule(steady, now)).toEqual([]);
+  });
+
+  it("flags long sessions with many sets", () => {
+    const big = Object.fromEntries(
+      [
+        "bench_press",
+        "lat_pulldown",
+        "squat",
+        "rdl",
+        "overhead_press",
+        "cable_row",
+        "db_curl",
+        "triceps_pushdown",
+        "leg_curl_lying",
+        "lateral_raise",
+        "calf_raise_standing",
+        "ab_machine",
+        "hip_thrust",
+        "leg_extension",
+      ].map((k) => [k, sets(3, 20, 10)]),
+    );
+    const specs: WorkoutSpec[] = [1, 4, 8].map((daysAgo) => ({ daysAgo, exercises: big }));
+    expect(longRule(timed(build(specs), 17, 120), now)[0]?.params).toMatchObject({ minutes: 120, sets: 42 });
+    expect(longRule(timed(build(specs), 17, 60), now)).toEqual([]);
+  });
+
+  it("asks about a workout closed right away with nothing ticked off", () => {
+    const base = timed(build([{ daysAgo: 2, exercises: { bench_press: sets(3, 60, 8) } }]), 1, 0);
+    const untouched = {
+      ...base,
+      workouts: base.workouts.map((w) => ({
+        ...w,
+        exercises: w.exercises.map((e) => ({ ...e, sets: e.sets.map((x) => ({ ...x, done: false })) })),
+      })),
+    };
+    expect(looksUnchecked(untouched.workouts[0]!)).toBe(true);
+    expect(allSuggestions(untouched).find((s) => s.kind === "unchecked")?.params.date).toBe(addDays(now, -2));
+    // Ticked off, or a real session length: nothing to ask.
+    expect(looksUnchecked(base.workouts[0]!)).toBe(false);
+    expect(looksUnchecked(timed(untouched, 1, 45).workouts[0]!)).toBe(false);
   });
 });

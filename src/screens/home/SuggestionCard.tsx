@@ -28,6 +28,7 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
 
   const accept = () => {
     if (suggestion.info) return dismiss();
+    if (suggestion.kind === "unchecked") return open({ type: "workout", id: String(suggestion.params.workoutId) });
     if (suggestion.kind === "deload") {
       actions.updateSettings({ deloadWeek: weekStart(today()) });
       toast(
@@ -102,6 +103,8 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
       <button className="button dark full" onClick={accept}>
         {suggestion.info ? (
           t("Verstanden", "Got it")
+        ) : suggestion.kind === "unchecked" ? (
+          t("Ansehen", "Show me")
         ) : suggestion.kind === "deload" ? (
           t("Deload-Woche starten", "Start deload week")
         ) : (

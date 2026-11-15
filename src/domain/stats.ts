@@ -292,6 +292,18 @@ export const workoutTimes = (w: Workout): { start: number; end: number | null } 
   return { start: w.startedAt, end: length > 0 && length <= 240 * 60_000 ? w.finishedAt : null };
 };
 
+/**
+ * Started live, closed within three minutes, nothing ticked off: often a
+ * template opened and closed again, sometimes a real workout logged in one
+ * go. Can't tell which, so the app asks instead of guessing.
+ */
+export const looksUnchecked = (w: Workout): boolean =>
+  workoutTimes(w) !== null &&
+  w.finishedAt !== null &&
+  w.finishedAt - w.startedAt < 3 * 60_000 &&
+  w.exercises.some((e) => e.sets.some(hasValue)) &&
+  !w.exercises.some((e) => e.sets.some((s) => s.done));
+
 /** Number of new est. 1RM records from `from` on. */
 export const recordsSince = (data: Data, from: string): number => recentPrs(data, Infinity).filter((p) => p.date >= from).length;
 

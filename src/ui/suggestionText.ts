@@ -6,7 +6,7 @@ import type { Suggestion } from "../domain/suggestions";
 import { balanceSides } from "./balance";
 import type { App } from "./context";
 import type { StickerName } from "./stickers";
-import { isPluralMuscle, muscleName } from "./text";
+import { formatDate, isPluralMuscle, muscleName } from "./text";
 
 export const cardColors: Record<Suggestion["kind"], string> = {
   split: "var(--yellow)",
@@ -24,6 +24,9 @@ export const cardColors: Record<Suggestion["kind"], string> = {
   easy: "var(--pink)",
   repRange: "var(--sky)",
   order: "var(--yellow)",
+  jump: "var(--pink)",
+  long: "var(--lavender)",
+  unchecked: "var(--sky)",
 };
 
 export const cardSticker: Record<Suggestion["kind"], StickerName> = {
@@ -42,6 +45,9 @@ export const cardSticker: Record<Suggestion["kind"], StickerName> = {
   easy: "flame",
   repRange: "dumbbell",
   order: "medal",
+  jump: "bolt",
+  long: "hourglass",
+  unchecked: "note",
 };
 
 export const suggestionText = (s: Suggestion, app: App): { title: string; text: string } => {
@@ -184,9 +190,47 @@ export const suggestionText = (s: Suggestion, app: App): { title: string; text: 
     case "order":
       return {
         title: t(`${ex(p.exercise)} früher machen`, `Do ${ex(p.exercise)} earlier`),
+        text:
+          p.goal === "strength"
+            ? t(
+                "Du machst sie meist nach mehreren kleineren Übungen. Was am Anfang steht, gewinnt am meisten Kraft – zieh sie im Training nach oben.",
+                "You usually do it after several smaller exercises. What comes first gains the most strength – drag it up in your workout.",
+              )
+            : t(
+                `Sie kommt bei dir erst nach ${p.before} anderen Übungen. Müde schaffst du bei schweren Grundübungen weniger – zieh sie im Training weiter nach oben.`,
+                `It comes after ${p.before} other exercises. Tired, you get fewer reps on heavy compound lifts – drag it further up in your workout.`,
+              ),
+      };
+    case "jump":
+      return {
+        title: t("Plötzlich viel stärker?", "Suddenly much stronger?"),
         text: t(
-          "Du machst sie meist nach mehreren kleineren Übungen. Was am Anfang steht, gewinnt am meisten Kraft – zieh sie im Training nach oben.",
-          "You usually do it after several smaller exercises. What comes first gains the most strength – drag it up in your workout.",
+          `Bei ${p.count} Übungen ist deine geschätzte Maximalkraft von einem Training aufs nächste um 15 % oder mehr gestiegen (${ex(p.exercise)}: +${p.percent} %). So schnell wächst Kraft nicht – die Sätze davor waren wohl weit vom Limit entfernt. ${
+            p.rated
+              ? "Sag nach jeder Übung, wie sie sich angefühlt hat, dann passt repylo die Vorschläge an."
+              : "Schalte in den Einstellungen „Nach Anstrengung fragen“ ein, dann passt repylo die Vorschläge an."
+          }`,
+          `On ${p.count} exercises your estimated max jumped 15 % or more from one workout to the next (${ex(p.exercise)}: +${p.percent} %). Strength doesn't grow that fast – the earlier sets were probably far from your limit. ${
+            p.rated
+              ? "Rate how each exercise felt and repylo will adjust its suggestions."
+              : "Turn on “Ask how it felt” in Settings and repylo will adjust its suggestions."
+          }`,
+        ),
+      };
+    case "long":
+      return {
+        title: t("Sehr lange Einheiten", "Very long sessions"),
+        text: t(
+          `Deine letzten Trainings dauerten im Schnitt ${p.minutes} Minuten mit ~${p.sets} Sätzen. Auf mehr, kürzere Einheiten verteilt (z. B. Ober- und Unterkörper) bleibt das Wochenvolumen gleich – und die letzten Übungen leiden nicht unter Müdigkeit.`,
+          `Your last workouts took ${p.minutes} minutes on average with ~${p.sets} sets. Spread over more, shorter sessions (e.g. upper and lower body), the weekly volume stays the same – and the last exercises don't suffer from fatigue.`,
+        ),
+      };
+    case "unchecked":
+      return {
+        title: t(`Training vom ${formatDate(String(p.date), lang)} prüfen`, `Check the workout from ${formatDate(String(p.date), lang)}`),
+        text: t(
+          "Kein Satz abgehakt und nach einer Minute beendet. Hast du das so trainiert? Sonst verfälscht es deine Statistik.",
+          "No set ticked off and closed after a minute. Did you train it like that? Otherwise it skews your stats.",
         ),
       };
   }
@@ -244,9 +288,24 @@ export const whyText = (s: Suggestion, app: App): string | null => {
             "Between about 6 and 30 reps near failure, muscles grow similarly. With very light weights the effect is smaller. (Schoenfeld et al. 2017; Lasevicius et al. 2018)",
           );
     case "order":
+      return s.params.goal === "strength"
+        ? t(
+            "Übungen am Anfang einer Einheit zeigen größere Kraftzuwächse als dieselben Übungen am Ende. Für den Muskelaufbau ist die Reihenfolge fast egal. (Nunes et al. 2021, Meta-Analyse)",
+            "Exercises done early in a session gain more strength than the same exercises done last. For muscle growth, the order hardly matters. (Nunes et al. 2021, meta-analysis)",
+          )
+        : t(
+            "Für den Muskelaufbau ist die Reihenfolge laut Studien zweitrangig. Übungen am Ende einer langen Einheit schaffen aber weniger Wiederholungen und Gewicht als dieselben am Anfang. (Simão et al. 2012, Übersicht; Nunes et al. 2021, Meta-Analyse)",
+            "For muscle growth, studies find the order matters little. But exercises at the end of a long session get fewer reps and less weight than the same ones done first. (Simão et al. 2012, review; Nunes et al. 2021, meta-analysis)",
+          );
+    case "jump":
       return t(
-        "Übungen am Anfang einer Einheit zeigen größere Kraftzuwächse als dieselben Übungen am Ende. Für den Muskelaufbau ist die Reihenfolge fast egal. (Nunes et al. 2021, Meta-Analyse)",
-        "Exercises done early in a session gain more strength than the same exercises done last. For muscle growth, the order hardly matters. (Nunes et al. 2021, meta-analysis)",
+        "repylo schätzt deine Maximalkraft aus Gewicht und Wiederholungen. Das stimmt nur, wenn ein Satz nah am Limit endet. Springt die Schätzung plötzlich, waren die Sätze davor weit davon entfernt – und Sätze nah am Limit bringen deutlich mehr Muskelaufbau. (Refalo et al. 2023; Robinson et al. 2024, Meta-Analysen)",
+        "repylo estimates your max from weight and reps. That only holds when a set ends close to your limit. If the estimate suddenly jumps, earlier sets were far from it – and sets close to the limit build clearly more muscle. (Refalo et al. 2023; Robinson et al. 2024, meta-analyses)",
+      );
+    case "long":
+      return t(
+        "Bei gleichem Wochenvolumen ist es fürs Wachstum fast egal, auf wie viele Einheiten du es verteilst. Übungen am Ende einer langen Einheit schaffen aber weniger Wiederholungen. (Schoenfeld et al. 2019, Meta-Analyse; Simão et al. 2012, Übersicht)",
+        "With the same weekly volume, it hardly matters for growth how many sessions you split it into. But exercises at the end of a long session get fewer reps. (Schoenfeld et al. 2019, meta-analysis; Simão et al. 2012, review)",
       );
     default:
       return null;

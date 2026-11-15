@@ -724,6 +724,14 @@ button.week-dot {
   margin: 6px 0 0;
   opacity: 0.85;
 }
+/* "Did this workout happen?" in a workout with nothing ticked off. */
+.check-card {
+  background: var(--sky);
+}
+.check-card p {
+  margin: 0;
+  font-weight: 600;
+}
 .coach-list {
   display: flex;
   flex-direction: column;

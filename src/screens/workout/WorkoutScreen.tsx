@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { today } from "../../domain/dates";
 import type { WorkoutExercise } from "../../domain/model";
-import { hasValue, workoutTimes } from "../../domain/stats";
+import { hasValue, looksUnchecked, workoutTimes } from "../../domain/stats";
 import { Icon } from "../../ui/components";
 import { useApp } from "../../ui/context";
 import { useFeedback } from "../../ui/feedback";
@@ -119,6 +119,42 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
           </span>
         )}
       </header>
+
+      {looksUnchecked(workout) && (
+        <div className="card check-card">
+          <p>
+            {t(
+              "Kein Satz abgehakt und gleich wieder beendet. Hast du das so trainiert? Sonst verfälscht es deine Statistik.",
+              "No set ticked off and closed right away. Did you train it like that? Otherwise it skews your stats.",
+            )}
+          </p>
+          <div className="action-grid">
+            <button
+              className="button dark"
+              onClick={() => {
+                for (const e of workout.exercises) for (const s of e.sets) if (hasValue(s)) actions.updateSet(s.id, { done: true });
+              }}
+            >
+              <Icon name="check" /> {t("Alles abhaken", "Tick all off")}
+            </button>
+            <button
+              className="button"
+              onClick={async () => {
+                const ok = await confirm({
+                  title: t("Dieses Training löschen?", "Delete this workout?"),
+                  confirmLabel: t("Löschen", "Delete"),
+                  danger: true,
+                });
+                if (!ok) return;
+                actions.deleteWorkout(workout);
+                back();
+              }}
+            >
+              <Icon name="trash" /> {t("Löschen", "Delete")}
+            </button>
+          </div>
+        </div>
+      )}
 
       <Readiness workout={workout} />
 

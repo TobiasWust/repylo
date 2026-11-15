@@ -163,6 +163,7 @@ export const variedMovements: ReadonlySet<Movement> = new Set(["stability", "rot
  */
 export const lengthened: Partial<Record<Muscle, ReadonlySet<string>>> = {
   triceps: new Set(classes.tricepsOverhead),
-  hamstrings: new Set(["leg_curl_seated", "rdl", "good_morning"]),
+  // The EGYM leg curl is a seated machine.
+  hamstrings: new Set(["leg_curl_seated", "egym_leg_curl", "rdl", "good_morning"]),
   calves: new Set(classes.calfRaise),
 };
