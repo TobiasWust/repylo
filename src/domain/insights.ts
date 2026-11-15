@@ -340,7 +340,6 @@ export const comebackRule = (data: Data, now: string): Suggestion[] => {
 };
 
 export const insightRules = (data: Data, now: string, recovering: ReadonlySet<Muscle>): Suggestion[] => [
-  ...comebackRule(data, now),
   ...overVolumeRule(data, now),
   ...easyRule(data, now),
   ...repRangeRule(data, now),
@@ -352,18 +351,3 @@ export const insightRules = (data: Data, now: string, recovering: ReadonlySet<Mu
   ...jumpRule(data, now),
   ...longRule(data, now),
 ];
-
-/** Kinds that come from these rules, e.g. for the coach card in Stats. */
-export const insightKinds: ReadonlySet<Suggestion["kind"]> = new Set([
-  "comeback",
-  "overVolume",
-  "easy",
-  "repRange",
-  "crammed",
-  "similar",
-  "stretch",
-  "variety",
-  "order",
-  "jump",
-  "long",
-]);

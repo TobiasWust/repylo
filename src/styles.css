@@ -732,27 +732,29 @@ button.week-dot {
   margin: 0;
   font-weight: 600;
 }
-.coach-list {
+/* The one coaching tip after a workout. */
+.coach-tip {
+  border: var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 6px;
 }
-.coach-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 10px;
-  align-items: start;
+.coach-tip-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.coach-item > :not(.sticker-cell) {
-  grid-column: 2;
+.coach-tip-head small {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
 }
-.coach-item .sticker-cell {
-  grid-row: span 3;
-}
-.coach-item strong {
-  font-size: 15px;
-}
-.coach-item p {
+.coach-tip p {
   margin: 0;
   font-size: 14px;
 }

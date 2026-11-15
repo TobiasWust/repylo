@@ -6,7 +6,7 @@
 import { balanceChecks, imbalances, trainsSide } from "./balance";
 import { addDays, daysBetween, today, weekStart } from "./dates";
 import { builtinExercises, type Muscle } from "./exercises";
-import { insightRules } from "./insights";
+import { comebackRule, insightDismissDays, insightRules } from "./insights";
 import { pickExercises } from "./pick";
 import { getExercise, type Data } from "./model";
 import { exerciseSessions, hasValue, looksUnchecked, majorMuscles, setsPerMuscle, trainedDays, weeklySetTarget } from "./stats";
@@ -223,22 +223,37 @@ const uncheckedRule = (data: Data, now: string): Suggestion[] =>
       params: { workoutId: w.id, date: w.date },
     }));
 
-/** Every current suggestion, best first, without the dismissed ones. */
+const notDismissed = (data: Data, nowMs: number) => (s: Suggestion) => (data.dismissedUntil.get(s.key) ?? 0) < nowMs;
+
+/** Every current home-screen suggestion, best first, without the dismissed ones. */
 export const allSuggestions = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion[] => {
   const recovering = recoveringMuscles(data, now);
   return [
     ...uncheckedRule(data, now),
+    ...comebackRule(data, now),
     ...deloadRule(data, now),
     ...splitRule(data, now),
     ...neglectedRule(data, now, recovering),
     ...missingRule(data, now, recovering),
     ...imbalanceRule(data, now, recovering),
     ...plateauRule(data, now, recovering),
-    ...insightRules(data, now, recovering),
   ]
-    .filter((s) => (data.dismissedUntil.get(s.key) ?? 0) < nowMs)
+    .filter(notDismissed(data, nowMs))
     .sort((a, b) => b.priority - a.priority);
 };
+
+/**
+ * The one coaching tip for the summary after a workout: the most important
+ * insight not shown in the last two weeks. Showing it counts as seen (see
+ * `coachTipDismissDays`), so the next workout brings the next one.
+ */
+export const coachTip = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion | null =>
+  insightRules(data, now, recoveringMuscles(data, now))
+    .filter(notDismissed(data, nowMs))
+    .sort((a, b) => b.priority - a.priority)[0] ?? null;
+
+/** How long a tip rests after it was shown. */
+export const coachTipDismissDays = insightDismissDays;
 
 export const computeSuggestions = (data: Data, nowMs: number = Date.now(), now: string = today()): Suggestion[] =>
   allSuggestions(data, nowMs, now).slice(0, 3);

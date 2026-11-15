@@ -21,7 +21,6 @@ import { Sticker } from "../../ui/stickers";
 import { StrengthOverview } from "../../ui/StrengthLevel";
 import { ReadinessCard } from "./ReadinessCard";
 import { BalanceCard } from "./BalanceCard";
-import { CoachCard } from "./CoachCard";
 import { DepotCard } from "./DepotCard";
 
 export const Stats = () => {
@@ -127,7 +126,6 @@ export const Stats = () => {
         </div>
       </section>
 
-      <CoachCard />
       <BalanceCard />
 
       <ReadinessCard />

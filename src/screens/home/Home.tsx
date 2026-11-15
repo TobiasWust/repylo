@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
-import { insightKinds } from "../../domain/insights";
-import { allSuggestions } from "../../domain/suggestions";
+import { computeSuggestions } from "../../domain/suggestions";
 import { hasValue, majorMuscles, recentPrs, trainedDays, weekStreak } from "../../domain/stats";
 import { muscleRecovery } from "../../domain/recovery";
 import { InstallCard } from "../../ui/InstallCard";
@@ -28,14 +27,9 @@ export const Home = () => {
   // Read the clock once per mount; render must stay pure.
   const [now] = useState(Date.now);
   // Recompute when data changes; "now" is fixed per render on purpose.
-  // At most two cards keep the home screen calm: the most important suggestion,
-  // plus the top coaching hint so the split reminder never crowds it out.
-  const suggestions = useMemo(() => {
-    const all = allSuggestions(data);
-    const top = all[0];
-    const hint = all.find((s) => s !== top && insightKinds.has(s.kind));
-    return [top, hint].filter((s) => s !== undefined);
-  }, [data]);
+  // One suggestion at a time keeps the home screen calm; the most important comes first.
+  // Coaching tips come one at a time after a workout (summary sheet), not here.
+  const suggestions = useMemo(() => computeSuggestions(data).slice(0, 1), [data]);
   const days = useMemo(() => trainedDays(data), [data]);
   const dayPrs = useMemo(() => recentPrs(data, 30), [data]);
   const goal = data.settings.weeklyGoal;
@@ -233,9 +227,7 @@ export const Home = () => {
 
       {suggestions.length > 0 && (
         <section>
-          <h2 className="section-title">
-            {suggestions.length > 1 ? t("Vorschläge für dich", "Suggestions for you") : t("Vorschlag für dich", "Suggestion for you")}
-          </h2>
+          <h2 className="section-title">{t("Vorschlag für dich", "Suggestion for you")}</h2>
           <div className="stack">
             {suggestions.map((s) => (
               <SuggestionCard key={s.key} suggestion={s} />

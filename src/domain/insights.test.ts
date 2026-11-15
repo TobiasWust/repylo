@@ -19,7 +19,7 @@ import { suggestProgression } from "./progression";
 import { addDays, today } from "./dates";
 import type { Data } from "./model";
 import { looksUnchecked } from "./stats";
-import { allSuggestions } from "./suggestions";
+import { allSuggestions, coachTip } from "./suggestions";
 import { build, type SetSpec, type WorkoutSpec } from "../test/fixtures";
 
 const sets = (n: number, weight: number | null, reps: number): SetSpec[] => Array.from({ length: n }, () => [weight, reps]);
@@ -302,5 +302,23 @@ describe("more insights", () => {
     // Ticked off, or a real session length: nothing to ask.
     expect(looksUnchecked(base.workouts[0]!)).toBe(false);
     expect(looksUnchecked(timed(untouched, 1, 45).workouts[0]!)).toBe(false);
+  });
+});
+
+describe("coach tip", () => {
+  const data = build([
+    { daysAgo: 1, exercises: { triceps_pushdown: sets(4, 30, 12) } },
+    { daysAgo: 5, exercises: { triceps_pushdown: sets(4, 30, 12) } },
+    ...history,
+  ]);
+
+  it("is one insight, never on the home screen", () => {
+    expect(coachTip(data)?.kind).toBe("stretch");
+    expect(allSuggestions(data).some((s) => s.kind === "stretch")).toBe(false);
+  });
+
+  it("moves on to the next one once shown", () => {
+    const shown = { ...data, dismissedUntil: new Map([["stretch:triceps", Date.now() + 86_400_000]]) };
+    expect(coachTip(shown)?.key).not.toBe("stretch:triceps");
   });
 });
