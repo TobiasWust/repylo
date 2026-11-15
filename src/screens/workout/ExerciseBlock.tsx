@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { today } from "../../domain/dates";
 import {
   getExercise,
@@ -31,8 +31,7 @@ import { ReplaceSheet } from "./ReplaceSheet";
 export const ExerciseBlock = ({
   workout,
   entry,
-  index,
-  count,
+  handle,
   added = false,
   open: isOpen,
   onToggle,
@@ -40,8 +39,8 @@ export const ExerciseBlock = ({
 }: {
   workout: WorkoutModel;
   entry: WorkoutExercise;
-  index: number;
-  count: number;
+  /** Drag handle for reordering, if this card can be moved. */
+  handle?: ReactNode;
   /** Added after the workout was opened: slides in. */
   added?: boolean;
   /** Collapsed cards show one line; tapping it opens the card. */
@@ -121,6 +120,7 @@ export const ExerciseBlock = ({
   if (!isOpen)
     return (
       <section className={`card exercise-card collapsed ${finished ? "finished" : ""} ${added ? "entering" : ""}`}>
+        {handle}
         <button className="exercise-row" onClick={onToggle} aria-expanded={false}>
           <span className="list-main">
             <strong>{exerciseName(exercise)}</strong>
@@ -161,6 +161,7 @@ export const ExerciseBlock = ({
   return (
     <section className={`card exercise-card ${added ? "entering" : ""}`}>
       <div className="exercise-head">
+        {handle}
         <button className="exercise-title" onClick={() => open({ type: "exercise", key: entry.exerciseKey })}>
           <strong>{exerciseName(exercise)}</strong>
           <small>
@@ -195,12 +196,6 @@ export const ExerciseBlock = ({
       </div>
       {menu && (
         <div className="chips">
-          <button className="chip" disabled={index === 0} onClick={() => actions.moveExercise(workout, entry.id, -1)}>
-            <Icon name="up" size={16} /> {t("Hoch", "Up")}
-          </button>
-          <button className="chip" disabled={index === count - 1} onClick={() => actions.moveExercise(workout, entry.id, 1)}>
-            <Icon name="down" size={16} /> {t("Runter", "Down")}
-          </button>
           <button className="chip" onClick={() => setReplacing(true)}>
             <Icon name="sync" size={16} /> {t("Ersetzen", "Replace")}
           </button>

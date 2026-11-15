@@ -837,6 +837,55 @@ button.week-dot {
 .exercise-row strong {
   font-size: 17px;
 }
+/* Drag handle: only it starts a drag, so the card keeps scrolling normally. */
+.exercise-card.collapsed {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding-left: 6px;
+}
+.exercise-card:not(.collapsed) .exercise-head {
+  margin-left: -10px;
+}
+.drag-handle {
+  width: 30px;
+  min-height: 42px;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--muted);
+  border-radius: 10px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+.exercise-head > .drag-handle {
+  align-self: flex-start;
+}
+.sortable-item {
+  position: relative;
+}
+.sorting {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.sortable-item.dragging {
+  z-index: 5;
+}
+.sortable-item.dragging > .card {
+  box-shadow: 8px 10px 0 var(--shade);
+  rotate: -1deg;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sortable-item.shifting {
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+}
 .exercise-card.finished {
   background: var(--soft);
 }

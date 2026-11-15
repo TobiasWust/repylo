@@ -112,18 +112,9 @@ export const createActions = (evolu: AppEvolu) => {
     setExerciseEffort: (id: string, effort: 1 | 2 | 3) =>
       evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(id), effort: int(effort) }),
 
-    moveExercise: (workout: Workout, id: string, direction: -1 | 1) => {
-      const list = workout.exercises;
-      const index = list.findIndex((e) => e.id === id);
-      const other = list[index + direction];
-      const self = list[index];
-      if (!other || !self) return;
-      // Re-number everything so equal positions from concurrent edits get fixed too.
-      const reordered = [...list];
-      reordered[index] = other;
-      reordered[index + direction] = self;
-      reordered.forEach((e, i) => evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(e.id), position: int(i) }));
-    },
+    /** Re-numbers everything, so equal positions from concurrent edits get fixed too. */
+    reorderExercises: (ids: readonly string[]) =>
+      ids.forEach((id, i) => evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(id), position: int(i) })),
 
     /** Swaps an exercise for another one at the same position, with fresh sets. */
     replaceExercise: (workout: Workout, id: string, exerciseKey: string, sets: readonly TemplateSet[]): string | null => {

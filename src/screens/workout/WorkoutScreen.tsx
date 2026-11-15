@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { today } from "../../domain/dates";
 import type { WorkoutExercise } from "../../domain/model";
 import { hasValue } from "../../domain/stats";
@@ -15,6 +15,7 @@ import { CopySheet } from "./CopySheet";
 import { SaveTemplateSheet } from "./SaveTemplateSheet";
 import { Readiness } from "./Readiness";
 import { SummarySheet } from "./SummarySheet";
+import { useSortable } from "../../ui/sortable";
 
 const isFinished = (e: WorkoutExercise) => e.sets.length > 0 && e.sets.every((s) => s.done);
 const firstOpen = (exercises: readonly WorkoutExercise[]): string | null =>
@@ -37,6 +38,27 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
   // One exercise is open at a time; the rest show one line each. Starts on the
   // first exercise with sets left. null = all collapsed on purpose.
   const [chosen, setChosen] = useState<string | null | undefined>(() => workout && firstOpen(workout.exercises));
+  // A chosen exercise that's gone (replaced, deleted, not loaded yet) falls back to the next one to do.
+  const openId = !workout
+    ? null
+    : chosen === null
+      ? null
+      : workout.exercises.some((e) => e.id === chosen)
+        ? chosen
+        : firstOpen(workout.exercises);
+  // Finished exercises move into "Done", except the open one – it stays put
+  // until you move on, so the last set can still be corrected.
+  const finished = (e: WorkoutExercise) => e.id !== openId && isFinished(e);
+  const active = workout?.exercises.filter((e) => !finished(e)) ?? [];
+  // Exercises still to do can be dragged into a new order. Done ones keep their slots.
+  const sortable = useSortable(
+    active.map((e) => e.id),
+    (ids) => {
+      if (!workout) return;
+      const next = [...ids];
+      actions.reorderExercises(workout.exercises.map((e) => (finished(e) ? e.id : next.shift()!)));
+    },
+  );
 
   if (!workout)
     return (
@@ -53,20 +75,13 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
   const done = workout.exercises.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0);
   const total = workout.exercises.reduce((n, e) => n + e.sets.length, 0);
   const exclude = new Set(workout.exercises.map((e) => e.exerciseKey));
-  // A chosen exercise that's gone (replaced, deleted, not loaded yet) falls back to the next one to do.
-  const openId = chosen === null ? null : workout.exercises.some((e) => e.id === chosen) ? chosen : firstOpen(workout.exercises);
-  // Finished exercises move into "Done", except the open one – it stays put
-  // until you move on, so the last set can still be corrected.
-  const finished = (e: WorkoutExercise) => e.id !== openId && isFinished(e);
-  const active = workout.exercises.filter((e) => !finished(e));
   const completed = workout.exercises.filter(finished);
-  const block = (e: WorkoutExercise) => (
+  const block = (e: WorkoutExercise, handle?: ReactNode) => (
     <ExerciseBlock
       key={e.id}
       workout={workout}
       entry={e}
-      index={workout.exercises.indexOf(e)}
-      count={workout.exercises.length}
+      handle={handle}
       added={initialExercises !== null && !initialExercises.has(e.id)}
       open={e.id === openId}
       onToggle={() => setChosen(e.id === openId ? null : e.id)}
@@ -124,13 +139,29 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
         </div>
       )}
 
-      <div className="stack">{active.map(block)}</div>
+      <div className={`stack ${sortable.dragging ? "sorting" : ""}`}>
+        {sortable.order.map((id) => {
+          const e = active.find((x) => x.id === id)!;
+          return (
+            <div key={id} {...sortable.item(id)}>
+              {block(
+                e,
+                active.length > 1 && (
+                  <button className="drag-handle" aria-label={t("Verschieben (Pfeiltasten)", "Move (arrow keys)")} {...sortable.handle(id)}>
+                    <Icon name="grip" />
+                  </button>
+                ),
+              )}
+            </div>
+          );
+        })}
+      </div>
       {completed.length > 0 && (
         <section className="stack done-exercises" aria-label={t("Erledigt", "Done")}>
           <h2 className="section-label">
             {t("Erledigt", "Done")} · {completed.length}
           </h2>
-          {completed.map(block)}
+          {completed.map((e) => block(e))}
         </section>
       )}
 
