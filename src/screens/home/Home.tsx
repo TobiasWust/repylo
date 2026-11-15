@@ -11,7 +11,7 @@ import { Sticker } from "../../ui/stickers";
 import { previousMonth } from "../../domain/review";
 import { isDeloadWeek } from "../../domain/progression";
 import { useApp } from "../../ui/context";
-import { formatDate, monthName, plural } from "../../ui/text";
+import { formatDate, monthName, muscleName, plural } from "../../ui/text";
 import { ensureTodayWorkout, templateItems } from "../../ui/workoutOps";
 import { SuggestionCard } from "./SuggestionCard";
 import { GoalRing } from "./GoalRing";
@@ -39,14 +39,16 @@ export const Home = () => {
   const recent = data.workouts.filter((w) => w.date !== today()).slice(0, 1);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(thisWeek, i));
   const daysThisWeek = weekDays.filter((d) => days.has(d)).length;
-  // Days when tired big muscles are recovered again, marked on the week row.
-  const readyDays = new Set(
-    muscleRecovery(data, now)
-      .filter((r) => r.readyOn && majorMuscles.includes(r.muscle))
-      .map((r) => r.readyOn!),
-  );
-  // The row shows this week, and runs on into next week up to the last "ready again" day.
-  const lastReady = [...readyDays].sort().at(-1);
+  // Big muscles still recovering, and the one day when all of them are ready
+  // again – the only day marked. Earlier days are partly recovered; tapping
+  // them says which muscles still need time.
+  const recovering = muscleRecovery(data, now).filter((r) => r.readyOn && majorMuscles.includes(r.muscle));
+  const lastReady = recovering
+    .map((r) => r.readyOn!)
+    .sort()
+    .at(-1);
+  const readyDays = new Set(lastReady ? [lastReady] : []);
+  // The row shows this week, and runs on into next week up to that day.
   const rowDays = [...weekDays];
   while (lastReady && rowDays.at(-1)! < lastReady) rowDays.push(addDays(rowDays.at(-1)!, 1));
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -72,7 +74,10 @@ export const Home = () => {
     }
     if (d < today()) return t("Ruhetag", "Rest day");
     if (d === today()) return t("Heute noch kein Training", "No training yet today");
-    if (readyDays.has(d)) return t("Wieder fit", "Ready again");
+    if (readyDays.has(d)) return t("Wieder fit – alle Muskeln erholt", "Ready again – all muscles recovered");
+    const notYet = recovering.filter((r) => r.readyOn! > d).map((r) => muscleName(r.muscle, lang));
+    if (notYet.length > 0 && notYet.length < recovering.length)
+      return t(`Teilweise erholt – noch nicht: ${notYet.join(", ")}`, `Partly recovered – not yet: ${notYet.join(", ")}`);
     return t("Noch offen", "Not planned yet");
   };
   // Since this screen was last shown: days ticked off get stamped, a grown streak flickers.
