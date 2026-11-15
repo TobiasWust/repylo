@@ -39,9 +39,12 @@ describe("muscle recovery", () => {
     expect(quads(2).hoursLeft).toBe(0);
   });
 
-  it("keeps three days only for very high volume", () => {
-    const quads = muscleRecovery(build([{ daysAgo: 2, exercises: { squat: sets(10) } }]), morning()).find((r) => r.muscle === "quads")!;
-    expect(quads.hoursLeft).toBeGreaterThan(0);
+  it("keeps three days only for extreme volume", () => {
+    const quads = (count: number) =>
+      muscleRecovery(build([{ daysAgo: 2, exercises: { squat: sets(count) } }]), morning()).find((r) => r.muscle === "quads")!;
+    // A big full-body session (10 sets for a muscle) still allows Mon/Wed/Fri.
+    expect(quads(10).hoursLeft).toBe(0);
+    expect(quads(16).hoursLeft).toBeGreaterThan(0);
   });
 
   it("counts every big muscle as rested two days after a normal full-body session", () => {

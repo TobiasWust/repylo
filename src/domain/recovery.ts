@@ -3,9 +3,11 @@
  *
  * Recovery is a deliberately simple model: the harder a muscle was worked in
  * one workout (direct sets count 1, secondary 0.5), the longer it needs –
- * one day for a little work, two for a normal session (4–9 sets, in line with
+ * one day for a little work, two for a normal session (4–15 sets, in line with
  * the ~48 h guidance between sessions for the same muscle), three only for
- * very high volume. It counts calendar days, so a muscle trained on Monday
+ * extreme volume. Full-body training three times a week (e.g. Mon/Wed/Fri)
+ * is a standard, well-supported schedule, so a typical full-body session must
+ * not push the next one out by a day. It counts calendar days, so a muscle trained on Monday
  * with a normal session is ready on Wednesday morning, whatever the time.
  */
 import { addDays, parseDay, toDay, weekStart } from "./dates";
@@ -25,7 +27,7 @@ export interface MuscleRecovery {
   readonly readyOn: string | null;
 }
 
-const recoveryDays = (sets: number): number => (sets >= 10 ? 3 : sets >= 4 ? 2 : 1);
+const recoveryDays = (sets: number): number => (sets >= 16 ? 3 : sets >= 4 ? 2 : 1);
 
 /** Midnight at the start of a day, local time. */
 const startOf = (day: string): number => new Date(`${day}T00:00:00`).getTime();
