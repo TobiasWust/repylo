@@ -267,8 +267,8 @@ export const ExerciseBlock = ({
           <span>#</span>
           {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
             <>
-              <span>{weightLabel}</span>
               <span>{t("Wdh.", "Reps")}</span>
+              <span>{weightLabel}</span>
             </>
           )}
           {exercise.metric === "time" && <span className="span2">{t("Zeit", "Time")}</span>}
@@ -297,14 +297,6 @@ export const ExerciseBlock = ({
             <span className="set-index">{i + 1}</span>
             {(exercise.metric === "weight" || exercise.metric === "bodyweight") && (
               <>
-                <Stepper label={weightLabel} onStep={(d) => stepWeight(set, d)}>
-                  <NumberField
-                    label={weightLabel}
-                    value={set.weight == null ? null : Math.round(toUnit(set.weight, unit) * 100) / 100}
-                    placeholder={exercise.metric === "bodyweight" ? "0" : "–"}
-                    onCommit={(v) => commit(set, { weight: v == null ? null : fromUnit(v, unit) })}
-                  />
-                </Stepper>
                 <Stepper label={t("Wiederholungen", "Reps")} onStep={(d) => stepReps(set, d)}>
                   <NumberField
                     label={t("Wiederholungen", "Reps")}
@@ -312,6 +304,14 @@ export const ExerciseBlock = ({
                     decimals={false}
                     placeholder="–"
                     onCommit={(v) => commit(set, { reps: v })}
+                  />
+                </Stepper>
+                <Stepper label={weightLabel} onStep={(d) => stepWeight(set, d)}>
+                  <NumberField
+                    label={weightLabel}
+                    value={set.weight == null ? null : Math.round(toUnit(set.weight, unit) * 100) / 100}
+                    placeholder={exercise.metric === "bodyweight" ? "0" : "–"}
+                    onCommit={(v) => commit(set, { weight: v == null ? null : fromUnit(v, unit) })}
                   />
                 </Stepper>
               </>
