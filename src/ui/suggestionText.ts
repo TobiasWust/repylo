@@ -104,87 +104,69 @@ export const suggestionText = (s: Suggestion, app: App): { title: string; text: 
       return {
         title: t("Willkommen zurück!", "Welcome back!"),
         text: t(
-          `${p.weeks} Wochen Pause – kein Problem. Die Vorschläge im Training starten diesmal etwas leichter, damit du sauber wieder reinkommst.`,
-          `${p.weeks} weeks off – no problem. Today's suggested weights start a bit lighter so you can ease back in.`,
+          `${p.weeks} Wochen Pause. Starte heute etwas leichter – die Gewichte im Training sind schon angepasst.`,
+          `${p.weeks} weeks off. Start a bit lighter today – the weights in your workout are already adjusted.`,
         ),
       };
     case "overVolume":
       return {
-        title: t(`${muscle}: sehr viele Sätze`, `${muscle}: a lot of sets`),
+        title: t(`${muscle}: weniger Sätze`, `${muscle}: fewer sets`),
         text: t(
-          `~${p.sets} Sätze in 7 Tagen. Über ~${p.upper} pro Woche bringt kaum noch zusätzliches Wachstum, kostet aber Erholung. Ein paar Sätze weniger reichen.`,
-          `~${p.sets} sets in 7 days. Beyond ~${p.upper} a week adds little growth but costs recovery. A few sets fewer will do.`,
+          `${p.sets} Sätze in 7 Tagen. Streich ${Number(p.sets) - Number(p.upper)} davon – mehr als ~${p.upper} bringen kaum noch etwas.`,
+          `${p.sets} sets in 7 days. Cut ${Number(p.sets) - Number(p.upper)} of them – beyond ~${p.upper} adds little.`,
         ),
       };
     case "crammed":
       return {
-        title: t(`${muscle}: alles an einem Tag`, `${muscle}: all in one day`),
+        title: t(`${muscle} auf zwei Tage verteilen`, `Split ${muscle.toLowerCase()} over two days`),
         text: t(
-          `${p.sets} Sätze in einer Einheit. Verteil sie lieber auf zwei Tage – das bringt mindestens genauso viel, und jede Einheit bleibt frischer.`,
-          `${p.sets} sets in one session. Split them over two days – it works at least as well and keeps each session fresher.`,
+          `${p.sets} Sätze in einer Einheit. Mach die Hälfte davon an einem anderen Tag.`,
+          `${p.sets} sets in one session. Do half of them on another day.`,
         ),
       };
-    case "similar": {
-      const more = Number(p.count) > 2 ? t(` (+${Number(p.count) - 2})`, ` (+${Number(p.count) - 2})`) : "";
+    case "similar":
       return {
-        title: t("Sehr ähnliche Übungen", "Very similar exercises"),
+        title: t("Eine Übung tauschen", "Swap one exercise"),
         text: t(
-          `${ex(p.first)} und ${ex(p.second)}${more} trainieren fast dasselbe. Tausch eine gegen eine Übung aus einem anderen Winkel${s.exerciseKeys.length ? ", z. B.:" : "."}`,
-          `${ex(p.first)} and ${ex(p.second)}${more} train almost the same thing. Swap one for an exercise from a different angle${s.exerciseKeys.length ? ", e.g.:" : "."}`,
+          `${ex(p.first)} und ${ex(p.second)} trainieren fast dasselbe.${s.exerciseKeys.length ? " Ersetze eine durch:" : " Ersetze eine durch eine andere Bewegung."}`,
+          `${ex(p.first)} and ${ex(p.second)} train almost the same.${s.exerciseKeys.length ? " Replace one with:" : " Replace one with another movement."}`,
         ),
       };
-    }
     case "variety":
       return {
-        title: t(`${muscle}: immer dieselbe Bewegung`, `${muscle}: always the same movement`),
-        text: t(
-          "In vier Wochen nur eine Art von Übung. Eine zweite Bewegung trifft den Muskel aus einem anderen Winkel.",
-          "Only one kind of exercise in four weeks. A second movement hits the muscle from another angle.",
-        ),
+        title: t(`${muscle}: neue Übung dazunehmen`, `${muscle}: add another exercise`),
+        text: t("Seit 4 Wochen nur eine Bewegung. Nimm eine davon dazu:", "Only one movement for 4 weeks. Add one of these:"),
       };
-    case "stretch": {
-      const how: Partial<Record<Muscle, [string, string]>> = {
-        triceps: ["Überkopf-Übungen dehnen den langen Trizepskopf", "Overhead exercises stretch the long head"],
-        hamstrings: [
-          "Beinbeuger sitzend oder rumänisches Kreuzheben dehnen ihn über die Hüfte",
-          "Seated leg curls or RDLs stretch them over the hip",
-        ],
-        calves: [
-          "Wadenheben mit gestrecktem Knie dehnt den großen Wadenmuskel",
-          "Calf raises with straight knees stretch the big calf muscle",
-        ],
-      };
-      const [de, en] = how[p.muscle as Muscle] ?? ["Übungen in Dehnung", "Exercises in a stretch"];
+    case "stretch":
       return {
         title: t(`${muscle} in Dehnung trainieren`, `Train ${muscle.toLowerCase()} in a stretch`),
         text: t(
-          `Bisher mit ${ex(p.exercise)}. ${de} – in Studien wuchs der Muskel damit deutlich mehr.`,
-          `So far with ${ex(p.exercise)}. ${en} – in studies, the muscle grew clearly more.`,
+          `Bisher nur ${ex(p.exercise)}. Ersetze einen Teil der Sätze durch:`,
+          `So far only ${ex(p.exercise)}. Replace some sets with:`,
         ),
       };
-    }
     case "easy":
       return {
-        title: t("Meist zu leicht?", "Mostly too easy?"),
+        title: t("Näher ans Limit gehen", "Get closer to your limit"),
         text: t(
-          `${p.easy} von ${p.total} Übungen hast du zuletzt als „leicht“ markiert. Fürs Wachstum sollten am Ende jedes Satzes nur noch 1–3 Wiederholungen übrig sein.`,
-          `You marked ${p.easy} of ${p.total} exercises as “easy” lately. For growth, end each set with only 1–3 reps left in the tank.`,
+          `${p.easy} von ${p.total} Übungen waren „leicht“. Nimm mehr Gewicht, bis am Satzende nur noch 1–3 Wiederholungen gehen.`,
+          `${p.easy} of ${p.total} exercises felt “easy”. Add weight until only 1–3 reps are left at the end of a set.`,
         ),
       };
     case "repRange":
       return p.goal === "strength"
         ? {
-            title: t("Für Kraft: schwerer werden", "For strength: go heavier"),
+            title: t("Grundübungen schwerer machen", "Go heavier on main lifts"),
             text: t(
-              "Bei deinen Grundübungen hattest du zuletzt kaum Sätze mit 6 oder weniger Wiederholungen. Maximalkraft wächst am meisten mit schweren Gewichten.",
-              "Your main lifts had hardly any sets of 6 reps or fewer lately. Max strength grows most with heavy weights.",
+              "Kaum Sätze mit 6 oder weniger Wiederholungen. Wähl bei Grundübungen ein Gewicht für 3–6 Wiederholungen.",
+              "Hardly any sets of 6 reps or fewer. Pick a weight for 3–6 reps on your main lifts.",
             ),
           }
         : {
-            title: t("Sehr leichte Gewichte", "Very light weights"),
+            title: t("Mehr Gewicht nehmen", "Use more weight"),
             text: t(
-              "Die meisten Sätze hatten über 30 Wiederholungen. Etwas mehr Gewicht für 6–30 Wiederholungen bringt zuverlässiger Muskelaufbau.",
-              "Most sets had more than 30 reps. A bit more weight for 6–30 reps builds muscle more reliably.",
+              "Meist über 30 Wiederholungen. Nimm so viel Gewicht, dass du 8–12 schaffst.",
+              "Mostly over 30 reps. Use enough weight that you manage 8–12.",
             ),
           };
     case "order":
@@ -193,44 +175,36 @@ export const suggestionText = (s: Suggestion, app: App): { title: string; text: 
         text:
           p.goal === "strength"
             ? t(
-                "Du machst sie meist nach mehreren kleineren Übungen. Was am Anfang steht, gewinnt am meisten Kraft – zieh sie im Training nach oben.",
-                "You usually do it after several smaller exercises. What comes first gains the most strength – drag it up in your workout.",
+                "Kam zuletzt nach kleineren Übungen. Zieh sie im Training an den Anfang.",
+                "Came after smaller exercises lately. Drag it to the start of your workout.",
               )
             : t(
-                `Sie kommt bei dir erst nach ${p.before} anderen Übungen. Müde schaffst du bei schweren Grundübungen weniger – zieh sie im Training weiter nach oben.`,
-                `It comes after ${p.before} other exercises. Tired, you get fewer reps on heavy compound lifts – drag it further up in your workout.`,
+                `Kam zuletzt erst nach ${p.before} Übungen. Zieh sie im Training weiter nach vorn.`,
+                `Came after ${p.before} exercises lately. Drag it further up in your workout.`,
               ),
       };
     case "jump":
       return {
-        title: t("Plötzlich viel stärker?", "Suddenly much stronger?"),
+        title: t("Sätze härter machen", "Make your sets harder"),
         text: t(
-          `Bei ${p.count} Übungen ist deine geschätzte Maximalkraft von einem Training aufs nächste um 15 % oder mehr gestiegen (${ex(p.exercise)}: +${p.percent} %). So schnell wächst Kraft nicht – die Sätze davor waren wohl weit vom Limit entfernt. ${
-            p.rated
-              ? "Sag nach jeder Übung, wie sie sich angefühlt hat, dann passt repylo die Vorschläge an."
-              : "Schalte in den Einstellungen „Nach Anstrengung fragen“ ein, dann passt repylo die Vorschläge an."
-          }`,
-          `On ${p.count} exercises your estimated max jumped 15 % or more from one workout to the next (${ex(p.exercise)}: +${p.percent} %). Strength doesn't grow that fast – the earlier sets were probably far from your limit. ${
-            p.rated
-              ? "Rate how each exercise felt and repylo will adjust its suggestions."
-              : "Turn on “Ask how it felt” in Settings and repylo will adjust its suggestions."
-          }`,
+          `Bei ${p.count} Übungen bist du plötzlich 15 % und mehr stärker (${ex(p.exercise)}: +${p.percent} %) – die Sätze davor waren zu leicht. Hör erst auf, wenn nur noch 1–3 Wiederholungen gingen${p.rated ? "." : ", und schalte in den Einstellungen „Nach Anstrengung fragen“ ein."}`,
+          `On ${p.count} exercises you're suddenly 15 % or more stronger (${ex(p.exercise)}: +${p.percent} %) – earlier sets were too easy. Only stop when 1–3 reps are left${p.rated ? "." : ", and turn on “Ask how it felt” in Settings."}`,
         ),
       };
     case "long":
       return {
-        title: t("Sehr lange Einheiten", "Very long sessions"),
+        title: t("Training aufteilen", "Split your workout"),
         text: t(
-          `Deine letzten Trainings dauerten im Schnitt ${p.minutes} Minuten mit ~${p.sets} Sätzen. Auf mehr, kürzere Einheiten verteilt (z. B. Ober- und Unterkörper) bleibt das Wochenvolumen gleich – und die letzten Übungen leiden nicht unter Müdigkeit.`,
-          `Your last workouts took ${p.minutes} minutes on average with ~${p.sets} sets. Spread over more, shorter sessions (e.g. upper and lower body), the weekly volume stays the same – and the last exercises don't suffer from fatigue.`,
+          `Zuletzt ~${p.minutes} Minuten mit ${p.sets} Sätzen. Verteil die Übungen auf mehr, kürzere Einheiten, z. B. Ober- und Unterkörper.`,
+          `Lately ~${p.minutes} minutes with ${p.sets} sets. Spread the exercises over more, shorter sessions, e.g. upper and lower body.`,
         ),
       };
     case "unchecked":
       return {
         title: t(`Training vom ${formatDate(String(p.date), lang)} prüfen`, `Check the workout from ${formatDate(String(p.date), lang)}`),
         text: t(
-          "Kein Satz abgehakt und nach einer Minute beendet. Hast du das so trainiert? Sonst verfälscht es deine Statistik.",
-          "No set ticked off and closed after a minute. Did you train it like that? Otherwise it skews your stats.",
+          "Nichts abgehakt und gleich beendet. Hak die Sätze ab oder lösch das Training.",
+          "Nothing ticked off and closed right away. Tick off the sets or delete the workout.",
         ),
       };
   }
@@ -242,24 +216,24 @@ export const whyText = (s: Suggestion, app: App): string | null => {
   switch (s.kind) {
     case "comeback":
       return t(
-        "Kraft hält sich etwa drei Wochen ohne Training und sinkt danach nur langsam – beim Wiedereinstieg kommt sie schnell zurück. Ein leichterer Start schont Sehnen und Gelenke. (Bosquet et al. 2013, Meta-Analyse; Ogasawara et al. 2013)",
-        "Strength holds for about three weeks without training and fades slowly after that – it comes back quickly once you restart. Starting lighter spares tendons and joints. (Bosquet et al. 2013, meta-analysis; Ogasawara et al. 2013)",
+        "Kraft hält sich etwa drei Wochen und kommt danach schnell zurück. Leichter starten schont Sehnen und Gelenke. (Bosquet et al. 2013; Ogasawara et al. 2013)",
+        "Strength holds for about three weeks and comes back quickly after. Starting lighter spares tendons and joints. (Bosquet et al. 2013; Ogasawara et al. 2013)",
       );
     case "overVolume":
       return t(
-        "Mehr Sätze bringen mehr Muskelwachstum, aber der Zusatznutzen wird mit jedem Satz kleiner. Sehr hohe Wochenvolumen lohnen sich selten. (Schoenfeld et al. 2017; Pelland et al. 2024, Meta-Analysen)",
-        "More sets mean more growth, but each extra set adds less. Very high weekly volumes rarely pay off. (Schoenfeld et al. 2017; Pelland et al. 2024, meta-analyses)",
+        "Jeder weitere Satz bringt weniger zusätzliches Wachstum, kostet aber Erholung. (Schoenfeld et al. 2017; Pelland et al. 2024)",
+        "Each extra set adds less growth but still costs recovery. (Schoenfeld et al. 2017; Pelland et al. 2024)",
       );
     case "crammed":
       return t(
-        "Bei gleichem Wochenvolumen ist es fürs Wachstum fast egal, ob ein Muskel ein- oder zweimal pro Woche trainiert wird. Viele Sätze am Stück werden gegen Ende aber schwächer. (Schoenfeld et al. 2019, Meta-Analyse)",
-        "With the same weekly volume, training a muscle once or twice a week makes little difference for growth. Many sets in a row get weaker towards the end, though. (Schoenfeld et al. 2019, meta-analysis)",
+        "Bei gleichem Wochenvolumen wachsen Muskeln mit ein oder zwei Einheiten gleich gut – verteilt bleiben die Sätze frischer. (Schoenfeld et al. 2019)",
+        "With the same weekly volume, muscles grow equally with one or two sessions – spread out, sets stay fresher. (Schoenfeld et al. 2019)",
       );
     case "similar":
     case "variety":
       return t(
-        "Verschiedene Übungen belasten unterschiedliche Bereiche eines Muskels. Abwechslung bei der Übungsauswahl führt zu gleichmäßigerem Wachstum als immer dieselbe Bewegung. (Fonseca et al. 2014; Kassiano et al. 2022, systematische Übersicht)",
-        "Different exercises load different regions of a muscle. Varied exercise selection grows muscles more evenly than repeating one movement. (Fonseca et al. 2014; Kassiano et al. 2022, systematic review)",
+        "Verschiedene Übungen trainieren verschiedene Bereiche eines Muskels. Abwechslung lässt ihn gleichmäßiger wachsen. (Fonseca et al. 2014; Kassiano et al. 2022)",
+        "Different exercises train different regions of a muscle. Variety grows it more evenly. (Fonseca et al. 2014; Kassiano et al. 2022)",
       );
     case "stretch": {
       const source: Partial<Record<string, string>> = {
@@ -268,44 +242,40 @@ export const whyText = (s: Suggestion, app: App): string | null => {
         calves: "Kinoshita et al. 2023",
       };
       return t(
-        `Muskeln, die unter Last stark gedehnt werden, wachsen in Studien oft deutlich mehr als bei Übungen, die sie nur im verkürzten Bereich belasten. (${source[String(s.params.muscle)] ?? "Wolf et al. 2023"}; Übersicht: Wolf et al. 2023)`,
-        `Muscles loaded in a deep stretch often grew clearly more in studies than with exercises that only load them short. (${source[String(s.params.muscle)] ?? "Wolf et al. 2023"}; review: Wolf et al. 2023)`,
+        `Unter Last gedehnte Muskeln wuchsen in Studien deutlich mehr. (${source[String(s.params.muscle)] ?? "Wolf et al. 2023"})`,
+        `Muscles loaded in a stretch grew clearly more in studies. (${source[String(s.params.muscle)] ?? "Wolf et al. 2023"})`,
       );
     }
     case "easy":
+    case "jump":
       return t(
-        "Je näher ein Satz am Muskelversagen endet, desto mehr Wachstum – bis etwa 0–3 Wiederholungen Reserve. Weit davon entfernt bringt deutlich weniger. (Refalo et al. 2023; Robinson et al. 2024, Meta-Analysen)",
-        "The closer a set ends to failure, the more growth – down to about 0–3 reps in reserve. Stopping far from it brings clearly less. (Refalo et al. 2023; Robinson et al. 2024, meta-analyses)",
+        "Sätze, die nah am Limit enden, bringen deutlich mehr Muskelaufbau als lockere. (Refalo et al. 2023; Robinson et al. 2024)",
+        "Sets that end close to your limit build clearly more muscle than easy ones. (Refalo et al. 2023; Robinson et al. 2024)",
       );
     case "repRange":
       return s.params.goal === "strength"
         ? t(
-            "Muskelaufbau klappt mit leichten und schweren Gewichten etwa gleich gut, Maximalkraft steigt mit schweren Lasten aber deutlich stärker. (Schoenfeld et al. 2017; Lopez et al. 2021, Meta-Analysen)",
-            "Muscle grows about equally with light and heavy weights, but max strength rises clearly more with heavy loads. (Schoenfeld et al. 2017; Lopez et al. 2021, meta-analyses)",
+            "Muskeln wachsen mit leichten und schweren Gewichten, Maximalkraft aber vor allem mit schweren. (Schoenfeld et al. 2017; Lopez et al. 2021)",
+            "Muscles grow with light and heavy weights, but max strength mostly with heavy ones. (Schoenfeld et al. 2017; Lopez et al. 2021)",
           )
         : t(
-            "Zwischen etwa 6 und 30 Wiederholungen nahe am Versagen wachsen Muskeln ähnlich gut. Mit sehr leichten Gewichten ist der Effekt kleiner. (Schoenfeld et al. 2017; Lasevicius et al. 2018)",
-            "Between about 6 and 30 reps near failure, muscles grow similarly. With very light weights the effect is smaller. (Schoenfeld et al. 2017; Lasevicius et al. 2018)",
+            "Mit sehr leichten Gewichten wachsen Muskeln weniger zuverlässig. (Schoenfeld et al. 2017; Lasevicius et al. 2018)",
+            "With very light weights, muscles grow less reliably. (Schoenfeld et al. 2017; Lasevicius et al. 2018)",
           );
     case "order":
       return s.params.goal === "strength"
         ? t(
-            "Übungen am Anfang einer Einheit zeigen größere Kraftzuwächse als dieselben Übungen am Ende. Für den Muskelaufbau ist die Reihenfolge fast egal. (Nunes et al. 2021, Meta-Analyse)",
-            "Exercises done early in a session gain more strength than the same exercises done last. For muscle growth, the order hardly matters. (Nunes et al. 2021, meta-analysis)",
+            "Übungen am Anfang einer Einheit legen mehr Kraft zu. (Nunes et al. 2021)",
+            "Exercises early in a session gain more strength. (Nunes et al. 2021)",
           )
         : t(
-            "Für den Muskelaufbau ist die Reihenfolge laut Studien zweitrangig. Übungen am Ende einer langen Einheit schaffen aber weniger Wiederholungen und Gewicht als dieselben am Anfang. (Simão et al. 2012, Übersicht; Nunes et al. 2021, Meta-Analyse)",
-            "For muscle growth, studies find the order matters little. But exercises at the end of a long session get fewer reps and less weight than the same ones done first. (Simão et al. 2012, review; Nunes et al. 2021, meta-analysis)",
+            "Am Ende einer langen Einheit schaffst du weniger Wiederholungen. (Simão et al. 2012)",
+            "At the end of a long session you get fewer reps. (Simão et al. 2012)",
           );
-    case "jump":
-      return t(
-        "repylo schätzt deine Maximalkraft aus Gewicht und Wiederholungen. Das stimmt nur, wenn ein Satz nah am Limit endet. Springt die Schätzung plötzlich, waren die Sätze davor weit davon entfernt – und Sätze nah am Limit bringen deutlich mehr Muskelaufbau. (Refalo et al. 2023; Robinson et al. 2024, Meta-Analysen)",
-        "repylo estimates your max from weight and reps. That only holds when a set ends close to your limit. If the estimate suddenly jumps, earlier sets were far from it – and sets close to the limit build clearly more muscle. (Refalo et al. 2023; Robinson et al. 2024, meta-analyses)",
-      );
     case "long":
       return t(
-        "Bei gleichem Wochenvolumen ist es fürs Wachstum fast egal, auf wie viele Einheiten du es verteilst. Übungen am Ende einer langen Einheit schaffen aber weniger Wiederholungen. (Schoenfeld et al. 2019, Meta-Analyse; Simão et al. 2012, Übersicht)",
-        "With the same weekly volume, it hardly matters for growth how many sessions you split it into. But exercises at the end of a long session get fewer reps. (Schoenfeld et al. 2019, meta-analysis; Simão et al. 2012, review)",
+        "Fürs Wachstum zählt das Wochenvolumen, nicht die Zahl der Einheiten – und am Ende langer Einheiten fehlt die Kraft. (Schoenfeld et al. 2019; Simão et al. 2012)",
+        "Growth depends on weekly volume, not the number of sessions – and strength fades at the end of long ones. (Schoenfeld et al. 2019; Simão et al. 2012)",
       );
     default:
       return null;

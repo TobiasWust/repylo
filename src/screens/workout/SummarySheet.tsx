@@ -97,8 +97,7 @@ export const SummarySheet = ({ workoutId, onClose }: { workoutId: string; onClos
           </div>
           <p>
             {suggestionText(tip, app).text}
-            {tip.exerciseKeys.length > 0 &&
-              ` ${tip.kind === "similar" ? "" : t("Z. B.: ", "E.g.: ")}${tip.exerciseKeys.map((k) => exerciseName(getExercise(data, k))).join(", ")}`}
+            {tip.exerciseKeys.length > 0 && ` ${tip.exerciseKeys.map((k) => exerciseName(getExercise(data, k))).join(", ")}`}
           </p>
           {whyText(tip, app) && (
             <details className="why">
