@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { workoutSummary } from "../../domain/coach";
-import { addDays, today, weekStart } from "../../domain/dates";
-import { hasValue } from "../../domain/stats";
-import { formatNumber } from "../../domain/units";
-import { useApp } from "../../ui/context";
-import { Icon } from "../../ui/components";
-import { Sticker } from "../../ui/stickers";
-import { formatDate, plural } from "../../ui/text";
+import { workoutSummary } from "../domain/coach";
+import { addDays, today, weekStart } from "../domain/dates";
+import { hasValue } from "../domain/stats";
+import { formatNumber } from "../domain/units";
+import { useApp } from "../ui/context";
+import { Icon } from "../ui/components";
+import { Sticker } from "../ui/stickers";
+import { formatDate, plural } from "../ui/text";
 
 /** One day's workouts for the heatmap bubble: how it went, not just what was done. */
 const DayInfo = ({ day, column, pinned, onUnpin }: { day: string; column: number; pinned: boolean; onUnpin: () => void }) => {

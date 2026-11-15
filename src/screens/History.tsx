@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getExercise } from "../domain/model";
-import { hasValue, workoutTimes } from "../domain/stats";
+import { hasValue, trainedDays, workoutTimes } from "../domain/stats";
+import { Heatmap } from "./Heatmap";
 import { formatNumber, toUnit } from "../domain/units";
 import { BackfillSheet } from "../ui/BackfillSheet";
 import { Empty, Icon } from "../ui/components";
@@ -12,6 +13,7 @@ export const History = () => {
   const { t, data, lang, open, exerciseName } = useApp();
   const unit = data.settings.unit;
   const [backfill, setBackfill] = useState(false);
+  const days = useMemo(() => trainedDays(data), [data]);
   const months = new Map<string, typeof data.workouts>();
   for (const w of data.workouts) {
     const key = w.date.slice(0, 7);
@@ -28,6 +30,12 @@ export const History = () => {
       </div>
       {data.workouts.length === 0 && (
         <Empty sticker="calendar">{t("Hier erscheinen deine Trainings.", "Your workouts will appear here.")}</Empty>
+      )}
+      {days.size > 0 && (
+        <section className="card">
+          <h2 className="card-title">{t("Trainingstage", "Training days")}</h2>
+          <Heatmap days={days} />
+        </section>
       )}
       {[...months].map(([month, workouts]) => (
         <section key={month}>

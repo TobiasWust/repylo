@@ -20,7 +20,6 @@ import { formatDate, muscleName } from "../../ui/text";
 import { Sticker } from "../../ui/stickers";
 import { StrengthOverview } from "../../ui/StrengthLevel";
 import { ReadinessCard } from "./ReadinessCard";
-import { Heatmap } from "./Heatmap";
 import { BalanceCard } from "./BalanceCard";
 import { DepotCard } from "./DepotCard";
 
@@ -85,11 +84,6 @@ export const Stats = () => {
           </strong>
         </div>
       </div>
-
-      <section className="card">
-        <h2 className="card-title">{t("Trainingstage", "Training days")}</h2>
-        <Heatmap days={days} />
-      </section>
 
       <section className="card">
         <h2 className="card-title">{t("Sätze pro Woche", "Sets per week")}</h2>
