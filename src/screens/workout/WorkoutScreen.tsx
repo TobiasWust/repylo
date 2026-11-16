@@ -226,7 +226,9 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
         <button
           className="button pink"
           onClick={() => {
-            actions.updateWorkout(workout.id, { finished: true });
+            // Only the first "Done" sets the end time: reopening a workout from
+            // History to fix a number must not stretch it to hours or days.
+            if (workout.finishedAt === null) actions.updateWorkout(workout.id, { finished: true });
             // An empty workout has nothing to summarise.
             if (workout.exercises.some((e) => e.sets.some(hasValue))) setSheet("summary");
             else back();
