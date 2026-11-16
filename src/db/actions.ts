@@ -77,11 +77,23 @@ export const createActions = (evolu: AppEvolu) => {
 
     updateWorkout: (
       id: string,
-      values: { date?: string; note?: string | null; finished?: boolean; templateId?: string | null; sleep?: number; energy?: number },
+      values: {
+        date?: string;
+        note?: string | null;
+        finished?: boolean;
+        templateId?: string | null;
+        sleep?: number;
+        energy?: number;
+        /** Set start and end times directly (edited afterwards). */
+        startedAt?: number;
+        finishedAt?: number | null;
+      },
     ) =>
       evolu.update("workout", {
         id: WorkoutId.orThrow(id),
         ...(values.date !== undefined && { date: Text40.orThrow(values.date) }),
+        ...(values.startedAt !== undefined && { startedAt: int(values.startedAt) }),
+        ...(values.finishedAt !== undefined && { finishedAt: values.finishedAt === null ? null : int(values.finishedAt) }),
         ...(values.note !== undefined && { note: note(values.note) }),
         ...(values.finished !== undefined && { finishedAt: values.finished ? int(Date.now()) : null }),
         ...(values.templateId !== undefined && { templateId: values.templateId ? TemplateId.orThrow(values.templateId) : null }),

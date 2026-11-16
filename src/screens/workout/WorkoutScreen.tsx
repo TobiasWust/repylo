@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { today } from "../../domain/dates";
+import { parseDay, today } from "../../domain/dates";
 import type { WorkoutExercise } from "../../domain/model";
 import { hasValue, looksUnchecked, workoutTimes } from "../../domain/stats";
 import { Icon } from "../../ui/components";
@@ -15,6 +15,7 @@ import { CopySheet } from "./CopySheet";
 import { SaveTemplateSheet } from "./SaveTemplateSheet";
 import { Readiness } from "./Readiness";
 import { SummarySheet } from "./SummarySheet";
+import { TimeSheet } from "./TimeSheet";
 import { useSortable } from "../../ui/sortable";
 
 const isFinished = (e: WorkoutExercise) => e.sets.length > 0 && e.sets.every((s) => s.done);
@@ -24,7 +25,7 @@ const firstOpen = (exercises: readonly WorkoutExercise[]): string | null =>
 export const WorkoutScreen = ({ id }: { id: string }) => {
   const { t, data, actions, back, lang } = useApp();
   const { confirm } = useFeedback();
-  const [sheet, setSheet] = useState<"add" | "copy" | "template" | "summary" | null>(null);
+  const [sheet, setSheet] = useState<"add" | "copy" | "template" | "summary" | "time" | null>(null);
   // Comment, template and delete live behind "More" – rarely needed mid-workout.
   const [more, setMore] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
@@ -99,15 +100,27 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
         <div className="overlay-title">
           <h1>{t("Training", "Workout")}</h1>
           <div className="overlay-sub">
-            <DatePill value={workout.date} onChange={(date) => actions.updateWorkout(workout.id, { date })}>
+            <DatePill
+              value={workout.date}
+              onChange={(date) => {
+                // Moving a workout to another day keeps its clock times.
+                const shift = times ? parseDay(date).getTime() - parseDay(workout.date).getTime() : 0;
+                actions.updateWorkout(workout.id, {
+                  date,
+                  ...(times && {
+                    startedAt: workout.startedAt + shift,
+                    ...(workout.finishedAt !== null && { finishedAt: workout.finishedAt + shift }),
+                  }),
+                });
+              }}
+            >
               {formatDate(workout.date, lang, "long")}
             </DatePill>
-            {times && (
-              <small>
-                {times.end === null && workout.finishedAt === null ? t("seit ", "since ") : ""}
-                {formatTimes(times, lang)}
-              </small>
-            )}
+            <button className="time-pill" onClick={() => setSheet("time")}>
+              {times
+                ? `${times.end === null && workout.finishedAt === null ? t("seit ", "since ") : ""}${formatTimes(times, lang)}`
+                : t("Uhrzeit eintragen", "Add time")}
+            </button>
           </div>
         </div>
         {total > 0 && (
@@ -283,6 +296,7 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
           }}
         />
       )}
+      {sheet === "time" && <TimeSheet workout={workout} onClose={() => setSheet(null)} />}
       {sheet === "copy" && <CopySheet workout={workout} onClose={() => setSheet(null)} />}
       {sheet === "template" && <SaveTemplateSheet workout={workout} onClose={() => setSheet(null)} />}
       {sheet === "summary" && (

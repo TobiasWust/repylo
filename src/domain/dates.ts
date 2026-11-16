@@ -58,3 +58,23 @@ export const parseDayInput = (text: string, lang: "de" | "en", reference: string
   if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== dayOfMonth) return null;
   return toDay(date);
 };
+
+/** Timestamp of a clock time ("18:05") on a day, local time. */
+export const atTime = (day: string, time: string): number => new Date(`${day}T${time}:00`).getTime();
+
+/** "18:05" for a timestamp, local time. */
+export const clockTime = (time: number): string => {
+  const d = new Date(time);
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+/**
+ * Start and end of a workout from clock times on its day. An end before the
+ * start ran past midnight, so it's on the next day.
+ */
+export const sessionTimes = (day: string, start: string, end: string | null): { start: number; end: number | null } => {
+  const from = atTime(day, start);
+  if (end === null) return { start: from, end: null };
+  const to = atTime(day, end);
+  return { start: from, end: to > from ? to : atTime(addDays(day, 1), end) };
+};
