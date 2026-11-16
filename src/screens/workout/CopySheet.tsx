@@ -14,9 +14,12 @@ export const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose
   const [selected, setSelected] = useState<{ id: string; items: readonly TemplateItem[]; templateId: string | null } | null>(null);
   const [checked, setChecked] = useState<ReadonlySet<number>>(new Set());
 
+  // Exercises already in this workout start unticked, so copying a template
+  // twice (or one that overlaps) doesn't add them a second time by accident.
+  const already = new Set(workout.exercises.map((e) => e.exerciseKey));
   const choose = (id: string, items: readonly TemplateItem[], templateId: string | null) => {
     setSelected({ id, items, templateId });
-    setChecked(new Set(items.map((_, i) => i)));
+    setChecked(new Set(items.flatMap((item, i) => (already.has(item.exerciseKey) ? [] : [i]))));
   };
   const apply = () => {
     if (!selected) return;
@@ -95,6 +98,7 @@ export const CopySheet = ({ workout, onClose }: { workout: WorkoutModel; onClose
                     />
                     <span>
                       {exerciseName(getExercise(data, item.exerciseKey))}
+                      {already.has(item.exerciseKey) && <span className="already-tag">{t("schon drin", "already in")}</span>}
                       <small> {describeSets(app, item.sets, getExercise(data, item.exerciseKey).metric)}</small>
                     </span>
                   </label>

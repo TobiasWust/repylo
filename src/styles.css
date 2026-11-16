@@ -733,6 +733,16 @@ button.week-dot {
   font-weight: 600;
 }
 /* The one coaching tip after a workout. */
+/* "Already in this workout" next to an exercise in the copy sheet. */
+.already-tag {
+  font-size: 11px;
+  font-weight: 700;
+  border: var(--line);
+  border-radius: 999px;
+  padding: 0 7px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
 .coach-tip {
   border: var(--line);
   border-radius: var(--radius);
