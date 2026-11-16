@@ -36,9 +36,14 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
   // The progress counter bumps when it changes, not when the screen opens.
   const doneCount = workout?.exercises.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0) ?? 0;
   const [openedWith] = useState(doneCount);
+  // A workout that was already finished when opened (e.g. from History) is
+  // being looked at, not trained: everything starts collapsed.
+  const [reviewing] = useState(() => workout?.finishedAt != null);
   // One exercise is open at a time; the rest show one line each. Starts on the
   // first exercise with sets left. null = all collapsed on purpose.
-  const [chosen, setChosen] = useState<string | null | undefined>(() => workout && firstOpen(workout.exercises));
+  const [chosen, setChosen] = useState<string | null | undefined>(() =>
+    !workout ? undefined : reviewing ? null : firstOpen(workout.exercises),
+  );
   // A chosen exercise that's gone (replaced, deleted, not loaded yet) falls back to the next one to do.
   const openId = !workout
     ? null
@@ -46,7 +51,9 @@ export const WorkoutScreen = ({ id }: { id: string }) => {
       ? null
       : workout.exercises.some((e) => e.id === chosen)
         ? chosen
-        : firstOpen(workout.exercises);
+        : reviewing
+          ? null
+          : firstOpen(workout.exercises);
   // Finished exercises move into "Done", except the open one – it stays put
   // until you move on, so the last set can still be corrected.
   const finished = (e: WorkoutExercise) => e.id !== openId && isFinished(e);
