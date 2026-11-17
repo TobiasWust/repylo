@@ -903,10 +903,16 @@ button.week-dot {
   color: var(--muted);
   font-weight: 600;
 }
-/* Collapsed exercise: one tappable line. */
+/* Collapsed exercise: one tappable line, swipe sideways to remove. */
 .exercise-card.collapsed {
   padding-top: 10px;
   padding-bottom: 10px;
+  touch-action: pan-y;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      transform 0.2s,
+      opacity 0.2s;
+  }
 }
 .exercise-row {
   display: flex;
@@ -1976,6 +1982,24 @@ body:has(.overlay-screen) .rest-timer {
   max-width: calc(100% - 32px);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.toast.with-action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 8px;
+}
+.toast.with-action span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toast-action {
+  flex-shrink: 0;
+  color: var(--yellow);
+  font-weight: 800;
+  padding: 2px 8px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 @media (max-width: 380px) {

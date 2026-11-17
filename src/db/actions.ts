@@ -10,7 +10,7 @@ import {
   sqliteFalse,
   sqliteTrue,
 } from "@evolu/common";
-import type { Data, Goal, Language, Prefill, Standards, TemplateItem, TemplateSet, Unit, Workout } from "../domain/model";
+import type { Data, Goal, Language, Prefill, Standards, TemplateItem, TemplateSet, Unit, Workout, WorkoutExercise } from "../domain/model";
 import { today } from "../domain/dates";
 import {
   BodyWeightId,
@@ -142,6 +142,12 @@ export const createActions = (evolu: AppEvolu) => {
       if (!e) return;
       for (const s of e.sets) evolu.update("workoutSet", { id: WorkoutSetId.orThrow(s.id), isDeleted: sqliteTrue });
       evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(id), isDeleted: sqliteTrue });
+    },
+
+    /** Undo for `removeExercise`: brings the exercise back with the sets it had. */
+    restoreExercise: (exercise: WorkoutExercise) => {
+      evolu.update("workoutExercise", { id: WorkoutExerciseId.orThrow(exercise.id), isDeleted: sqliteFalse });
+      for (const s of exercise.sets) evolu.update("workoutSet", { id: WorkoutSetId.orThrow(s.id), isDeleted: sqliteFalse });
     },
 
     addSet: (workoutId: string, workoutExerciseId: string, exerciseKey: string, copyFrom: TemplateSet | undefined, position: number) =>

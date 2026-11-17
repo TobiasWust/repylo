@@ -10,11 +10,17 @@ import { createContext, use } from "react";
 export interface Feedback {
   readonly startRest: (seconds: number) => void;
   readonly celebrate: (message: string) => void;
-  readonly toast: (message: string) => void;
+  /** A short message; with an action (e.g. "Undo") it stays a little longer and shows a button. */
+  readonly toast: (message: string, action?: ToastAction) => void;
   /** Resolves true when the user confirms, false on cancel, Escape or backdrop tap. */
   readonly confirm: (options: ConfirmOptions) => Promise<boolean>;
   /** Resolves the trimmed text, or null when cancelled or left empty. */
   readonly prompt: (options: PromptOptions) => Promise<string | null>;
+}
+
+export interface ToastAction {
+  readonly label: string;
+  readonly run: () => void;
 }
 
 export interface ConfirmOptions {

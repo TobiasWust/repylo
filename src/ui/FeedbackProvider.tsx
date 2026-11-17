@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { FeedbackContext, type ConfirmOptions, type PromptOptions } from "./feedback";
+import { FeedbackContext, type ConfirmOptions, type PromptOptions, type ToastAction } from "./feedback";
 import { useModal } from "./modal";
 import { Sticker } from "./stickers";
 
@@ -46,7 +46,7 @@ const Confetti = () => {
  * (those sit in the browser's top layer). Without popover support it stays
  * a plain fixed element.
  */
-const Toast = ({ message }: { message: string }) => {
+const Toast = ({ message, action, onAction }: { message: string; action?: ToastAction; onAction: () => void }) => {
   const ref = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     try {
@@ -56,8 +56,19 @@ const Toast = ({ message }: { message: string }) => {
     }
   }, []);
   return (
-    <div ref={ref} popover="manual" className="toast">
-      {message}
+    <div ref={ref} popover="manual" className={`toast ${action ? "with-action" : ""}`}>
+      <span>{message}</span>
+      {action && (
+        <button
+          className="toast-action"
+          onClick={() => {
+            action.run();
+            onAction();
+          }}
+        >
+          {action.label}
+        </button>
+      )}
     </div>
   );
 };
@@ -150,7 +161,7 @@ export const FeedbackProvider = ({ children, labels }: { children: ReactNode; la
   const [restTotal, setRestTotal] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const [celebration, setCelebration] = useState<{ id: number; message: string } | null>(null);
-  const [toastMessage, setToastMessage] = useState<{ id: number; message: string } | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ id: number; message: string; action?: ToastAction } | null>(null);
   const finished = useRef(false);
   const [dialog, setDialog] = useState<DialogRequest | null>(null);
 
@@ -203,15 +214,16 @@ export const FeedbackProvider = ({ children, labels }: { children: ReactNode; la
   }, [celebration]);
 
   const toast = useCallback(
-    (message: string) => {
-      setToastMessage({ id: Date.now(), message });
+    (message: string, action?: ToastAction) => {
+      setToastMessage({ id: Date.now(), message, action });
       announce(message);
     },
     [announce],
   );
   useEffect(() => {
     if (!toastMessage) return;
-    const id = setTimeout(() => setToastMessage(null), 2600);
+    // Long enough to reach an "Undo" button.
+    const id = setTimeout(() => setToastMessage(null), toastMessage.action ? 5000 : 2600);
     return () => clearTimeout(id);
   }, [toastMessage]);
 
@@ -272,7 +284,9 @@ export const FeedbackProvider = ({ children, labels }: { children: ReactNode; la
         </div>
       )}
       {dialog && <Dialog key={dialog.options.title} request={dialog} cancelLabel={labels.cancel} onDone={closeDialog} />}
-      {toastMessage && <Toast key={toastMessage.id} message={toastMessage.message} />}
+      {toastMessage && (
+        <Toast key={toastMessage.id} message={toastMessage.message} action={toastMessage.action} onAction={() => setToastMessage(null)} />
+      )}
       <div className="sr-only" role="status">
         {announcement}
       </div>

@@ -26,6 +26,7 @@ import { DurationField, Stepper } from "./SetInputs";
 import { weightStep } from "./weightStep";
 import { CoachLine } from "./CoachLine";
 import { useInitialIds } from "../../ui/motion";
+import { useSwipe } from "../../ui/swipe";
 import { ReplaceSheet } from "./ReplaceSheet";
 
 export const ExerciseBlock = ({
@@ -51,7 +52,7 @@ export const ExerciseBlock = ({
 }) => {
   const app = useApp();
   const { t, data, actions, open, lang, exerciseName } = app;
-  const { startRest, celebrate, confirm } = useFeedback();
+  const { startRest, celebrate, confirm, toast } = useFeedback();
   const exercise = getExercise(data, entry.exerciseKey);
   const unit = data.settings.unit;
   const progression = suggestProgression(data, entry.exerciseKey, workout.id);
@@ -69,6 +70,15 @@ export const ExerciseBlock = ({
   const [justDone, setJustDone] = useState<string | null>(null);
   const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set());
   const initialSets = useInitialIds(entry.sets.map((x) => x.id));
+  // Collapsed cards can be swiped away to drop an exercise from today's
+  // workout; the toast offers to bring it back with its sets.
+  const swipe = useSwipe(() => {
+    actions.removeExercise(workout, entry.id);
+    toast(t(`Entfernt: ${exerciseName(exercise)}`, `Removed: ${exerciseName(exercise)}`), {
+      label: t("Rückgängig", "Undo"),
+      run: () => actions.restoreExercise(entry),
+    });
+  });
 
   const removeSet = (id: string) => {
     setLeaving((current) => new Set(current).add(id));
@@ -119,7 +129,11 @@ export const ExerciseBlock = ({
 
   if (!isOpen)
     return (
-      <section className={`card exercise-card collapsed ${finished ? "finished" : ""} ${added ? "entering" : ""}`}>
+      <section
+        className={`card exercise-card collapsed ${finished ? "finished" : ""} ${added ? "entering" : ""}`}
+        style={swipe.style}
+        {...swipe.handlers}
+      >
         {handle}
         <button className="exercise-row" onClick={onToggle} aria-expanded={false}>
           <span className="list-main">
