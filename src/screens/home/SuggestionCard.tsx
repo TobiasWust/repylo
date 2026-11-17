@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
 import { insightDismissDays } from "../../domain/insights";
-import { dismissDays, type Suggestion } from "../../domain/suggestions";
+import { dismissDays, homePauseDays, homePauseKey, type Suggestion } from "../../domain/suggestions";
 import { Icon } from "../../ui/components";
 import { Sticker } from "../../ui/stickers";
 import { cardColors, cardSticker, suggestionText, whyText } from "../../ui/suggestionText";
@@ -23,7 +23,10 @@ export const SuggestionCard = ({ suggestion }: { suggestion: Suggestion }) => {
   const dismiss = () => {
     setLeaving(true);
     setDx((d) => (d < 0 ? -500 : 500));
-    setTimeout(() => actions.dismiss(suggestion.key, suggestion.info ? insightDismissDays : dismissDays), 220);
+    setTimeout(() => {
+      actions.dismiss(suggestion.key, suggestion.info ? insightDismissDays : dismissDays);
+      actions.dismiss(homePauseKey, homePauseDays);
+    }, 220);
   };
 
   const accept = () => {

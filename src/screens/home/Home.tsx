@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { addDays, today, weekStart } from "../../domain/dates";
 import { getExercise } from "../../domain/model";
-import { computeSuggestions } from "../../domain/suggestions";
+import { computeSuggestions, homePauseKey } from "../../domain/suggestions";
 import { hasValue, majorMuscles, recentPrs, trainedDays, weekStreak } from "../../domain/stats";
 import { muscleRecovery } from "../../domain/recovery";
 import { InstallCard } from "../../ui/InstallCard";
@@ -29,7 +29,9 @@ export const Home = () => {
   // Recompute when data changes; "now" is fixed per render on purpose.
   // One suggestion at a time keeps the home screen calm; the most important comes first.
   // Coaching tips come one at a time after a workout (summary sheet), not here.
-  const suggestions = useMemo(() => computeSuggestions(data).slice(0, 1), [data]);
+  // After one is swiped away, the next waits a day instead of popping up at once.
+  const paused = (data.dismissedUntil.get(homePauseKey) ?? 0) > now;
+  const suggestions = useMemo(() => (paused ? [] : computeSuggestions(data).slice(0, 1)), [data, paused]);
   const days = useMemo(() => trainedDays(data), [data]);
   const dayPrs = useMemo(() => recentPrs(data, 30), [data]);
   const goal = data.settings.weeklyGoal;

@@ -48,6 +48,13 @@ export interface Suggestion {
 export const dismissDays = 4;
 
 /**
+ * After one suggestion is swiped away, the home screen stays quiet this long
+ * instead of showing the next one right away.
+ */
+export const homePauseKey = "home-pause";
+export const homePauseDays = 1;
+
+/**
  * Muscles trained hard (≥ 3 direct sets) today or yesterday. They need ~48 h,
  * so we don't suggest exercises that hit them as a primary mover.
  */
