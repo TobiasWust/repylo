@@ -184,7 +184,10 @@ export const ImprintSheet = ({ onClose }: { onClose: () => void }) => (
   </Sheet>
 );
 
-/** "Made with ❤️ by Wust" plus links to the privacy policy and imprint. */
+/** A plain link, not Ko-fi's widget, so nothing third-party loads until tapped. */
+export const KOFI_URL = "https://ko-fi.com/tobiaswust";
+
+/** "Made with ❤️ by Wust", the Ko-fi link and links to the privacy policy and imprint. */
 export const LegalFooter = () => {
   const [open, setOpen] = useState<"privacy" | "imprint" | null>(null);
   return (
@@ -194,6 +197,11 @@ export const LegalFooter = () => {
           Made with ❤️ by{" "}
           <a href="https://wust.dev/" target="_blank" rel="noopener noreferrer">
             Wust
+          </a>
+        </p>
+        <p>
+          <a href={KOFI_URL} target="_blank" rel="noopener noreferrer">
+            ☕ Buy me a coffee
           </a>
         </p>
         <p className="app-footer-legal">

@@ -5,6 +5,7 @@ import { computeSuggestions, homePauseKey } from "../../domain/suggestions";
 import { hasValue, majorMuscles, recentPrs, trainedDays, weekStreak } from "../../domain/stats";
 import { muscleRecovery } from "../../domain/recovery";
 import { InstallCard } from "../../ui/InstallCard";
+import { SupportCard } from "../../ui/SupportCard";
 import { PlanSheet } from "../../ui/PlanSheet";
 import { Icon } from "../../ui/components";
 import { Sticker } from "../../ui/stickers";
@@ -196,6 +197,7 @@ export const Home = () => {
       )}
 
       <InstallCard />
+      <SupportCard trainedDays={days.size} />
 
       {showReview && (
         <section className="card review-teaser">

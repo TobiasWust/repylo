@@ -204,6 +204,14 @@ const art = {
       <path d="M21 4h4l-4 4.5h4M26.5 10.5h3l-3 3.5h3" strokeWidth={1.6} />
     </>
   ),
+  coffee: (
+    <>
+      <path d="M23 15h2.5a3.5 3.5 0 0 1 0 7H22" fill="none" />
+      <path d="M5 12.5h18v8a7 7 0 0 1-7 7h-4a7 7 0 0 1-7-7z" fill={c.orange} />
+      <path d="M10.5 3.5q-1.4 2 0 3.6t0 3.4M16 3.5q-1.4 2 0 3.6t0 3.4" strokeWidth={1.6} />
+      <Face x={14} y={19.4} scale={0.75} />
+    </>
+  ),
 } satisfies Record<string, ReactNode>;
 
 export type StickerName = keyof typeof art;

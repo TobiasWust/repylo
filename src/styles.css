@@ -2191,6 +2191,13 @@ body:has(.overlay-screen) .rest-timer {
 .install-card {
   background: var(--sky);
 }
+.support-card {
+  background: var(--lavender);
+}
+a.button {
+  color: inherit;
+  text-decoration: none;
+}
 
 /* Heatmap day details: a speech bubble whose arrow points at the tapped column. */
 .day-bubble {
